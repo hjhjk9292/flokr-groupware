@@ -1,0 +1,285 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+        }
+        
+        body {
+            background-color: #f9fbfd;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .va-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 53, 97, 0.08);
+        }
+        
+        /* 문서 헤더 */
+        .va-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .va-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #003561;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        
+        /* 로고 */
+        .va-logo {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        /* 그룹 스타일 */
+        .va-group {
+            margin-bottom: 25px;
+        }
+        
+        .va-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 15px;
+        }
+        
+        .va-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8fafc;
+        }
+        
+        .va-textarea {
+            min-height: 120px;
+            resize: vertical;
+            background-color: #f8fafc;
+            line-height: 1.8;
+        }
+        
+        /* 기본 정보 */
+        .va-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* 체크 항목 */
+        .va-check-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .va-check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .va-check {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* 날짜 선택 */
+        .va-date-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .va-date-group input[type="date"] {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            width: 200px;
+        }
+        
+        /* 연차 정보 */
+        .va-annual-info {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            align-items: center;
+        }
+        
+        .va-annual-info input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* 결재선 */
+        .va-approval-section {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .va-approval-line {
+            margin-top: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #fff;
+            min-height: 100px;
+        }
+        
+        .va-empty-approval {
+            color: #94a3b8;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .va-approval-item {
+            display: flex;
+            align-items: center;
+            background-color: #f8fafc;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .va-approval-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #003561;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+        
+        .va-approval-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .va-approval-dept {
+            color: #64748b;
+            font-size: 13px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid #e2e8f0;
+        }
+        
+        .va-approval-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        /* 구분선 */
+        .va-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 30px 0;
+        }
+        
+        /* 버튼 스타일 */
+        .va-actions {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .va-btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .va-btn-outline {
+            background: none;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        
+        .va-btn-outline:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .va-btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+        
+        .va-btn-secondary:hover {
+            backgro
+            und-color: #5a6268;
+        }
+        
+        .va-btn-primary {
+            background-color: #003561;
+            color: white;
+            border: none;
+        }
+        
+        .va-btn-primary:hover {
+            background-color: #002d52;
+        }
+        
+        /* 첨부파일 영역 */
+        .va-attach-section {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .va-attach-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }

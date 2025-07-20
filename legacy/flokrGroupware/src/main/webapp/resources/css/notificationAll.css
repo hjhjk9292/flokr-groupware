@@ -1,0 +1,172 @@
+@charset "UTF-8";
+.notificationAll-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.notificationAll-title {
+  margin-bottom: 1.5rem;
+}
+
+.notificationAll-title h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.notificationAll-title p {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.notificationAll-item {
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  /* transition: all 0.2s ease; */
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e9ecef;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.notificationAll-list {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.notificationAll-item.unread {
+  background-color: #f0f5ff;
+}
+
+.notificationAll-item.unread::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 8px;
+  height: 8px;
+  background-color: #003561;
+  border-radius: 50%;
+}
+
+.notificationAll-item:hover {
+  background-color: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.notificationAll-item:active {
+  transform: scale(0.99);
+}
+
+.notificationAll-content h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.notificationAll-item.unread .notificationAll-content h3 {
+  font-weight: 700;
+  color: #002548;
+}
+
+.notificationAll-content p {
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.notificationAll-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 0.75rem;
+}
+
+.notificationAll-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.notificationAll-type.NOTICE {
+  background-color: #e3f2fd;
+  color: #0277bd;
+}
+
+.notificationAll-type.APPROVAL {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.notificationAll-type.TASK {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.notificationAll-type.CHAT {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.notificationAll-type.SCHEDULE {
+  background-color: #e8eaf6;
+  color: #3949ab;
+}
+
+.notificationAll-time {
+  font-size: 0.8rem;
+}
+
+.notificationAll-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  color: #64748b;
+}
+
+.notificationAll-empty i {
+  font-size: 3rem;
+  color: #e2e8f0;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* 페이지네이션 */
+.notificationAll-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 0.25rem;
+}
+
+.notificationAll-pagination a {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.notificationAll-pagination a:hover {
+  background-color: #f1f5f9;
+  color: #003561;
+}
+
+.notificationAll-pagination a.active {
+  background-color: #003561;
+  color: white;
+  border-color: #003561;
+}

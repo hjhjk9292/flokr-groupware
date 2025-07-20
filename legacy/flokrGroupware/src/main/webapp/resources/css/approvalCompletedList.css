@@ -1,0 +1,374 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .apcomplete-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .apcomplete-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .apcomplete-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .apcomplete-subtitle {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .apcomplete-count {
+            color: #003561;
+            font-weight: 600;
+        }
+        
+        .apcomplete-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .apcomplete-stat-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .apcomplete-stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .apcomplete-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        
+        .apcomplete-stat-approved {
+            color: #28a745;
+        }
+        
+        .apcomplete-stat-rejected {
+            color: #dc3545;
+        }
+        
+        .apcomplete-stat-avg {
+            color: #17a2b8;
+        }
+        
+        .apcomplete-stat-total {
+            color: #003561;
+        }
+        
+        /* 검색 폼 스타일 */
+        .apcomplete-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .apcomplete-search-form {
+		    display: flex;
+		    gap: 10px;
+		    align-items: center;
+		    width: 100%; /* 전체 너비 사용 */
+		}
+		
+		.apcomplete-date-range {
+		    display: flex;
+		    align-items: center;
+		    gap: 5px;
+		    white-space: nowrap; /* 날짜 필드가 줄바꿈되지 않도록 */
+		    width: auto; /* 날짜 범위는 내용에 맞는 너비만 사용 */
+		}
+		
+		.apcomplete-date-input {
+		    padding: 6px 10px;
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    font-size: 14px;
+		    width: 130px;
+		}
+		
+		.apcomplete-search-container {
+		    display: flex;
+		    flex: 1; /* 남은 공간 채우기 */
+		    gap: 10px;
+		    max-width: 500px; /* 검색 영역 최대 너비 제한 */
+		}
+		
+		.apcomplete-search-select {
+		    width: 120px;
+		    padding: 8px 12px;
+		    border: 1px solid #ddd;
+		    border-radius: 6px;
+		    font-size: 14px;
+		    background: white;
+		}
+		
+		.apcomplete-search-input {
+		    flex: 1; /* 검색 입력창이 남은 공간 채우도록 */
+		    min-width: 100px; /* 최소 너비 설정 */
+		    max-width: 250px; /* 최대 너비 제한 */
+		    padding: 8px 12px;
+		    border: 1px solid #ddd;
+		    border-radius: 6px;
+		    font-size: 14px;
+		}
+		
+		.apcomplete-search-btn {
+		    padding: 8px 16px;
+		    background: #003561;
+		    color: white;
+		    border: none;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    font-size: 14px;
+		    white-space: nowrap;
+		}
+		        
+        .apcomplete-filter-section {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .apcomplete-filter-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .apcomplete-filter-select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .apcomplete-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .apcomplete-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .apcomplete-table th,
+        .apcomplete-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .apcomplete-table th {
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        
+        .apcomplete-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .apcomplete-doc-title {
+            color: #003561;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .apcomplete-doc-title:hover {
+            text-decoration: underline;
+        }
+        
+        .apcomplete-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .apcomplete-status-approved {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .apcomplete-status-rejected {
+            background: #ffeaea;
+            color: #f44336;
+        }
+        
+        .apcomplete-drafter {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .apcomplete-drafter-name {
+            font-weight: 500;
+        }
+        
+        .apcomplete-drafter-dept {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .apcomplete-duration {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .apcomplete-fast {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .apcomplete-slow {
+            color: #dc3545;
+            font-weight: 500;
+        }
+        
+        .apcomplete-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        
+        .apcomplete-empty i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        
+        .apcomplete-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+        
+        .apcomplete-page-link {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #666;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .apcomplete-page-link:hover {
+            background: #f8f9fa;
+            border-color: #999;
+        }
+        
+        .apcomplete-page-link.active {
+            background: #003561;
+            color: white;
+            border-color: #003561;
+        }
+        
+        .apcomplete-page-link.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .apcomplete-page-info {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        /*처리 효율성 스타일*/
+        .apcomplete-stat-fast {
+	        color: #28a745; /* 녹색 */
+	    }
+	    .apcomplete-stat-normal {
+	        color: #17a2b8; /* 파란색 */
+	    }
+	    .apcomplete-stat-slow {
+	        color: #dc3545; /* 빨간색 */
+	    }
+	    .apcomplete-stat-percentage {
+	        font-size: 14px;
+	        margin-left: 4px;
+	    }
+	    
+	    /* 툴팁 스타일 */
+		.apcomplete-tooltip {
+		    position: relative;
+		    cursor: help;
+		}
+		
+		.apcomplete-tooltip .apcomplete-tooltip-text {
+		    visibility: hidden;
+		    width: 300px;
+		    background-color: #f8f9fa;
+		    color: #333;
+		    text-align: left;
+		    border-radius: 6px;
+		    padding: 10px;
+		    border: 1px solid #ddd;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    
+		    /* 위치 */
+		    position: absolute;
+		    z-index: 1;
+		    bottom: 125%;
+		    left: 50%;
+		    margin-left: -150px;
+		    
+		    /* 애니메이션 효과 */
+		    opacity: 0;
+		    transition: opacity 0.3s;
+		    
+		    /* 줄바꿈 허용 */
+		    white-space: normal;
+		    font-weight: normal;
+		    font-size: 12px;
+		    line-height: 1.5;
+		}
+		
+		/* 마우스 올렸을 때 툴팁 표시 */
+		.apcomplete-tooltip:hover .apcomplete-tooltip-text {
+		    visibility: visible;
+		    opacity: 1;
+		}

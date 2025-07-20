@@ -1,0 +1,247 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .aprequest-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .aprequest-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .aprequest-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .aprequest-subtitle {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .aprequest-count {
+            color: #003561;
+            font-weight: 600;
+        }
+        
+        .aprequest-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .aprequest-search-form {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .aprequest-search-select {
+            width: 120px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .aprequest-search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .aprequest-search-btn {
+            padding: 8px 16px;
+            background: #003561;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+           font-size: 14px;
+       }
+       
+       .aprequest-filter-section {
+           margin-top: 15px;
+           display: flex;
+           gap: 10px;
+           align-items: center;
+       }
+       
+       .aprequest-filter-label {
+           font-size: 14px;
+           color: #666;
+       }
+       
+       .aprequest-filter-select {
+           padding: 6px 10px;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           font-size: 13px;
+       }
+       
+       .aprequest-table-container {
+           background: white;
+           border-radius: 12px;
+           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+           overflow: hidden;
+       }
+       
+       .aprequest-table {
+           width: 100%;
+           border-collapse: collapse;
+           font-size: 14px;
+       }
+       
+       .aprequest-table th,
+       .aprequest-table td {
+           padding: 15px;
+           text-align: left;
+           border-bottom: 1px solid #f0f0f0;
+       }
+       
+       .aprequest-table th {
+           background: #f8f9fa;
+           color: #555;
+           font-weight: 600;
+           font-size: 13px;
+           text-transform: uppercase;
+       }
+       
+       .aprequest-table tr:hover {
+           background: #f8f9fa;
+       }
+       
+       .aprequest-doc-title {
+           color: #003561;
+           text-decoration: none;
+           font-weight: 500;
+       }
+       
+       .aprequest-doc-title:hover {
+           text-decoration: underline;
+       }
+       
+       .aprequest-status-badge {
+           padding: 4px 8px;
+           border-radius: 12px;
+           font-size: 12px;
+           font-weight: 500;
+           display: inline-block;
+       }
+       
+       .aprequest-status-requested {
+           background: #e8f4fd;
+           color: #2196f3;
+       }
+       
+       .aprequest-status-approved {
+           background: #e8f5e9;
+           color: #4caf50;
+       }
+       
+       .aprequest-status-rejected {
+           background: #ffeaea;
+           color: #f44336;
+       }
+       
+       .aprequest-progress {
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           font-size: 13px;
+           color: #666;
+       }
+       
+       .aprequest-progress-bar {
+           width: 80px;
+           height: 6px;
+           background: #e9ecef;
+           border-radius: 3px;
+           overflow: hidden;
+       }
+       
+       .aprequest-progress-fill {
+           height: 100%;
+           background: #2196f3;
+           border-radius: 3px;
+           transition: width 0.3s ease;
+       }
+       
+       .aprequest-empty {
+           text-align: center;
+           padding: 50px 20px;
+           color: #888;
+       }
+       
+       .aprequest-empty i {
+           font-size: 48px;
+           margin-bottom: 15px;
+           color: #ddd;
+       }
+       
+       .aprequest-pagination {
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           margin-top: 30px;
+           gap: 5px;
+       }
+       
+       .aprequest-page-link {
+           padding: 8px 12px;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           text-decoration: none;
+           color: #666;
+           background: white;
+           transition: all 0.2s;
+       }
+       
+       .aprequest-page-link:hover {
+           background: #f8f9fa;
+           border-color: #999;
+       }
+       
+       .aprequest-page-link.active {
+           background: #003561;
+           color: white;
+           border-color: #003561;
+       }
+       
+       .aprequest-page-link.disabled {
+           color: #ccc;
+           cursor: not-allowed;
+       }
+       
+       .aprequest-page-info {
+           color: #666;
+           font-size: 14px;
+           margin-top: 15px;
+           text-align: center;
+       }

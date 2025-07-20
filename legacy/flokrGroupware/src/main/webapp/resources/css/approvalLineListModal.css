@@ -1,0 +1,315 @@
+@charset "UTF-8";
+/* 스타일은 기존 코드 유지 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .apline-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .apline-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .apline-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .apline-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .apline-search-section {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+        }
+        
+        .apline-search-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .apline-search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .apline-search-btn {
+            padding: 8px 16px;
+            background: #003561;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .apline-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .apline-org-tree {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #eee;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .apline-dept-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .apline-dept-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .apline-dept-item.active {
+            background: #e8f4fd;
+            color: #003561;
+        }
+        
+        .apline-emp-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .apline-emp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .apline-emp-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .apline-emp-card:hover {
+            border-color: #003561;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .apline-emp-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .apline-emp-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #495057;
+        }
+        
+        .apline-emp-details {
+            flex: 1;
+        }
+        
+        .apline-emp-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .apline-emp-position {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .apline-recent-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .apline-recent-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .apline-recent-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .apline-recent-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #495057;
+        }
+        
+        .apline-recent-item:hover {
+            background: #e9ecef;
+        }
+        
+        .apline-action-bar {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .apline-selected-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .apline-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: white;
+            color: #666;
+        }
+        
+        .apline-btn-primary {
+            background: #003561;
+            color: white;
+            border-color: #003561;
+        }
+        
+        .apline-btn-primary:hover {
+            background: #002d52;
+        }
+        
+        .apline-no-recent {
+            color: #94a3b8;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+        }
+        
+        /* 부서 카테고리 스타일 */
+    .apline-dept-category {
+        margin-bottom: 5px;
+    }
+    
+    .apline-dept-header {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 14px;
+        position: relative;
+    }
+    
+    .apline-dept-header:hover {
+        background: #f8f9fa;
+    }
+    
+    .apline-dept-header span {
+        flex: 1;
+        margin-left: 8px;
+    }
+    
+    .dept-toggle-icon {
+        font-size: 12px;
+        transition: transform 0.2s;
+    }
+    
+    .dept-toggle-icon.active {
+        transform: rotate(180deg);
+    }
+    
+    .apline-dept-employees {
+        padding-left: 28px;
+    }
+    
+    .apline-dept-emp-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        margin: 3px 0;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    
+    .apline-dept-emp-item:hover {
+        background: #f1f5f9;
+    }
+    
+    .apline-emp-avatar-small {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #495057;
+        margin-right: 8px;
+    }
+    
+    .apline-emp-name-small {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .apline-emp-position-small {
+        font-size: 11px;
+        color: #777;
+        margin-left: 4px;
+    }

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="taskMapper">
+
+	<!-- 기존 resultMap들 -->
+	<resultMap id="taskResult" type="Task">
+		<result column="task_no" property="taskNo"/>
+		<result column="title" property="taskTitle"/>
+		<result column="task_content" property="taskContent"/>
+		<result column="category" property="category"/>
+		<result column="creator_emp_no" property="taskWriter"/>
+		<result column="due_date" property="dueDate"/>
+		<result column="create_date" property="createDate"/>
+		<result column="update_date" property="updateDate"/>
+		<result column="task_status" property="taskStatus"/>
+		<result column="emoji" property="emoji"/>
+	</resultMap>
+	
+	<resultMap id="AttachmentResult" type="Attachment">
+		<result column="attachment_no" property="attachmentNo"/>
+		<result column="ref_type" property="refType"/>
+		<result column="ref_no" property="refNo"/>
+		<result column="uploader_emp_no" property="uploaderEmpNo"/>
+		<result column="original_filename" property="originalFilename"/>
+		<result column="stored_filepath" property="storedFilepath"/>
+		<result column="file_extension" property="fileExtension"/>
+		<result column="upload_date" property="uploadDate"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	
+    <resultMap id="employeeResultMap" type="employee">
+        <result property="empNo" column="EMP_NO"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="empId" column="EMP_ID"/>
+        <result property="passwordHash" column="PASSWORD_HASH"/>
+        <result property="email" column="EMAIL"/>
+        <result property="phone" column="PHONE"/>
+        <result property="hireDate" column="HIRE_DATE"/>
+        <result property="profileImgPath" column="PROFILE_IMG_PATH"/>
+        <result property="signatureImgPath" column="SIGNATURE_IMG_PATH"/>
+        <result property="isAdmin" column="IS_ADMIN"/>
+        <result property="lastLoginDate" column="LAST_LOGIN_DATE"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+        <result property="status" column="STATUS"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="positionNo" column="POSITION_NO"/>
+        <result property="positionName" column="POSITION_NAME"/>
+    </resultMap>
+    
+    <!-- 새로 추가한 TaskAssignee ResultMap -->
+    <resultMap id="taskAssigneeResult" type="com.kh.flokrGroupware.task.model.vo.TaskAssignee">
+        <result property="taskAssigneeNo" column="TASK_ASSIGNEE_NO"/>
+        <result property="taskNo" column="TASK_NO"/>
+        <result property="assigneeEmpNo" column="ASSIGNEE_EMP_NO"/>
+        <result property="assignDate" column="ASSIGN_DATE"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="positionName" column="POSITION_NAME"/>
+        <result property="phone" column="PHONE"/>
+        <result property="email" column="EMAIL"/>
+    </resultMap>
+
+	<!-- 기존 쿼리들 -->
+	<select id="taskList" resultMap="taskResult">
+		select
+		       task_no
+		     , title
+		     , task_content
+		     , category
+		     , creator_emp_no
+		     , to_char(due_date, 'YYYY-MM-DD') as due_date
+		     , create_date
+		     , update_date
+		     , task_status
+		     , emoji
+		  from task
+		 where creator_emp_no = #{empNo}
+		 order
+		    by create_date desc
+	</select>
+
+	<insert id="taskInsert">
+		insert
+		  into task
+		  (
+		    task_no
+		  , title
+		  , task_content
+		  , category
+		  , creator_emp_no
+		  , due_date
+		  , emoji
+		  )
+		  values
+		  (
+		    seq_task.nextval
+		  , #{taskTitle}
+		  , #{taskContent}
+		  , #{category}
+		  , #{taskWriter}
+		  , #{dueDate}
+		  , #{emoji}
+		  )
+	</insert>
+	
+	<insert id="insertAttachment">
+		insert
+		  into attachment
+		  (
+		    attachment_no
+		  , ref_type
+		  , ref_no
+		  , uploader_emp_no
+		  , original_filename
+		  , stored_filepath
+		  , file_extension
+		  )
+		  values
+		  (
+		    seq_attachment.nextval
+		  , 'TASK'
+		  , seq_task.currval
+		  , #{uploaderEmpNo}
+		  , #{originalFilename}
+		  , #{storedFilepath}
+		  , #{fileExtension}
+		  )
+	</insert>
+	
+	<select id="taskDetail" resultMap="taskResult">
+		select
+		       task_no
+		     , title
+		     , task_content
+		     , category
+		     , creator_emp_no
+		     , to_char(due_date, 'YYYY-MM-DD') as due_date
+		     , create_date
+		     , update_date
+		     , task_status
+		     , emoji
+		  from task
+		 where task_no = #{taskNo}
+	</select>
+	
+	<select id="selectRecentTask" parameterType="Task" resultMap="taskResult">
+	    SELECT *
+	    FROM (
+	        SELECT *
+	        FROM TASK
+	        WHERE TITLE = #{taskTitle}
+	        AND TASK_CONTENT = #{taskContent}
+	        ORDER BY TASK_NO DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+	
+	<select id="getAttachment" resultMap="AttachmentResult">
+		select
+		       attachment_no
+		     , ref_type
+		     , ref_no
+		     , uploader_emp_no
+		     , original_filename
+		     , stored_filepath
+		     , file_extension
+		     , upload_date
+		     , status
+		  from attachment
+		 where ref_no = #{taskNo}
+		   and status = 'Y'
+		   and ref_type = 'TASK'
+	</select>
+	
+	<update id="attachmentDelete">
+		update attachment
+		   set status = 'N'
+		 where attachment_no = #{attachmentNo}
+	</update>
+	
+	<update id="taskUpdate">
+		update task
+		   set title = #{taskTitle}
+		     , task_content = #{taskContent}
+		     , category = #{category}
+		     , due_date = #{dueDate}
+		     , update_date = SYSDATE
+		     , task_status = #{taskStatus}
+		     , emoji = #{emoji}
+		 where task_no = #{taskNo}
+	</update>
+	
+	<insert id="newAttachment">
+		insert
+		  into attachment
+		  (
+		    attachment_no
+		  , ref_type
+		  , ref_no
+		  , uploader_emp_no
+		  , original_filename
+		  , stored_filepath
+		  , file_extension
+		  )
+		  values
+		  (
+		    seq_attachment.nextval
+		  , 'TASK'
+		  , #{refNo}
+		  , #{uploaderEmpNo}
+		  , #{originalFilename}
+		  , #{storedFilepath}
+		  , #{fileExtension}
+		  )
+	</insert>
+	
+	<select id="getAllEmployees" resultMap="employeeResultMap">
+		select
+		       emp_no
+		     , emp_name
+		     , emp_id
+		     , password_hash
+		     , email
+		     , phone
+		     , dept_no
+		     , position_no
+		     , hire_date
+		     , profile_img_path
+		     , signature_img_path
+		     , is_admin
+		     , last_login_date
+		     , e.create_date
+		     , update_date
+		     , e.status
+		     , dept_name
+		     , position_name
+		  from employee e
+		  join department d using (dept_no)
+		  join position p using (position_no)
+		 where e.status = 'Y'
+		   and emp_no != #{empNo}
+		   and is_admin = 'N'
+	</select>
+	
+	<!-- 새로 추가한 쿼리: 업무 담당자 등록 -->
+	<insert id="insertTaskAssignee" parameterType="com.kh.flokrGroupware.task.model.vo.TaskAssignee">
+		INSERT INTO task_assignee (
+			task_assignee_no,
+			task_no,
+			assignee_emp_no
+		) VALUES (
+			seq_task_assignee.nextval,
+			#{taskNo},
+			#{assigneeEmpNo}
+		)
+	</insert>
+	
+	<!-- 새로 추가한 쿼리: 업무의 담당자 목록 조회 -->
+	<select id="getTaskAssignees" parameterType="int" resultMap="taskAssigneeResult">
+		SELECT 
+		       task_assignee_no,
+		       task_no,
+		       assignee_emp_no,
+		       emp_name,
+		       dept_name,
+		       position_name,
+		       phone,
+		       email,
+		       to_char(assign_date, 'YYYY-MM-DD') as assign_date
+		  FROM task_assignee
+		  JOIN employee on (emp_no = assignee_emp_no)
+		  JOIN department using (dept_no)
+		  JOIN position using (position_no)
+		 WHERE task_no = #{taskNo}
+	</select>
+</mapper>

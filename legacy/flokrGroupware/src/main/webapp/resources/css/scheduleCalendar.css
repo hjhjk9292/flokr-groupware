@@ -1,0 +1,779 @@
+@charset "UTF-8";
+        /* 전체 레이아웃 */
+        .calendar-wrapper {
+            background-color: #f5f6f8;
+            margin-top: 0;
+        }
+        
+        /* body 태그의 마진 제거 */
+		body {
+		    margin: 0;
+		    padding: 0;
+		}
+        
+        .calendar-content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 캘린더 상단 컨트롤 영역 */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .calendar-navigation {
+            display: flex;
+            align-items: center;
+        }
+        
+        .calendar-nav-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #555;
+            padding: 0 10px;
+        }
+        
+        .calendar-today-button {
+            background-color: #f0f2f5;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        
+        .calendar-view-controls {
+            display: flex;
+            margin-left: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .calendar-view-button {
+            background-color: #fff;
+            border: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .calendar-view-button.active {
+            background-color: #003561;
+            color: #fff;
+        }
+        
+        /* 캘린더 메인 영역 */
+        .calendar-main-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        #calendar-main {
+            width: 100%;
+            min-height: 700px;
+        }
+        
+        /* FullCalendar 커스텀 스타일 */
+        .fc-theme-standard th {
+            padding: 10px 0;
+            font-weight: 500;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .fc-col-header-cell-cushion {
+            color: #333;
+            text-decoration: none !important;
+            width: 100%;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .fc-day-sun .fc-col-header-cell-cushion {
+            color: #ff3b30;
+        }
+        
+        .fc-day-sat .fc-col-header-cell-cushion {
+            color: #003561;
+        }
+        
+        /* 날짜 번호 스타일 및 위치 조정 */
+        .fc-daygrid-day-number {
+            display: inline-block;
+            padding: 3px 0;
+            color: #333;
+            text-decoration: none !important;
+            width: 100%;
+            text-align: left;
+            padding-left: 10px;
+            margin-top: 5px;
+        }
+        
+        .fc-day-sun .fc-daygrid-day-number {
+            color: #ff3b30;
+        }
+        
+        .fc-day-sat .fc-daygrid-day-number {
+            color: #003561;
+        }
+        
+        .fc-theme-standard td, .fc-theme-standard th {
+            border: 1px solid #e9e9e9;
+        }
+        
+        .fc .fc-daygrid-day-top {
+            justify-content: flex-start;
+            flex-direction: row;
+        }
+        
+        /* 이벤트 스타일 */
+        .fc-event {
+            border: none;
+            border-radius: 0;
+            padding: 3px 5px;
+            margin-bottom: 2px;
+            font-size: 12px;
+            margin-left: 4px;
+            font-weight: normal;
+        }
+        
+        /* 일정 유형별 스타일 */
+		.calendar-personal-event {
+		    background-color: rgba(219, 234, 254, 0.8);
+		    color: #003561 ;
+		    border-left: 3px solid #003561 ;
+		    border-radius: 4px; /*둥글게*/
+		    padding: 1px 5px;
+		    transition: all 0.2s ease;
+		}
+		
+		.calendar-personal-event:hover {
+		    background-color: rgba(219, 234, 254, 0.9);
+		    box-shadow: 0 1px 3px rgba(0, 53, 97, 0.3);
+		    transform: translateY(-1px);
+		    cursor: pointer;
+		}
+
+		.calendar-personal-event *:hover{
+			background-color: rgba(219, 234, 254, 0.9);
+			border-radius: 3px;
+		}		
+		
+		.calendar-team-event {
+		    background-color: rgba(209, 250, 229, 0.8);
+		    color: #27ae60;
+		    border-left: 3px solid #27ae60;
+		    border-radius: 4px; /*둥글게*/
+		    padding: 1px 5px;
+		    transition: all 0.2s ease;
+		}
+		
+		.calendar-team-event:hover {
+			background-color: rgba(209, 250, 229, 0.9);
+			box-shadow: 0 1px 3px rgba(0, 53, 97, 0.3);
+			transform: translateY(-1px);
+		    cursor: pointer
+		}
+		
+		.calendar-team-event *:hover {
+			background-color: rgba(209, 250, 229, 0.9);
+			border-radius: 3px;
+		}
+		
+		.calendar-company-event {
+		    background-color: rgba(255, 237, 213, 0.8);
+		    color: #f39c12;
+		    border-left: 3px solid #f39c12;
+		    border-radius: 4px; /*둥글게*/
+		    padding: 1px 5px;
+		    transition: all 0.2s ease;
+		}
+		
+		.calendar-company-event:hover {
+			background-color: rgba(255, 237, 213, 0.9);
+			box-shadow: 0 1px 3px rgba(0, 53, 97, 0.3);
+		    transform: translateY(-1px);
+		    cursor: pointer;		
+		}
+		
+		.calendar-company-event *:hover{
+			background-color: rgba(255, 237, 213, 0.9);
+			border-radius: 3px;
+		}
+		
+		.calendar-other-event {
+		    background-color: rgba(237, 233, 254, 0.8);
+		    color: #8e44ad;
+		    border-left: 3px solid #8e44ad;
+		    border-radius: 4px; /*둥글게*/
+		    padding: 1px 5px;
+		    transition: all 0.2s ease;
+		}
+		
+		.calendar-other-event:hover{
+			background-color: rgba(237, 233, 254, 0.9);
+			box-shadow: 0 1px 3px rgba(0, 53, 97, 0.3);
+		    transform: translateY(-1px);
+		    cursor: pointer;
+		}
+		
+		.calendar-other-event *:hover{
+			background-color: rgba(237, 233, 254, 0.9);
+			border-radius: 3px;
+		}
+		
+		/* CSS에 추가: 일정 세로줄 겹침 방지 */
+		.fc-daygrid-event-harness {
+		    margin-top: 1px;
+		    box-sizing: border-box;
+		    border-left: none !important; /* 강제로 왼쪽 테두리 제거 */
+		}
+		
+        /* 오늘 날짜 스타일 */
+        .fc .fc-daygrid-day.fc-day-today {
+            background-color: inherit;
+        }
+        
+        /* 날짜 선택 스타일 */
+        .fc-day-selected {
+            background-color: #dbebfb !important;
+        }
+        
+        /* 날짜 선택 동그라미 스타일 */
+		.date-circle {
+		    width: 36px;
+		    height: 36px;
+		    background-color: #003561;
+		    color: white !important;
+		    border-radius: 50%;
+		    display: inline-flex !important;
+		    justify-content: center;
+		    align-items: center;
+		    font-weight: bold;
+		    text-align: center;
+		}
+		
+        
+        /* 요일 행 스타일 */
+        .fc-col-header {
+            background-color: #f8f9fa;
+        }
+        
+        /* 선택된 날짜 스타일 */
+        .fc-day-selected .fc-daygrid-day-number {
+            font-weight: bold;
+        }
+        
+		.fc-day-selected .fc-daygrid-day-number.date-circle {
+		    padding: 0 !important;
+		    margin: 5px 0 0 5px !important;
+		    width: 35px !important;
+		    height: 35px !important;
+		    text-align: center !important;
+		}
+        
+        /* 날짜 그리드 높이 조정 */
+        .fc-daygrid-body .fc-daygrid-day {
+            min-height: 100px;
+        }
+        
+        /* 날짜 셀 높이 증가 */
+		.fc-daygrid-day {
+		    height: 130px !important; /* 원하는 높이로 조정 */
+		}
+        
+        /* 날짜 번호 크기 및 위치 조정 */
+        .fc-daygrid-day-number {
+            font-size: 14px;
+            padding: 5px 0 0 10px;
+        }
+        
+        /* 달력 헤더 버튼 스타일링 */
+        .calendar-header h4 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        /* 오늘 날짜 표시 */
+        .fc-day-today .fc-daygrid-day-number {
+            font-weight: bold;
+        }
+        
+        /* 일정 높이 조정 */
+        .fc-daygrid-event-harness {
+            margin-top: 1px;
+        }
+        
+       /* 월/연도 선택기 스타일 */
+		#month-year-picker {
+		    background-color: #fff;
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+		    padding: 10px;
+		    z-index: 1000;
+		}
+		
+		#calendar-current-month-year {
+		    cursor: pointer;
+		}
+		
+		#calendar-current-month-year:hover {
+		    color: #003561;
+		    text-decoration: underline;
+		} 
+		
+		 /* ★★★ 일정 상세 모달 스타일 ★★★ */
+        .schedule-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .schedule-modal.active {
+            display: flex;
+        }
+        
+        .schedule-modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            
+            overflow: hidden;
+        }
+        
+        .schedule-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #eaedf0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+        }
+        
+        .schedule-modal-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .schedule-modal-title-icon {
+            color: #003561;
+            display: flex;
+            align-items: center;
+        }
+        
+        .schedule-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            line-height: 1;
+        }
+        
+        .schedule-modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+        
+        .schedule-modal-btn-header {
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .schedule-modal-btn-edit {
+            background-color: #f1f5f9;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+        
+        .schedule-modal-btn-delete {
+            background-color: #003561;
+            color: white;
+            border-color: #003561;
+        }
+        
+        .schedule-modal-btn-edit:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .schedule-modal-btn-delete:hover {
+            background-color: #002a4a;
+        }
+        
+        .schedule-modal-btn-header svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .schedule-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .schedule-detail-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .schedule-detail-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .schedule-detail-title-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .schedule-detail-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.4;
+        }
+        
+        /* 중요도 스타일 */
+        .schedule-detail-important {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .schedule-detail-important.low {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
+        
+        .schedule-detail-important.normal {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        
+        .schedule-detail-important.high {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .schedule-detail-section {
+            margin-bottom: 14px;
+        }
+        
+        .schedule-detail-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 4px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        .schedule-detail-value {
+            font-size: 15px;
+            color: #334155;
+            line-height: 1.5;
+        }
+        
+        /* 작성자 정보 스타일 */
+		.schedule-detail-date {
+		    font-size: 0.85em;
+		    color: #6c757d;
+		    margin-left: 8px;
+		}
+		
+		/* 현재 로그인 사용자 표시 스타일 */
+		.schedule-detail-current-user {
+		    font-size: 0.9em;
+		    color: #0d6efd;
+		    font-weight: bold;
+		    margin-left: 4px;
+		}
+        
+        /* 일정 유형 스타일 */
+        .schedule-detail-type {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .schedule-detail-type.personal {
+            background-color: rgba(0, 53, 97, 0.08);
+            color: #003561;
+        }
+        
+        .schedule-detail-type.team {
+            background-color: rgba(22, 163, 74, 0.08);
+            color: #16a34a;
+        }
+        
+        .schedule-detail-type.company {
+            background-color: rgba(234, 88, 12, 0.08);
+            color: #ea580c;
+        }
+        
+        .schedule-detail-type.other {
+            background-color: rgba(126, 34, 206, 0.08);
+            color: #7e22ce;
+        }
+        
+        .schedule-detail-attendee-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .schedule-detail-attendee-item {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .schedule-detail-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 4px 0;
+        }
+        
+        .schedule-detail-description {
+            background-color: #f8fafc;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.6;
+            /*white-space: pre-wrap;*/
+            min-height: 60px;
+        }
+        
+        .schedule-modal-footer {
+            padding: 13px 20px;
+            border-top: 1px solid #eaedf0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            background-color: #f9fafb;
+        }
+        
+        .schedule-modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .schedule-modal-btn-back {
+            background-color: #fff;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+        
+        .schedule-modal-btn-back:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .schedule-modal-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .schedule-detail-empty {
+            color: #94a3b8;
+            font-style: italic;
+        }
+        
+        /* ★★★ 날짜별 일정 목록 모달 스타일 (추가) ★★★ */
+        .date-schedules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .date-schedule-item {
+            border-radius: 6px;
+            padding: 12px;
+            background-color: #f8fafc;
+            border-left: 4px solid #003561;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        
+        .date-schedule-item:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        
+        .date-schedule-item.type-personal {
+            border-left-color: #003561;
+        }
+        
+        .date-schedule-item.type-team {
+            border-left-color: #27ae60;
+        }
+        
+        .date-schedule-item.type-company {
+            border-left-color: #f39c12;
+        }
+        
+        .date-schedule-item.type-other {
+            border-left-color: #8e44ad;
+        }
+        
+        .date-schedule-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 5px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+        }
+        
+        .date-schedule-importance {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            display: inline-block;
+        }
+        
+        .date-schedule-importance.high {
+            background-color: #ef4444;
+        }
+        
+        .date-schedule-importance.normal {
+            background-color: #10b981;
+        }
+        
+        .date-schedule-importance.low {
+            background-color: #3b82f6;
+        }
+        
+        .date-schedule-time {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        
+        .date-schedule-location {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .date-schedule-type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        
+        .date-schedule-type-badge.personal {
+            background-color: rgba(0, 53, 97, 0.1);
+            color: #003561;
+        }
+        
+        .date-schedule-type-badge.team {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        
+        .date-schedule-type-badge.company {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+        
+        .date-schedule-type-badge.other {
+            background-color: rgba(142, 68, 173, 0.1);
+            color: #8e44ad;
+        }
+        
+        .no-schedules-message {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 15px;
+        }
+        
+        .schedule-modal-btn-add {
+            background-color: #003561;
+            color: white;
+            margin-right: auto;
+        }
+        
+        .schedule-modal-btn-add:hover {
+            background-color: #002a4a;
+        }
+		
+

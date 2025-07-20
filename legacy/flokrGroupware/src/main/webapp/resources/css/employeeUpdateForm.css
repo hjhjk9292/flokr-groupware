@@ -1,0 +1,52 @@
+@charset "UTF-8";
+.update-form {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.profile-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.phone-group {
+    display: flex;
+    align-items: center;
+}
+
+.phone-input {
+    width: 100px;
+}
+
+.phone-separator {
+    margin: 0 10px;
+}
+
+.action-buttons {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.required-mark {
+    color: red;
+    margin-left: 3px;
+}

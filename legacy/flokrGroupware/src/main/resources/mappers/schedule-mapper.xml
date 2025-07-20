@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="scheduleMapper">
+
+	<!-- ResultMaps -->
+    <resultMap id="employeeResultMap" type="Employee">
+        <id property="empNo" column="EMP_NO"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="positionNo" column="POSITION_NO"/>
+        <result property="positionName" column="POSITION_NAME"/>
+        <result property="status" column="STATUS"/>        
+    </resultMap>
+    
+    <!-- Schedule 결과 매핑 -->
+    <resultMap id="scheduleResultMap" type="Schedule">
+    	<id property="scheduleNo" column="SCHEDULE_NO"/>
+    	<result property="createEmpNo" column="CREATE_EMP_NO"/>
+    	<result property="scheduleTitle" column="SCHEDULE_TITLE"/>
+    	<result property="description" column="DESCRIPTION"/>
+    	<result property="startDate" column="START_DATE"/>
+    	<result property="endDate" column="END_DATE"/>
+    	<result property="location" column="LOCATION"/>
+    	<result property="important" column="IMPORTANT"/>
+    	<result property="scheduleType" column="SCHEDULE_TYPE"/>
+    	<result property="createDate" column="CREATE_DATE"/>
+    	<result property="updateDate" column="UPDATE_DATE"/>
+    	<result property="status" column="STATUS"/>
+    	<result property="empName" column="EMP_NAME"/>
+    </resultMap>
+    
+    <!-- ScheduleAttendee 결과 매핑 -->
+    <resultMap id="attendeeResultMap" type="ScheduleAttendee" >
+    	<id property="attendeeNo" column="ATTENDEE_NO" />
+    	<result property="scheduleNo" column="SCHEDULE_NO" />
+    	<result property="empNo" column="EMP_NO" />
+    	<result property="responseStatus" column="RESPONSE_STATUS" />
+    	<result property="notificationSent" column="NOTIFICATION_SENT" />
+    	<result property="status" column="STATUS" />
+    	<result property="empName" column="EMP_NAME" />
+    	<result property="deptName" column="DEPT_NAME" />    
+    </resultMap>
+    
+
+	<!-- 직원 목록 조회 (참석자 선택용) 등록자 제외 -->
+    <select id="selectEmployeeList" resultMap="employeeResultMap">
+        SELECT 
+            E.EMP_NO,
+            E.EMP_NAME,
+            E.DEPT_NO,
+            D.DEPT_NAME,
+            P.POSITION_NO,
+            P.POSITION_NAME
+        FROM 
+            EMPLOYEE E
+        JOIN 
+            DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+        JOIN
+            POSITION P ON E.POSITION_NO = P.POSITION_NO
+        WHERE 
+            E.STATUS = 'Y'
+            AND E.EMP_NO != #{loginUserNo}
+        ORDER BY 
+            D.DEPT_NAME, P.POSITION_NO DESC, E.EMP_NAME
+    </select>
+    
+    
+    <!-- 일정 등록 (생성된 키 반환) 
+    	keyProperty: scheduleNo - 생성된 일정 번호가 저장될 객체의 속성명
+        resultType: int - CURRVAL 조회 결과 타입
+    -->
+    <insert id="insertSchedule" parameterType="Schedule">
+        INSERT INTO SCHEDULE (
+            SCHEDULE_NO,
+            CREATE_EMP_NO,
+            SCHEDULE_TITLE,
+            DESCRIPTION,
+            START_DATE,
+            END_DATE,
+            LOCATION,
+            IMPORTANT,
+            SCHEDULE_TYPE,
+            CREATE_DATE,
+            UPDATE_DATE,
+            STATUS
+        ) VALUES (
+            SEQ_SCHEDULE.NEXTVAL,
+            #{createEmpNo},
+            #{scheduleTitle},
+            #{description},
+            #{startDate},
+            #{endDate},
+            #{location},
+            #{important},
+            #{scheduleType},
+            SYSDATE,
+            SYSDATE,
+            'Y'
+        )
+        <selectKey keyProperty="scheduleNo" resultType="int" order="AFTER">
+            SELECT SEQ_SCHEDULE.CURRVAL FROM DUAL
+        </selectKey>
+    </insert>
+    
+    <!-- 일정 참석자 등록 -->
+    <insert id="insertScheduleAttendee" parameterType="ScheduleAttendee">
+        INSERT INTO SCHEDULE_ATTENDEE (
+            ATTENDEE_NO,
+            SCHEDULE_NO,
+            EMP_NO,
+            RESPONSE_STATUS,
+            NOTIFICATION_SENT,
+            STATUS
+        ) VALUES (
+            SEQ_SCHEDULE_ATTENDEE.NEXTVAL,
+            #{scheduleNo},
+            #{empNo},
+            #{responseStatus},
+            #{notificationSent},
+            'Y'
+        )
+    </insert>
+    
+    <!-- 일정 상세 조회 -->
+    <select id="selectSchedule" parameterType="_int" resultMap="scheduleResultMap">
+    	select 
+    	       s.schedule_no
+    	     , s.create_emp_no
+	         , s.schedule_title
+	         , s.description
+	         , s.start_date
+	         , s.end_date
+	         , s.location
+	         , s.important
+	         , s.schedule_type
+	         , s.create_date
+	         , s.update_date
+	         , s.status	         
+    		 , e.emp_name
+    	  from schedule s
+    	  join employee e on (s.create_emp_no = e.emp_no)
+    	 where s.schedule_no = #{scheduleNo}
+    	   and s.status = 'Y'
+    </select>
+    
+    <!-- 일정 참석자 목록 조회 -->
+    <select id="selectAttendees" parameterType="_int" resultMap="attendeeResultMap">
+    	select 
+    	       a.attendee_no
+    	     , a.schedule_no
+    	     , a.emp_no
+    	     , response_status
+    	     , notification_sent
+    	     , a.status
+    	     , e.emp_name
+    	     , d.dept_name
+    	  from schedule_attendee a
+    	  join employee e on (a.emp_no = e.emp_no)
+    	  join department d on (e.dept_no = d.dept_no)
+    	 where a.schedule_no = #{scheduleNo}
+    	   and e.status = 'Y'
+    	   and a.status = 'Y'
+      order by e.emp_name
+    </select>
+    
+    <!-- 모든 유형의 일정 조회 (개인, 팀, 회사, 기타) -->
+    <select id="selectAllTypeSchedules" parameterType="map" resultMap="scheduleResultMap">
+    	select 
+    	       s.schedule_no
+    	     , s.create_emp_no
+	         , s.schedule_title
+	         , s.description
+	         , s.start_date
+	         , s.end_date
+	         , s.location
+	         , s.important
+	         , s.schedule_type
+	         , s.create_date
+	         , s.update_date
+	         , s.status	
+    	     , e.emp_name
+    	  from schedule s
+    	  join employee e on (s.create_emp_no = e.emp_no)
+     left join (
+		          select distinct schedule_no 
+		          from schedule_attendee 
+		          where emp_no = #{empNo} and status = 'Y'
+		      ) a on (s.schedule_no = a.schedule_no)
+    	 where (
+	    	 	(s.schedule_type = 'PERSONAL' and s.create_emp_no = #{empNo})
+	    	 	or (s.schedule_type = 'TEAM' and e.dept_no = #{deptNo})
+	    	 	or s.schedule_type = 'COMPANY'
+	    	 	or (s.schedule_type = 'OTHER' and (s.create_emp_no = #{empNo} or a.schedule_no is not null))
+    	        )
+    	   and s.start_date between to_date(substr(#{start}, 1, 10), 'YYYY-MM-DD') and to_date(substr(#{end}, 1, 10), 'YYYY-MM-DD')
+    	   and s.status = 'Y'
+    	 order by s.start_date
+    </select>
+    
+    <!-- 특정 날짜의 일정 목록을 조회 -->
+    <select id="selectDaySchedules" parameterType="map" resultMap="scheduleResultMap">
+    	select
+    	        s.schedule_no
+    	      , s.create_emp_no
+    	      , s.schedule_title
+    	      , s.description
+    	      , s.start_date
+    	      , s.end_date
+    	      , s.location
+    	      , s.important
+    	      , s.schedule_type
+    	      , s.create_date
+    	      , s.update_date
+    	      , s.status
+    	      , e.emp_name
+    	  from schedule s
+    	  join employee e on (s.create_emp_no = e.emp_no)
+     left join (
+		          select distinct schedule_no 
+		          from schedule_attendee 
+		          where emp_no = #{empNo} and status = 'Y'
+		      ) a on (s.schedule_no = a.schedule_no)
+         where (
+	        <!-- 개인 일정 - 생성자만 볼 수 있음 -->
+	        (s.schedule_type = 'PERSONAL' and s.create_emp_no = #{empNo})
+	        <!-- 팀 일정 - 같은 부서 직원만 볼 수 있음 -->
+	        or (s.schedule_type = 'TEAM' and e.dept_no = #{deptNo})
+	        <!-- 회사 일정 - 모든 직원이 볼 수 있음 -->
+	        or (s.schedule_type = 'COMPANY')
+	        <!-- 기타 일정 - 생성자이거나 참석자인 경우만 볼 수 있음 -->
+	        or (s.schedule_type = 'OTHER' and (s.create_emp_no = #{empNo} or a.schedule_no is not null))
+	    		)
+           and (
+           	   (to_char(s.start_date, 'YYYY-MM-DD') = #{date})
+           	   or
+           	   (to_char(s.end_date, 'YYYY-MM-DD') = #{date})
+           	   or           
+           	   (s.start_date &lt;= to_date(#{date}, 'YYYY-MM-DD') and s.end_date &gt;= to_date(#{date}, 'YYYY-MM-DD'))
+                )  
+           and s.status = 'Y'
+         order by s.start_date         
+    </select>
+    
+    <!-- 일정 정보 업데이트 -->
+    <update id="updateSchedule" parameterType="Schedule">
+    	update schedule
+    	   set 
+    	       schedule_title = #{scheduleTitle},
+    	       description = #{description},
+    	       start_date = #{startDate},
+    	       end_date = #{endDate},
+    	       location = #{location},
+    	       important = #{important},
+    	       schedule_type = #{scheduleType},
+    	       update_date = sysdate
+    	 where schedule_no = #{scheduleNo}
+    	   and status = 'Y'    	       
+    </update>
+    
+    <!-- 일정의 모든 참석자 삭제 (활성상태 Y => N) -->
+    <update id="deleteScheduleAttendees" parameterType="_int">
+    	update schedule_attendee
+    	   set status = 'N'
+    	 where schedule_no = #{scheduleNo}
+    	   and status = 'Y'
+    </update>
+    
+    <!-- 일정-참석자 조합이 이미 존재하는지 확인 -->
+    <select id="checkExistingAttendee" parameterType="ScheduleAttendee" resultMap="attendeeResultMap">
+    	select
+    	        attendee_no
+    	      , schedule_no
+    	      , emp_no
+    	      , response_status
+    	      , notification_sent
+    	      , status
+    	  from schedule_attendee
+    	 where schedule_no = #{scheduleNo}
+    	   and emp_no = #{empNo}  
+    </select>
+    
+    <!-- 비활성화된 참석자 정보 다시 활성화 -->
+	<update id="reactivateScheduleAttendee" parameterType="ScheduleAttendee">
+		update schedule_attendee
+		   set response_status = #{responseStatus},
+		       status = 'Y'
+		 where attendee_no = #{attendeeNo}		      
+	</update>
+	
+	<!-- 일정 삭제 (활성상태 Y => N) -->
+	<update id="deleteSchedule" parameterType="_int">
+		update schedule
+		   set status = 'N',
+		update_date = sysdate
+	     where schedule_no = #{scheduleNo}
+	       and status = 'Y'	
+	</update>
+
+
+</mapper>

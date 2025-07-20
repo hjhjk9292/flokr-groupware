@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="organizationMapper">
+
+    <resultMap id="departmentResultMap" type="department">
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+    
+    <resultMap id="employeeResultMap" type="employee">
+        <result property="empNo" column="EMP_NO"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="empId" column="EMP_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="phone" column="PHONE"/>
+        <result property="hireDate" column="HIRE_DATE"/>
+        <result property="profileImgPath" column="PROFILE_IMG_PATH"/>
+        <result property="signatureImgPath" column="SIGNATURE_IMG_PATH"/>
+        <result property="isAdmin" column="IS_ADMIN"/>
+        <result property="lastLoginDate" column="LAST_LOGIN_DATE"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+        <result property="status" column="STATUS"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="positionNo" column="POSITION_NO"/>
+        <result property="positionName" column="POSITION_NAME"/>
+    </resultMap>
+
+    <!-- 부서 목록 조회 -->
+    <select id="selectDepartmentList" resultMap="departmentResultMap">
+        SELECT *
+        FROM DEPARTMENT
+        WHERE STATUS = 'Y'
+        ORDER BY DEPT_NO
+    </select>
+    
+    <!-- 부서 정보 조회 -->
+    <select id="selectDepartment" parameterType="int" resultMap="departmentResultMap">
+        SELECT *
+        FROM DEPARTMENT
+        WHERE DEPT_NO = #{deptNo}
+        AND STATUS = 'Y'
+    </select>
+    
+    <!-- 부서 등록 -->
+    <insert id="insertDepartment" parameterType="department">
+        INSERT INTO DEPARTMENT(
+            DEPT_NO,
+            DEPT_NAME,
+            CREATE_DATE,
+            STATUS
+        ) VALUES (
+            SEQ_DEPARTMENT.NEXTVAL,
+            #{deptName},
+            SYSDATE,
+            'Y'
+        )
+    </insert>
+    
+    <!-- 부서 정보 수정 -->
+    <update id="updateDepartment" parameterType="department">
+        UPDATE DEPARTMENT
+        SET
+            DEPT_NAME = #{deptName}
+        WHERE
+            DEPT_NO = #{deptNo}
+    </update>
+    
+    <!-- 부서 삭제 (상태 변경) -->
+    <update id="deleteDepartment" parameterType="int">
+        UPDATE DEPARTMENT
+        SET
+            STATUS = 'N'
+        WHERE
+            DEPT_NO = #{deptNo}
+    </update>
+    
+    <!-- 부서별 직원 목록 조회 -->
+    <select id="selectEmployeesByDept" parameterType="int" resultMap="employeeResultMap">
+        SELECT
+            E.EMP_NO, E.EMP_NAME, E.EMP_ID, E.EMAIL, E.PHONE,
+            E.PROFILE_IMG_PATH, E.SIGNATURE_IMG_PATH, E.HIRE_DATE,
+            E.IS_ADMIN, E.LAST_LOGIN_DATE,
+            E.CREATE_DATE, E.UPDATE_DATE, E.STATUS,
+            E.DEPT_NO, D.DEPT_NAME,
+            E.POSITION_NO, P.POSITION_NAME
+        FROM
+            EMPLOYEE E
+        LEFT JOIN
+            DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+        LEFT JOIN
+            POSITION P ON E.POSITION_NO = P.POSITION_NO
+        WHERE
+            E.DEPT_NO = #{deptNo}
+            AND E.STATUS = 'Y'
+        ORDER BY
+            P.POSITION_NO, E.EMP_NAME
+    </select>
+</mapper>

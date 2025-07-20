@@ -1,0 +1,512 @@
+@charset "UTF-8";
+    	/* body 태그의 마진 제거 */
+		body {
+		    margin: 0;
+		    padding: 0;
+		}
+		
+        /* 일정 등록 페이지 깔끔한 스타일 */
+        .sc-enroll-container {
+            max-width: 720px;
+            margin: 24px auto;
+            padding: 0;
+        }
+
+        .sc-enroll-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #eaedf0;
+        }
+
+        .sc-enroll-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eaedf0;
+            background-color: #f9fafb;
+        }
+
+        .sc-enroll-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sc-enroll-title svg {
+            color: #003561;
+            width: 20px;
+            height: 20px;
+        }
+
+        .sc-enroll-body {
+            padding: 24px;
+        }
+
+        .sc-enroll-notice {
+            display: flex;
+            align-items: flex-start;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            gap: 12px;
+        }
+
+        .sc-enroll-notice-icon {
+            color: #003561;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .sc-enroll-notice-text {
+        	margin-top: 2px;
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .sc-enroll-group {
+            margin-bottom: 20px;
+        }
+
+        .sc-enroll-label {
+            display: block;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .sc-enroll-label.required::after {
+            content: '*';
+            color: #dc2626;
+            margin-left: 4px;
+        }
+
+        .sc-enroll-input, .sc-enroll-select, .sc-enroll-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1e293b;
+            transition: all 0.2s;
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        .sc-enroll-input:focus, .sc-enroll-select:focus, .sc-enroll-textarea:focus {
+            border-color: #003561;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+        }
+
+        .sc-enroll-textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .sc-enroll-fields-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .sc-enroll-field-half {
+            flex: 1;
+            position: relative;
+        }
+
+        .sc-enroll-date-wrapper, .sc-enroll-time-wrapper {
+            position: relative;
+        }
+
+        .sc-enroll-date-icon, .sc-enroll-time-icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 36px;
+            height: 36px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            z-index: 1;
+        }
+
+        .sc-enroll-input[type="date"], .sc-enroll-input[type="time"] {
+            position: relative;
+        }
+
+        /* 브라우저 기본 아이콘 클릭 영역 확장을 위한 투명 오버레이 */
+        .sc-enroll-date-input-overlay, .sc-enroll-time-input-overlay {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .sc-enroll-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin: 0 0 16px 0;
+        }
+
+        .sc-enroll-checkbox {
+            margin-right: 8px;
+            accent-color: #003561;
+        }
+
+        .sc-enroll-checkbox-label {
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .sc-enroll-type-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+
+        /* 라디오 버튼 그룹 공통 스타일 (일정 유형, 중요도) */
+        .sc-enroll-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sc-enroll-radio-item {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sc-enroll-radio-input { /* 실제 라디오 버튼 숨김 */
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .sc-enroll-radio-label { /* 라디오 버튼 라벨 기본 스타일 */
+            display: flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+            background-color: #fff;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        /* 선택된 라디오 버튼 라벨 스타일 (공통) */
+        .sc-enroll-radio-input:checked + .sc-enroll-radio-label {
+            border-color: #003561;
+            background-color: #003561; /* 배경색 채우기 */
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .sc-enroll-color-group { /* 일정 유형 */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sc-enroll-color-item {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sc-enroll-color-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .sc-enroll-color-label {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .sc-enroll-color-input:checked + .sc-enroll-color-label {
+            box-shadow: 0 0 0 2px currentColor;
+            font-weight: 500;
+        }
+
+        .sc-enroll-color-blue { background-color: rgba(0, 53, 97, 0.08); color: #003561; }
+        .sc-enroll-color-green { background-color: rgba(22, 163, 74, 0.08); color: #16a34a; }
+        .sc-enroll-color-orange { background-color: rgba(234, 88, 12, 0.08); color: #ea580c; }
+        .sc-enroll-color-purple { background-color: rgba(126, 34, 206, 0.08); color: #7e22ce; }
+
+        .sc-enroll-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #eaedf0;
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .sc-enroll-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .sc-enroll-btn-cancel {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background-color: #fff;
+            color: #475569;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sc-enroll-btn-submit {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            background-color: #003561;
+            color: white;
+            font-weight: 500;
+        }
+
+        .sc-enroll-btn-cancel:hover {
+            background-color: #f1f5f9;
+            text-decoration: none;
+            color: #1e293b;
+        }
+
+        .sc-enroll-btn-submit:hover {
+            background-color: #002a4a;
+        }
+
+        /* 시간 필드 토글 시 애니메이션 효과 */
+        .sc-enroll-time-fields {
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin-bottom 0.3s ease, padding-top 0.3s ease;
+            padding-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .sc-enroll-time-fields.hidden {
+            max-height: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            overflow: hidden;
+        }
+        
+        /* --- 참석자 선택 모달 관련 스타일 --- */
+        .attendee-modal-overlay {
+            display: none; /* 초기에는 숨김 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+            z-index: 1000; /* 다른 요소 위에 표시 */
+            justify-content: center;
+            align-items: center;
+        }
+        .attendee-modal-overlay.active {
+            display: flex; /* 활성화 시 표시 */
+        }
+
+        .attendee-modal-content {
+            background-color: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 450px; /* 모달 최대 너비 */
+            max-height: 80vh; /* 모달 최대 높이 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendee-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaedf0;
+        }
+        .attendee-modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .attendee-modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0;
+        }
+
+        .attendee-search-input { /* 모달 내 검색창 */
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+        .attendee-search-input:focus {
+             border-color: #003561;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+        }
+
+        .attendee-modal-list { /* 모달 내 참석자 목록 */
+            flex-grow: 1; /* 남은 공간 채우기 */
+            overflow-y: auto; /* 스크롤 */
+            margin-bottom: 16px;
+            border: 1px solid #eaedf0;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .attendee-modal-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 0; /* 위아래 여백 */
+        }
+         .attendee-modal-item:not(:last-child) {
+             border-bottom: 1px solid #f1f5f9; /* 구분선 */
+         }
+
+        .attendee-modal-checkbox {
+            margin-right: 10px;
+            accent-color: #003561;
+            flex-shrink: 0;
+        }
+
+        .attendee-modal-label {
+            font-size: 14px;
+            color: #334155;
+            cursor: pointer;
+            display: flex; /* 이름과 부서/직책 정렬 */
+            flex-direction: column; /* 세로 정렬 */
+        }
+        .attendee-modal-label .name {
+             font-weight: 500;
+        }
+        .attendee-modal-label .details {
+             font-size: 12px;
+             color: #64748b;
+        }
+
+
+        .attendee-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #eaedf0;
+        }
+
+        .attendee-modal-btn { /* 모달 버튼 공통 */
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+        }
+        .attendee-modal-btn-cancel {
+            background-color: #fff;
+            color: #475569;
+        }
+        .attendee-modal-btn-confirm {
+            background-color: #003561;
+            color: white;
+            border-color: #003561;
+        }
+        .attendee-modal-btn-cancel:hover {
+            background-color: #f1f5f9;
+        }
+        .attendee-modal-btn-confirm:hover {
+            background-color: #002a4a;
+        }
+
+        /* 폼에 선택된 참석자 표시 영역 */
+        .selected-attendees-display {
+            min-height: 38px; /* 입력 필드와 높이 유사하게 */
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 9px 12px;
+            background-color: #f8fafc; /* 약간 다른 배경 */
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            flex-wrap: wrap; /* 이름 길면 줄바꿈 */
+            gap: 6px; /* 이름 태그 간 간격 */
+            cursor: default; /* 클릭 불가 표시 */
+        }
+        .selected-attendees-display.empty {
+             color: #94a3b8; /* 안내 문구 색상 */
+        }
+        .attendee-tag { /* 선택된 참석자 이름 태그 */
+            background-color: #e0e7ff; /* 연한 파란색 배경 */
+            color: #3730a3; /* 진한 파란색 텍스트 */
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* 참석자 선택 버튼 */
+        .btn-select-attendee {
+            padding: 9px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #003561;
+            background-color: #fff;
+            color: #003561;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-top: 8px; /* 위 요소와 간격 */
+            display: inline-flex; /* 아이콘과 텍스트 정렬 */
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-select-attendee:hover {
+            background-color: rgba(0, 53, 97, 0.05);
+        }
+        .btn-select-attendee svg {
+             width: 16px;
+             height: 16px;
+        }
+        /* --- 참석자 선택 모달 관련 스타일 끝 --- */

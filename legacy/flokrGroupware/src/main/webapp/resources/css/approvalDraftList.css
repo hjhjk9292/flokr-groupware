@@ -1,0 +1,245 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .apdraft-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .apdraft-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .apdraft-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .apdraft-subtitle {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .apdraft-count {
+            color: #003561;
+            font-weight: 600;
+        }
+        
+        .apdraft-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .apdraft-search-form {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .apdraft-search-select {
+            width: 120px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .apdraft-search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .apdraft-search-btn {
+            padding: 8px 16px;
+            background: #003561;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        
+        .apdraft-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .apdraft-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .apdraft-table th,
+        .apdraft-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .apdraft-table th {
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        
+        .apdraft-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .apdraft-doc-title {
+            color: #003561;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .apdraft-doc-title:hover {
+            text-decoration: underline;
+        }
+        
+        .apdraft-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .apdraft-status-draft {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .apdraft-actions-cell {
+            text-align: center;
+        }
+        
+        .apdraft-action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin: 0 5px;
+        }
+        
+        .apdraft-action-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .apdraft-action-edit {
+            color: #17a2b8;
+        }
+        
+        .apdraft-action-delete {
+            color: #dc3545;
+        }
+        
+        .apdraft-action-edit:hover {
+            background: #e8f7f9;
+            color: #138496;
+        }
+        
+        .apdraft-action-delete:hover {
+            background: #f8d7da;
+            color: #c82333;
+        }
+        
+        /* 추가된 결재요청 버튼 스타일 */
+        .apdraft-action-submit {
+            color: #28a745;
+        }
+        
+        .apdraft-action-submit:hover {
+            background: #e8f5e9;
+            color: #218838;
+        }
+        
+        .apdraft-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        
+        .apdraft-empty i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        
+        .apdraft-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+        
+        .apdraft-page-link {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #666;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .apdraft-page-link:hover {
+            background: #f8f9fa;
+            border-color: #999;
+        }
+        
+        .apdraft-page-link.active {
+            background: #003561;
+            color: white;
+            border-color: #003561;
+        }
+        
+        .apdraft-page-link.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .apdraft-page-info {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+        }

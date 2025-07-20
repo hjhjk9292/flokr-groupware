@@ -1,0 +1,346 @@
+@charset "UTF-8";
+
+* {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 헤더 스타일 */
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: #003561;
+}
+
+.header-logo-img {
+    height: 50px;
+    margin-right: 5px;
+}
+
+.header-right-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 네비게이션 바 스타일 */
+.header-nav-bar {
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 20px;
+}
+
+.header-nav-container {
+    display: flex;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #444;
+    text-decoration: none !important;
+    font-size: 14px;
+}
+
+.header-nav-item:hover {
+    color: #003561;
+}
+
+.header-nav-item.header-active {
+    color: #003561;
+    font-weight: 500;
+}
+
+.header-nav-icon {
+    margin-right: 5px;
+}
+
+/* 검색 바 스타일 */
+.header-search-container {
+    margin-left: auto;
+    position: relative;
+}
+
+.header-search-bar {
+    padding: 8px 12px;
+    padding-right: 35px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    width: 200px;
+    font-size: 14px;
+}
+
+.header-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+}
+
+/* 프로필 스타일 */
+.header-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.header-profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header-profile-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+}
+
+.header-profile-name {
+    font-weight: 500;
+    color: #444;
+}
+
+/* 아이콘 스타일 */
+.header-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* 배지 스타일 */
+.header-icon-badge {
+    position: relative;
+}
+
+.header-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff3b30;
+    color: white;
+    font-size: 10px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.header-btn-sm {
+    background-color: #003561;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+.header-btn-sm:hover {
+    background-color: #002b4e;
+}
+
+.header-btn-sm.header-logout-btn {
+    margin-left: 10px;
+}
+
+/* 알림 드롭다운 */
+.header-notification-wrapper {
+    position: relative;
+}
+
+.header-notification-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    padding: 8px; /**/
+}
+
+.header-notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1000;
+}
+
+.header-notification-dropdown.header-show {
+    display: block !important;
+    z-index: 9999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.header-notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-notification-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.header-all-notifications {
+    color: #003561;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.header-notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.header-notification-item {
+    padding: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.header-notification-item.header-new {
+    background-color: #f0f5ff;
+    position: relative;
+}
+
+.header-notification-item.header-new::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  background-color: #003561;
+  border-radius: 50%;
+}
+
+.header-notification-item.header-new .header-notification-title {
+  font-weight: 600;
+  color: #003561;
+}
+
+.header-notification-link {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.header-notification-title {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.header-notification-content {
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #666;
+}
+
+.header-notification-time {
+    font-size: 12px;
+    color: #777;
+}
+
+.header-empty-notification {
+    padding: 15px;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+}
+
+/* 토스트 알림 */
+.header-notification-toast {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    background-color: #003561 !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 5px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+    max-width: 300px !important;
+    z-index: 9999 !important;
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    transition: opacity 0.3s, transform 0.3s !important;
+}
+
+.header-notification-toast.header-show {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.header-notification-badge {
+    position: absolute;
+    top: 4px;
+    right: -1px;
+    background-color: #ff4757;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.header-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #0d6efd; /* 파란색 계열 (채팅과 연관) */
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: bold; /* 굵게 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-sizing: border-box;
+    z-index: 1; /* 아이콘 위에 오도록 z-index 설정 */
+}

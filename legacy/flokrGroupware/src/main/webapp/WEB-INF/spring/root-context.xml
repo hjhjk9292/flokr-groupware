@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:cache="http://www.springframework.org/schema/cache"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="
+	       http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+	       http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+	       http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+	       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 개발환경용 설정 파일 (로컬에서 개발 및 테스트 시 사용, Redis 프로파일 처리) dev/deploy-->
+	<context:property-placeholder location="classpath:application.properties,
+											classpath:application-${spring.profiles.active:deploy}.properties" 
+								  ignore-unresolvable="true" ignore-resource-not-found="true" />
+								  
+	<!-- 
+	운영환경용 설정 파일 (WAR 파일로 배포 시 사용)
+	배포 전에 아래 주석을 해제하고 위의 개발용 설정은 주석 처리할 것
+	<context:property-placeholder location="classpath:application-prod.properties,
+                                       classpath:application-${spring.profiles.active:deploy}.properties" 
+                             ignore-unresolvable="true" ignore-resource-not-found="true" /> -->
+
+	<!-- 2. DB 커넥션 설정: 값은 .properties에서 불러오기 -->
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource" destroy-method="close">
+		<property name="driverClassName" value="${db.driver}" />
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.password}" />
+	</bean>
+
+	<!-- 3. MyBatis 연결 -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- 4. 파일 업로드 관련 설정 -->
+	<bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver">
+		<property name="maxUploadSize" value="100000000" />
+		<property name="maxInMemorySize" value="100000000" />
+	</bean>
+	
+	<!-- 5. Redis 관련 설정 -->
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="${redis.host}" />
+        <property name="port" value="${redis.port}" />
+        <property name="password" value="${redis.password}" />
+        <property name="usePool" value="true" />
+    </bean>
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory" />
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer">
+             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+        <property name="hashKeySerializer">
+             <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="hashValueSerializer">
+             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+    </bean>
+
+    <bean id="ttl30Minutes" class="java.time.Duration" factory-method="ofMinutes">
+        <constructor-arg value="30"/>
+    </bean>
+
+    <bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+
+    <bean id="jdkSerializer" class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+
+    <bean id="keySerializationPair" class="org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair" factory-method="fromSerializer">
+        <constructor-arg ref="stringSerializer"/>
+    </bean>
+
+    <bean id="valueSerializationPair" class="org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair" factory-method="fromSerializer">
+        <constructor-arg ref="jdkSerializer"/>
+    </bean>
+
+    <bean id="baseRedisConfig" class="org.springframework.data.redis.cache.RedisCacheConfiguration" factory-method="defaultCacheConfig"/>
+
+    <bean id="configWithTtl" factory-bean="baseRedisConfig" factory-method="entryTtl">
+        <constructor-arg ref="ttl30Minutes"/>
+    </bean>
+
+    <bean id="configWithKeySerializer" factory-bean="configWithTtl" factory-method="serializeKeysWith">
+        <constructor-arg ref="keySerializationPair"/>
+    </bean>
+
+    <bean id="redisCacheConfiguration" factory-bean="configWithKeySerializer" factory-method="serializeValuesWith">
+	    <constructor-arg ref="valueSerializationPair"/>
+	</bean>
+
+    <bean id="redisCacheWriter" class="org.springframework.data.redis.cache.RedisCacheWriter" factory-method="nonLockingRedisCacheWriter">
+        <constructor-arg ref="jedisConnectionFactory" />
+    </bean>
+
+    <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
+        <constructor-arg name="cacheWriter" ref="redisCacheWriter" />
+        <constructor-arg name="defaultCacheConfiguration" ref="redisCacheConfiguration" /> </bean>
+	
+	<!-- AOP 설정 추가 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <!-- 캐시 어노테이션 활성화 -->
+	<cache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
+    
+    <context:component-scan base-package="com.kh.flokrGroupware">
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>    
+    	
+	<!-- Elasticsearch 클라이언트 빈 등록 -->
+	<bean id="elasticsearchClient" class="org.elasticsearch.client.RestHighLevelClient" factory-bean="elasticsearchClientFactory" factory-method="createClient" />
+	
+	<!-- 클라이언트 생성용 Factory 빈 등록 -->
+	<bean id="elasticsearchClientFactory" class="com.kh.flokrGroupware.common.ElasticsearchClientFactory" />
+	
+
+</beans>

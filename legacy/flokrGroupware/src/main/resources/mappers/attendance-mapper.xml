@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="attendanceMapper">
+
+	<resultMap id="attendanceResult" type="Attendance">
+		<result column="attendance_no" property="attendanceNo"/>
+		<result column="emp_no" property="empNo"/>
+		<result column="attendance_date" property="attendanceDate" javaType="java.sql.Date"/>
+		<result column="clock_in_time" property="clockInTime" javaType="java.sql.Timestamp"/>
+		<result column="clock_out_time" property="clockOutTime" javaType="java.sql.Timestamp"/>
+		<result column="att_status" property="attStatus"/>
+	</resultMap>
+	
+	<select id="getTodayAttendance" resultMap="attendanceResult">
+	  SELECT * FROM ATTENDANCE
+	  WHERE EMP_NO = #{empNo}
+	  AND TRUNC(ATTENDANCE_DATE) = TRUNC(SYSDATE)
+	</select>
+	
+	<insert id="insertTodayAttendance" parameterType="Attendance">
+	  INSERT INTO ATTENDANCE (ATTENDANCE_NO, EMP_NO, ATTENDANCE_DATE)
+	  VALUES (SEQ_ATTENDANCE.NEXTVAL, #{empNo}, #{attendanceDate}) <!-- ✅ Fix -->
+	</insert>
+
+	
+	<update id="updateClockIn">
+	    UPDATE ATTENDANCE
+	    SET CLOCK_IN_TIME = #{clockInTime},
+	        ATT_STATUS = #{attStatus}
+	    WHERE EMP_NO = #{empNo}
+	    AND TRUNC(ATTENDANCE_DATE) = TRUNC(SYSDATE)
+	</update>
+
+	
+	<update id="updateClockOut">
+	  UPDATE ATTENDANCE
+	  SET CLOCK_OUT_TIME = #{clockOutTime},
+	      ATT_STATUS = 'LEAVE'
+	  WHERE EMP_NO = #{empNo}
+	  AND TRUNC(ATTENDANCE_DATE) = TRUNC(SYSDATE)
+	</update>
+	
+	<select id="getAttendancesBetween" parameterType="attendance" resultMap="attendanceResult">
+	  SELECT *
+	  FROM ATTENDANCE
+	  WHERE EMP_NO = #{empNo}
+	    AND TRUNC(ATTENDANCE_DATE) BETWEEN TRUNC(#{startDate}) AND TRUNC(#{endDate})
+	  ORDER BY ATTENDANCE_DATE
+	</select>
+
+
+</mapper>

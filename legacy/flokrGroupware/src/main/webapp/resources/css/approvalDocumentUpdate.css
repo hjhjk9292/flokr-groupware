@@ -1,0 +1,311 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .apupdate-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .apupdate-form {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+        
+        .apupdate-header {
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .apupdate-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .apupdate-doc-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .apupdate-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .apupdate-status-rejected {
+            background: #ffeaea;
+            color: #f44336;
+        }
+        
+        .apupdate-section {
+            margin-bottom: 30px;
+        }
+        
+        .apupdate-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .apupdate-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .apupdate-label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .apupdate-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .apupdate-input:focus {
+            outline: none;
+            border-color: #003561;
+            box-shadow: 0 0 0 2px rgba(0,53,97,0.1);
+        }
+        
+        .apupdate-line-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .apupdate-line-list {
+            display: flex;
+            gap: 10px;
+            min-height: 60px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .apupdate-empty-line {
+            color: #999;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .apupdate-line-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .apupdate-line-order {
+            font-size: 12px;
+            background: #003561;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .apupdate-line-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .apupdate-line-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .apupdate-line-dept {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .apupdate-remove-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .apupdate-add-line-btn {
+            background: #003561;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .apupdate-content-editor {
+            margin-bottom: 30px;
+        }
+        
+        .apupdate-attachment {
+            margin-bottom: 30px;
+        }
+        
+        .apupdate-file-input {
+            display: none;
+        }
+        
+        .apupdate-file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .apupdate-file-upload:hover {
+            border-color: #003561;
+            background-color: #f8f9fa;
+        }
+        
+        .apupdate-file-upload.dragover {
+            border-color: #003561;
+            background-color: #e8f4fd;
+        }
+        
+        .apupdate-current-file {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .apupdate-file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .apupdate-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 15px 0;
+            z-index: 10;
+        }
+        
+        .apupdate-action-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .apupdate-info {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .apupdate-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .apupdate-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .apupdate-btn-primary {
+            background-color: #003561;
+            color: white;
+        }
+        
+        .apupdate-btn-primary:hover {
+            background-color: #002d52;
+        }
+        
+        .apupdate-btn-secondary {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .apupdate-btn-secondary:hover {
+            background-color: #218838;
+        }
+        
+        .apupdate-btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        
+        .apupdate-btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* 문서 내용 편집 필드 스타일 */
+        .doc-content-field {
+            min-height: 46px;
+            height: auto;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        /* placeholder 스타일 */
+        .placeholder {
+            color: #aaa;
+        }

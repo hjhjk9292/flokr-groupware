@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="employeeMapper">
+
+    <resultMap id="employeeResultMap" type="employee">
+        <result property="empNo" column="EMP_NO"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="empId" column="EMP_ID"/>
+        <result property="passwordHash" column="PASSWORD_HASH"/>
+        <result property="email" column="EMAIL"/>
+        <result property="phone" column="PHONE"/>
+        <result property="hireDate" column="HIRE_DATE"/>
+        <result property="profileImgPath" column="PROFILE_IMG_PATH"/>
+        <result property="signatureImgPath" column="SIGNATURE_IMG_PATH"/>
+        <result property="isAdmin" column="IS_ADMIN"/>
+        <result property="lastLoginDate" column="LAST_LOGIN_DATE"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+        <result property="status" column="STATUS"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="positionNo" column="POSITION_NO"/>
+        <result property="positionName" column="POSITION_NAME"/>
+    </resultMap>
+
+    <resultMap id="departmentResultMap" type="department">
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+    <resultMap id="positionResultMap" type="position">
+        <result property="positionNo" column="POSITION_NO"/>
+        <result property="positionName" column="POSITION_NAME"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+	<select id="loginEmployee" parameterType="employee" resultMap="employeeResultMap">
+	    SELECT
+	        E.EMP_NO, E.EMP_NAME, E.EMP_ID, E.PASSWORD_HASH, E.EMAIL, E.PHONE,
+	        E.HIRE_DATE, E.PROFILE_IMG_PATH, E.SIGNATURE_IMG_PATH, E.IS_ADMIN,
+	        E.LAST_LOGIN_DATE, E.CREATE_DATE, E.UPDATE_DATE, E.STATUS,
+	        E.DEPT_NO, D.DEPT_NAME,
+	        E.POSITION_NO, P.POSITION_NAME
+	    FROM
+	        EMPLOYEE E
+	    LEFT JOIN
+	        DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN
+	        POSITION P ON E.POSITION_NO = P.POSITION_NO
+	    WHERE
+	        E.EMP_ID = #{empId}
+	        AND E.STATUS = 'Y'
+	</select>
+
+    <select id="selectDepartmentList" resultMap="departmentResultMap">
+        SELECT *
+        FROM DEPARTMENT
+        WHERE STATUS = 'Y'
+        ORDER BY DEPT_NO
+    </select>
+
+    <select id="selectPositionList" resultMap="positionResultMap">
+        SELECT *
+        FROM POSITION
+        WHERE STATUS = 'Y'
+        ORDER BY POSITION_NO
+    </select>
+
+    <insert id="insertEmployee" parameterType="employee">
+        INSERT INTO EMPLOYEE(
+            EMP_NO, EMP_NAME, EMP_ID, PASSWORD_HASH, EMAIL, PHONE,
+            DEPT_NO, POSITION_NO, HIRE_DATE, IS_ADMIN, STATUS
+        )
+        VALUES(
+            SEQ_EMPLOYEE.NEXTVAL, #{empName}, #{empId}, #{passwordHash}, #{email}, #{phone},
+            #{deptNo}, #{positionNo}, #{hireDate}, #{isAdmin, jdbcType=VARCHAR}, 'Y'
+        )
+    </insert>
+
+    <select id="getLastEmployeeId" parameterType="map" resultType="string">
+        SELECT EMP_ID
+        FROM (
+            SELECT EMP_ID
+            FROM EMPLOYEE
+            WHERE DEPT_NO = #{deptNo}
+            AND EMP_ID LIKE #{deptNo} || #{yearPrefix} || '%'
+            ORDER BY EMP_ID DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+	<!-- 사원 목록 조회 쿼리 (페이징 처리) -->
+	<select id="selectEmployeeList" parameterType="map" resultMap="employeeResultMap">
+	    SELECT *
+	    FROM (
+	        SELECT
+	            ROWNUM RNUM,
+	            A.*
+	        FROM (
+	            SELECT
+	                E.EMP_NO, E.EMP_NAME, E.EMP_ID, E.EMAIL, E.PHONE,
+	                E.PROFILE_IMG_PATH, E.SIGNATURE_IMG_PATH, E.HIRE_DATE,
+	                E.IS_ADMIN, E.LAST_LOGIN_DATE,
+	                E.CREATE_DATE, E.UPDATE_DATE, E.STATUS,
+	                E.DEPT_NO, D.DEPT_NAME,
+	                E.POSITION_NO, P.POSITION_NAME
+	            FROM
+	                EMPLOYEE E
+	            LEFT JOIN
+	                DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+	            LEFT JOIN
+	                POSITION P ON E.POSITION_NO = P.POSITION_NO
+	            <where>
+	                <if test="employee.empId != null and employee.empId != ''">
+	                    AND E.EMP_ID LIKE '%' || #{employee.empId} || '%'
+	                </if>
+	                <if test="employee.empName != null and employee.empName != ''">
+	                    AND E.EMP_NAME LIKE '%' || #{employee.empName} || '%'
+	                </if>
+	                <if test="employee.email != null and employee.email != ''">
+	                    AND E.EMAIL LIKE '%' || #{employee.email} || '%'
+	                </if>
+	                <if test="employee.deptNo != null and employee.deptNo > 0">
+	                    AND E.DEPT_NO = #{employee.deptNo}
+	                </if>
+	                <if test="employee.status != null and employee.status != ''">
+	                    AND E.STATUS = #{employee.status}
+	                </if>
+	            </where>
+	            ORDER BY E.EMP_NO DESC ) A
+	    )
+	    WHERE RNUM BETWEEN #{pi.startRow} AND #{pi.endRow}
+	</select>
+
+	<!-- 검색 조건에 맞는 총 사원 수 조회 쿼리 -->
+	<select id="getEmployeeCount" parameterType="employee" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        EMPLOYEE E
+	    LEFT JOIN
+	        DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN
+	        POSITION P ON E.POSITION_NO = P.POSITION_NO
+	    <where>
+	        <if test="empId != null and empId != ''">
+	            E.EMP_ID LIKE '%' || #{empId} || '%'
+	        </if>
+	        <if test="empName != null and empName != ''">
+	            AND E.EMP_NAME LIKE '%' || #{empName} || '%'
+	        </if>
+	        <if test="email != null and email != ''">
+	            AND E.EMAIL LIKE '%' || #{email} || '%'
+	        </if>
+	        <if test="deptNo != null and deptNo > 0">
+	            AND E.DEPT_NO = #{deptNo}
+	        </if>
+	        <if test="status != null and status != ''">
+	            AND E.STATUS = #{status}
+	        </if>
+	    </where>
+	</select>
+
+    <select id="selectEmployee" parameterType="int" resultMap="employeeResultMap">
+        SELECT
+            E.EMP_NO, E.EMP_NAME, E.EMP_ID, E.EMAIL, E.PHONE,
+            E.PROFILE_IMG_PATH, E.SIGNATURE_IMG_PATH, E.HIRE_DATE,
+            E.IS_ADMIN, E.LAST_LOGIN_DATE,
+            E.CREATE_DATE, E.UPDATE_DATE, E.STATUS,
+            E.DEPT_NO, D.DEPT_NAME,
+            E.POSITION_NO, P.POSITION_NAME
+        FROM
+            EMPLOYEE E
+        LEFT JOIN
+            DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+        LEFT JOIN
+            POSITION P ON E.POSITION_NO = P.POSITION_NO
+        WHERE
+            E.EMP_NO = #{empNo}
+            AND E.STATUS = 'Y' </select>
+
+    <update id="updateEmployee" parameterType="employee">
+        UPDATE EMPLOYEE
+        SET
+            EMP_NAME = #{empName},
+            EMAIL = #{email},
+            PHONE = #{phone},
+            DEPT_NO = #{deptNo},
+            POSITION_NO = #{positionNo},
+            IS_ADMIN = #{isAdmin, jdbcType=VARCHAR},
+            STATUS = #{status, jdbcType=VARCHAR},
+	        HIRE_DATE = #{hireDate},
+	        UPDATE_DATE = SYSDATE
+            WHERE
+            EMP_NO = #{empNo}
+    </update>
+
+    <update id="deleteEmployee" parameterType="int">
+        UPDATE EMPLOYEE
+        SET
+            STATUS = 'N',
+            UPDATE_DATE = SYSDATE
+        WHERE
+            EMP_NO = #{empNo}
+    </update>
+    
+    <!-- 비밀번호 초기화 -->
+	<update id="resetPassword" parameterType="map">
+	    UPDATE EMPLOYEE
+	    SET 
+	        PASSWORD_HASH = #{passwordHash},
+	        UPDATE_DATE = SYSDATE
+	    WHERE 
+	        EMP_NO = #{empNo}
+	</update>
+	
+	<select id="searchEmployee" parameterType="string" resultType="hashmap">
+	    SELECT 
+	        E.EMP_NO as empNo,
+	        E.EMP_NAME as empName,
+	        E.EMP_ID as empId,
+	        D.DEPT_NAME as deptName,
+	        P.POSITION_NAME as positionName
+	    FROM EMPLOYEE E
+	    JOIN DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+	    JOIN POSITION P ON E.POSITION_NO = P.POSITION_NO
+	    WHERE 
+	        E.STATUS = 'Y'
+	        AND (
+	            E.EMP_NAME LIKE '%' || #{keyword} || '%'
+	            OR E.EMP_ID LIKE '%' || #{keyword} || '%'
+	            OR D.DEPT_NAME LIKE '%' || #{keyword} || '%'
+	        )
+	    ORDER BY E.EMP_NAME
+	</select>
+	
+	<select id="findAllActiveEmployeesWithDeptAndPosition" resultMap="employeeResultMap">
+        SELECT
+            E.EMP_NO, E.EMP_NAME, E.EMP_ID, E.EMAIL, E.PHONE,
+            E.PROFILE_IMG_PATH, E.SIGNATURE_IMG_PATH, E.HIRE_DATE,
+            E.IS_ADMIN, E.LAST_LOGIN_DATE,
+            E.CREATE_DATE, E.UPDATE_DATE, E.STATUS,
+            E.DEPT_NO, D.DEPT_NAME,
+            E.POSITION_NO, P.POSITION_NAME
+        FROM
+            EMPLOYEE E
+        LEFT JOIN
+            DEPARTMENT D ON E.DEPT_NO = D.DEPT_NO
+        LEFT JOIN
+            POSITION P ON E.POSITION_NO = P.POSITION_NO
+        WHERE
+            E.STATUS = 'Y'
+        ORDER BY
+            D.DEPT_NO, E.EMP_NAME
+    </select>
+</mapper>

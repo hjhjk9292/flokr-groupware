@@ -1,0 +1,259 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background-color: #f9fbfd;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .rwf-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 53, 97, 0.08);
+        }
+        
+        /* 문서 헤더 */
+        .rwf-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .rwf-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #003561;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        
+        /* 로고 */
+        .rwf-logo {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        /* 기본 정보 */
+        .rwf-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* 폼 그룹 */
+        .rwf-group {
+            margin-bottom: 25px;
+        }
+        
+        .rwf-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 15px;
+        }
+        
+        .rwf-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8fafc;
+        }
+        
+        .rwf-textarea {
+            min-height: 120px;
+            resize: vertical;
+            background-color: #f8fafc;
+            line-height: 1.8;
+        }
+        
+        /* 체크 그룹 */
+        .rwf-check-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .rwf-check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rwf-check {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* 날짜 선택 */
+        .rwf-date-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .rwf-date-group input[type="date"] {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            width: 200px;
+        }
+        
+        /* 결재선 */
+        .rwf-approval-section {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .rwf-approval-line {
+            margin-top: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #fff;
+            min-height: 100px;
+        }
+        
+        .rwf-empty-approval {
+            color: #94a3b8;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .rwf-approval-item {
+            display: flex;
+            align-items: center;
+            background-color: #f8fafc;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .rwf-approval-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #003561;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+        
+        .rwf-approval-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .rwf-approval-dept {
+            color: #64748b;
+            font-size: 13px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid #e2e8f0;
+        }
+        
+        .rwf-approval-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        /* 구분선 */
+        .rwf-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 30px 0;
+        }
+        
+        /* 버튼 스타일 */
+        .rwf-actions {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .rwf-btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .rwf-btn-outline {
+            background: none;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        
+        .rwf-btn-outline:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .rwf-btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+        
+        .rwf-btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .rwf-btn-primary {
+            background-color: #003561;
+            color: white;
+            border: none;
+        }
+        
+        .rwf-btn-primary:hover {
+            background-color: #002d52;
+        }
+        
+        /* 첨부파일 영역 */
+        .rwf-attach-section {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .rwf-attach-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }

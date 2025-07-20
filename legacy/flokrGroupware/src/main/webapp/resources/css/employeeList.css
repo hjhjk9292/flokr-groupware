@@ -1,0 +1,160 @@
+@charset "UTF-8";
+body {
+    background-color: #f5f7fb;
+    color: #333;
+}
+
+.employee-container {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.page-title h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.page-title p {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* 검색 필터 스타일 */
+.search-filter {
+    background-color: #f5f7fb;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+/* 상태 필터 스타일 */
+.status-filter {
+    margin-top: 10px;
+}
+
+.custom-control-label {
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+/* 테이블 스타일 */
+.table-container {
+    overflow-x: auto;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.employee-table th {
+    background-color: #f5f7fb;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.employee-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.employee-table tr:hover {
+    background-color: #f5f7fb;
+}
+
+/* 상태 배지 */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background-color: #e6f8f1;
+    color: #00b97c;
+}
+
+.status-inactive {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* 페이지네이션 */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.pagination .page-link {
+    color: #333;
+    border-color: #e2e8f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #003561;
+    border-color: #003561;
+}
+
+/* 액션 버튼 */
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    background-color: #f1f5f9;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.25rem;
+}
+
+.action-btn:hover {
+    background-color: #e2e8f0;
+}
+
+.action-btn.detail {
+    background-color: #003561;
+    color: white;
+}
+
+.action-btn.edit {
+    background-color: #ebf5ff;
+    color: #0078ff;
+}
+
+.action-btn.delete {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* 프로필 이미지 */
+.profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.profile-cell {
+    display: flex;
+    align-items: center;
+}

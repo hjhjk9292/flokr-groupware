@@ -1,0 +1,483 @@
+@charset "UTF-8";
+/* 전체 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding-bottom: 80px;
+        }
+        
+        .apdetail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .apdetail-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .apdetail-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .apdetail-doc-number {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .apdetail-status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .apdetail-status-draft {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+        
+        .apdetail-status-requested {
+            background: #e8f4fd;
+            color: #2196f3;
+        }
+        
+        .apdetail-status-approved {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .apdetail-status-rejected {
+            background: #ffeaea;
+            color: #f44336;
+        }
+        
+        .apdetail-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .apdetail-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .apdetail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .apdetail-meta-label {
+            color: #777;
+            font-size: 14px;
+            width: 80px;
+        }
+        
+        .apdetail-meta-value {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .apdetail-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .apdetail-section-title {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .apdetail-document-content {
+            padding: 30px;
+            min-height: 300px;
+        }
+        
+        .apdetail-approval-line {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .apdetail-approval-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .apdetail-approval-table th,
+        .apdetail-approval-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .apdetail-approval-table th {
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .apdetail-approval-table td:first-child {
+            font-weight: 500;
+        }
+        
+        .apdetail-approval-signature {
+            width: 80px;
+            height: 40px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            text-align: center;     /* 가로 중앙 정렬 */
+    		line-height: 40px;      /* 높이와 동일한 line-height로 세로 중앙 정렬 */
+        }
+        
+        .apdetail-approval-signature.approved {
+            background: #e8f5e9;
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+        
+        .apdetail-approval-signature.rejected {
+            background: #ffeaea;
+            color: #f44336;
+            border-color: #f44336;
+        }
+        
+        .apdetail-approval-comment {
+            font-size: 13px;
+            color: #666;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .apdetail-attachment {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .apdetail-attachment-list {
+            padding: 20px 30px;
+        }
+        
+        .apdetail-attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .apdetail-attachment-icon {
+            color: #777;
+            font-size: 18px;
+        }
+        
+        .apdetail-attachment-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .apdetail-attachment-name {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .apdetail-attachment-size {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .apdetail-download-btn {
+            color: #003561;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 12px;
+            border: 1px solid #003561;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .apdetail-download-btn:hover {
+            background: #003561;
+            color: white;
+        }
+        
+        .apdetail-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 15px 0;
+            z-index: 10;
+        }
+        
+        .apdetail-action-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .apdetail-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .apdetail-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .apdetail-btn-approve {
+            background: #28a745;
+            color: white;
+        }
+        
+        .apdetail-btn-approve:hover {
+            background: #218838;
+        }
+        
+        .apdetail-btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .apdetail-btn-reject:hover {
+            background: #c82333;
+        }
+        
+        .apdetail-btn-edit {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .apdetail-btn-edit:hover {
+            background: #138496;
+        }
+        
+        .apdetail-btn-delete {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .apdetail-btn-delete:hover {
+            background: #5a6268;
+        }
+        
+        .apdetail-btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        
+        .apdetail-btn-outline:hover {
+            background: #f8f9fa;
+        }
+        
+        /* 의견 모달 */
+        .apdetail-comment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .apdetail-comment-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .apdetail-comment-container {
+            background: white;
+            width: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+        
+        .apdetail-comment-modal.active .apdetail-comment-container {
+            transform: scale(1);
+        }
+        
+        .apdetail-comment-header {
+           padding: 15px 20px;
+           border-bottom: 1px solid #eee;
+           font-size: 16px;
+           font-weight: 600;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+       
+       .apdetail-comment-body {
+           padding: 20px;
+       }
+       
+       .apdetail-comment-form {
+           display: flex;
+           flex-direction: column;
+           gap: 15px;
+       }
+       
+       .apdetail-comment-textarea {
+           width: 100%;
+           min-height: 100px;
+           padding: 10px;
+           border: 1px solid #ddd;
+           border-radius: 6px;
+           resize: vertical;
+           font-size: 14px;
+       }
+       
+       .apdetail-comment-footer {
+           display: flex;
+           justify-content: flex-end;
+           gap: 10px;
+       }
+       
+       /* 문서 표시 관련 스타일 추가 */
+       .doc-section {
+          margin-bottom: 30px;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .doc-section-title {
+          background-color: #f8f9fa;
+          padding: 15px;
+          margin: 0;
+          border-bottom: 1px solid #e0e0e0;
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        .doc-info-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+
+        .doc-info-row {
+          display: grid;
+          grid-template-columns: 15% 18% 15% 18% 15% 19%;
+          border-bottom: 1px solid #e0e0e0;
+        }
+
+        .doc-info-label {
+          background-color: #f8f9fa;
+          padding: 10px;
+          font-weight: 500;
+          text-align: center;
+          border-right: 1px solid #e0e0e0;
+        }
+
+        .doc-info-value {
+          padding: 10px;
+          border-right: 1px solid #e0e0e0;
+        }
+
+        .doc-section-content {
+          padding: 20px;
+        }
+
+        .doc-field-group {
+          margin-bottom: 20px;
+        }
+
+        .doc-field-label {
+          font-weight: 500;
+          margin-bottom: 5px;
+          color: #666;
+        }
+
+        .doc-field-value {
+          padding: 8px;
+          background-color: #f9f9f9;
+          border-radius: 4px;
+          min-height: 24px;
+        }
+
+        /* 지출 항목 테이블 */
+        .doc-item-table, .doc-expense-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+
+        .doc-item-table th, .doc-expense-table th,
+        .doc-item-table td, .doc-expense-table td {
+          border: 1px solid #ddd;
+          padding: 8px 12px;
+        }
+
+        .doc-item-table th, .doc-expense-table th {
+          background-color: #f2f2f2;
+          text-align: center;
+        }
+
+        .doc-item-total, .doc-expense-total {
+          background-color: #f8f9fa;
+          font-weight: bold;
+        }

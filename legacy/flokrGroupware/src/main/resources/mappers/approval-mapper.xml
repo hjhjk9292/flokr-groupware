@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="approvalMapper">
+
+<!-- 결재 양식 결과 매핑 -->
+<resultMap id="approvalFormResultSet" type="ApprovalForm">
+	<result column="FORM_NO" property="formNo"/>
+	<result column="FORM_NAME" property="formName"/>
+	<result column="DESCRIPTION" property="description"/>
+	<result column="IS_ACTIVE" property="isActive"/>
+	<result column="CREATE_EMP_NO" property="createEmpNo"/>
+	<result column="CREATE_DATE" property="createDate"/>
+	<result column="STATUS" property="status"/>
+	<result column="CREATE_NAME" property="createName"/>
+</resultMap>
+
+<!-- 결재 문서 결과 매핑 -->
+<resultMap id="approvalDocResultSet" type="ApprovalDoc">
+	<result column="DOC_NO" property="docNo"/>
+	<result column="FORM_NO" property="formNo"/>
+	<result column="DRAFTER_EMP_NO" property="drafterEmpNo"/>
+	<result column="TITLE" property="title"/>
+	<result column="DOC_CONTENT" property="docContent"/>
+	<result column="REQUESTED_DATE" property="requestedDate"/>
+	<result column="COMPLETED_DATE" property="completedDate"/>
+	<result column="VERSION" property="version"/>
+	<result column="CREATE_DATE" property="createDate"/>
+	<result column="UPDATE_DATE" property="updateDate"/>
+	<result column="DOC_STATUS" property="docStatus"/>
+	<result column="STATUS" property="status"/>
+	<result column="FORM_NAME" property="formName"/>
+	<result column="DRAFTER_NAME" property="drafterName"/>
+	<result column="DRAFTER_DEPT_NAME" property="drafterDeptName"/>
+	<result column="DRAFTER_POSITION_NAME" property="drafterPositionName"/>
+</resultMap>
+
+<!-- 결재선 결과 매핑 -->
+<resultMap id="approvalLineResultSet" type="ApprovalLine">
+	<result column="LINE_NO" property="lineNo"/>
+	<result column="DOC_NO" property="docNo"/>
+	<result column="APPROVER_EMP_NO" property="approverEmpNo"/>
+	<result column="APPROVAL_ORDER" property="approvalOrder"/>
+	<result column="APPROVAL_COMMENT" property="approvalComment"/>
+	<result column="PROCESSED_DATE" property="processedDate"/>
+	<result column="LINE_STATUS" property="lineStatus"/>
+	<result column="APPROVER_NAME" property="approverName"/>
+	<result column="DEPT_NAME" property="deptName"/>
+	<result column="POSITION_NAME" property="positionName"/>
+</resultMap>
+
+<!-- 사원 결과 매핑 -->
+<resultMap id="employeeResultSet" type="Employee">
+	<result column="EMP_NO" property="empNo"/>
+	<result column="EMP_NAME" property="empName"/>
+	<result column="EMAIL" property="email"/>
+	<result column="DEPT_NAME" property="deptName"/>
+	<result column="POSITION_NAME" property="positionName"/>
+</resultMap>
+
+<!-- 첨부파일 결과 매핑 -->
+<resultMap id="attachmentResultSet" type="Attachment">
+	<result column="ATTACHMENT_NO" property="attachmentNo"/>
+	<result column="REF_TYPE" property="refType"/>
+	<result column="REF_NO" property="refNo"/>
+	<result column="UPLOADER_EMP_NO" property="uploaderEmpNo"/>
+	<result column="ORIGINAL_FILENAME" property="originalFilename"/>
+	<result column="STORED_FILEPATH" property="storedFilepath"/>
+	<result column="FILE_EXTENSION" property="fileExtension"/>
+	<result column="UPLOAD_DATE" property="uploadDate"/>
+	<result column="STATUS" property="status"/>
+</resultMap>
+
+<!-- ====================== 양식 관련 쿼리 ====================== -->
+
+<!-- 활성화된 모든 결재 양식 조회 -->
+<!-- 양식 선택 화면에서 사용할 수 있는 모든 양식을 조회 -->
+<select id="selectAllActiveForms" resultMap="approvalFormResultSet">
+	select
+		    af.form_no
+		  , af.form_name
+		  , af.description
+		  , af.is_active
+		  , af.create_emp_no
+		  , af.create_date
+		  , af.status
+		  , e.emp_name as create_name
+       from approval_form af
+       join employee e on (af.create_emp_no = e.emp_no)
+      where af.is_active = 1
+        and af.status = 'Y'
+      order 
+         by af.create_date desc
+</select>
+
+<!-- 양식 번호로 특정 양식 조회 -->
+<!-- 특정 양식의 상세 정보를 조회 (양식 선택 시 사용) -->
+<select id="selectFormByNo" resultMap="approvalFormResultSet" parameterType="_int">
+	select
+	        af.form_no
+	      , af.form_name
+	      , af.description
+	      , af.is_active
+		  , af.create_emp_no
+		  , af.create_date
+		  , af.status
+		  , e.emp_name as create_name
+	   from approval_form af
+	   join employee e on (af.create_emp_no = e.emp_no)
+	  where af.form_no = #{formNo}
+	    and af.status = 'Y'
+</select>
+
+<!-- ====================== 문서 관련 쿼리 ====================== -->
+
+<!-- 새 문서 등록 -->
+<!-- 사용자가 결재 문서를 작성하여 저장 -->
+<insert id="insertDocument" parameterType="ApprovalDoc">
+	insert
+	  into approval_doc
+	     (
+	       doc_no
+	     , form_no
+	     , drafter_emp_no
+	     , title
+	     , doc_content
+	     , requested_date 
+	     , completed_date
+	     , version
+	     , create_date
+	     , update_date
+	     , doc_status
+	     , status	     
+	     )
+	values
+	     (
+	       seq_approval_doc.nextval
+	     , #{formNo}
+	     , #{drafterEmpNo}
+	     , #{title}
+	     , #{docContent}
+	     , #{requestedDate, jdbcType=TIMESTAMP}
+         , #{completedDate, jdbcType=TIMESTAMP}
+	     , 1
+	     , sysdate
+	     , sysdate
+	     , #{docStatus}
+	     , 'Y'	     
+	     )
+	     <selectKey keyProperty="docNo" resultType="_int" order="AFTER">
+            select seq_approval_doc.currval from dual
+         </selectKey>
+</insert>
+
+<!-- 문서 번호로 문서 조회 -->
+<!-- 문서 상세보기 시 사용 (양식명, 기안자 정보 포함) -->
+<select id="selectDocumentByNo" resultMap="approvalDocResultSet" parameterType="_int">
+	select
+	       ad.doc_no
+	     , ad.form_no
+	     , ad.drafter_emp_no
+	     , ad.title
+	     , ad.doc_content
+	     , ad.requested_date
+	     , ad.completed_date
+	     , ad.version
+	     , ad.create_date
+	     , ad.update_date
+	     , ad.doc_status
+	     , ad.status
+	     , af.form_name
+	     , e.emp_name as drafter_name
+	     , d.dept_name as drafter_dept_name
+	     , p.position_name as drafter_position_name
+	  from approval_doc ad
+	  join approval_form af on (ad.form_no = af.form_no)
+	  join employee e on (ad.drafter_emp_no = e.emp_no)
+	  join department d on (e.dept_no = d.dept_no)
+	  join position p on (e.position_no = p.position_no)
+	 where ad.doc_no = #{docNo}
+	   and ad.status = 'Y'
+</select>
+
+<!-- 문서 정보 수정 -->
+<!-- 문서 내용, 상태 등 업데이트 -->
+<update id="updateDocument" parameterType="ApprovalDoc">
+	update approval_doc
+	   set
+	       title = #{title}
+	     , doc_content = #{docContent}
+	     , requested_date = #{requestedDate, jdbcType=TIMESTAMP}
+         , completed_date = #{completedDate, jdbcType=TIMESTAMP}
+		 , version = #{version}
+		 , update_date = sysdate
+		 , doc_status = #{docStatus}
+		 , status = #{status}
+     where doc_no = #{docNo}	
+</update>
+
+<!-- ====================== 결재선 관련 쿼리 ====================== -->
+
+<!-- 결재선 등록 -->
+<!-- 문서에 대한 결재자 한 명을 등록 -->
+<insert id="insertApprovalLine" parameterType="ApprovalLine">
+	insert
+	  into approval_line
+	     (
+	       line_no
+	     , doc_no
+	     , approver_emp_no
+	     , approval_order
+	     , approval_comment
+	     , processed_date
+	     , line_status  
+	     )
+	values
+	     (
+	       seq_approval_line.nextval
+	     , #{docNo}
+	     , #{approverEmpNo}
+	     , #{approvalOrder}
+	     , null
+	     , null
+	     , #{lineStatus}
+	     )
+</insert>
+
+<!-- 문서 번호로 결재선 목록 조회 -->
+<!-- 특정 문서의 모든 결재자 조회 (결재자 정보 포함) -->
+<select id="selectApprovalLineByDocNo" resultMap="approvalLineResultSet" parameterType="_int">
+	select
+	       al.line_no
+	     , al.doc_no
+	     , al.approver_emp_no
+	     , al.approval_order
+	     , al.approval_comment
+	     , al.processed_date
+	     , al.line_status
+	     , e.emp_name as approver_name
+	     , d.dept_name
+		 , p.position_name
+      from approval_line al
+      join employee e on (al.approver_emp_no = e.emp_no)
+      join department d on (e.dept_no = d.dept_no)
+      join position p on (e.position_no = p.position_no)
+     where al.doc_no = #{docNo}
+     order
+        by al.approval_order 
+</select>
+
+<!-- 결재선 정보 수정 -->
+<!-- 결재 처리 시 상태, 의견, 처리일 업데이트 -->
+<update id="updateApprovalLine" parameterType="ApprovalLine">
+	update approval_line
+	   set
+	       approval_comment = #{approvalComment}
+	     , <if test="processedDate != null">
+	       processed_date = #{processedDate}
+	     , </if>
+	       line_status = #{lineStatus}
+     where line_no = #{lineNo}
+</update>
+
+<!-- 첫번째 결재자 상태를 WAITING으로 변경 -->
+<!-- 문서를 결재요청할 때 첫번째 결재자를 활성화 -->
+<update id="updateFirstApproverStatus" parameterType="_int">
+	update approval_line
+	   set 
+	        line_status = 'WAITING'
+     where doc_no = #{docNo}
+       and approval_order = 1
+</update>
+
+<!-- 결재선 초기화 (모든 결재자를 PENDING 상태로 변경) -->
+<!-- 반려된 문서 재제출 시 결재선 초기화 -->
+<!-- ![CDATA[]] : XML에서 특수 문자를 텍스트 그대로 처리하기 위한 구문-->
+<update id="resetApprovalLines" parameterType="_int">
+	<![CDATA[
+	update approval_line
+	   set
+	       line_status = case
+	                     when approval_order = 1 then 'WAITING'
+	                     else 'PENDING'
+	                     end
+	     , approval_comment = null
+	     , processed_date = null
+	 where doc_no = #{docNo}                 
+	]]>
+</update>
+
+<!-- 결재선 번호로 특정 결재선 조회 -->
+<!-- 특정 결재선의 상세 정보 조회 -->
+<select id="selectApprovalLineByNo" resultMap="approvalLineResultSet" parameterType="_int">
+	select
+	       al.line_no
+	     , al.doc_no
+	     , al.approver_emp_no
+	     , al.approval_order   
+	     , al.approval_comment
+         , al.processed_date
+         , al.line_status
+         , e.emp_name as approver_name
+         , d.dept_name
+         , p.position_name
+      from approval_line al
+      join employee e on (al.approver_emp_no = e.emp_no)
+      join department d on (e.dept_no = d.dept_no)
+      join position p on (e.position_no = p.position_no)
+     where al.line_no = #{lineNo}
+</select>
+
+<!-- 결재선 완전 삭제 쿼리 추가 -->
+<delete id="deleteApprovalLinesByDocNo" parameterType="_int">
+    DELETE FROM approval_line 
+    WHERE doc_no = #{docNo}
+</delete>
+<!-- ====================== 문서함 관련 쿼리 ====================== -->
+
+<!-- 임시저장함 조회 -->
+<!-- 사용자가 임시저장한 문서 목록 조회 -->
+<select id="selectDraftDocuments" resultMap="approvalDocResultSet" parameterType="_int">
+	select
+	       ad.doc_no
+	     , ad.form_no
+	     , ad.drafter_emp_no
+	     , ad.title
+	     , ad.doc_content
+	     , ad.requested_date
+	     , ad.completed_date
+	     , ad.version
+	     , ad.create_date
+	     , ad.update_date
+	     , ad.doc_status
+	     , ad.status
+	     , af.form_name
+	  from approval_doc ad
+	  join approval_form af on (ad.form_no = af.form_no)
+	 where ad.drafter_emp_no = #{empNo}
+	   and ad.doc_status = 'DRAFT'
+	   and ad.status = 'Y'
+	 order
+	    by ad.update_date desc
+</select>
+
+<!-- 상신 문서함 조회 -->
+<!-- 사용자가 결재요청한 문서 목록 조회 -->
+<select id="selectRequestedDocuments" resultMap="approvalDocResultSet" parameterType="_int">
+	select
+	       ad.doc_no
+	     , ad.form_no
+	     , ad.drafter_emp_no
+	     , ad.title
+	     , ad.doc_content
+	     , ad.requested_date
+	     , ad.completed_date
+	     , ad.version
+	     , ad.create_date
+	     , ad.update_date
+	     , ad.doc_status
+	     , ad.status
+	     , af.form_name
+	  from approval_doc ad
+	  join approval_form af on (ad.form_no = af.form_no)
+	 where ad.drafter_emp_no = #{empNo}
+	   and ad.doc_status = 'REQUESTED'  <!-- 진행 중인 문서만 표시 -->
+	   and ad.status = 'Y'
+	 order
+	    by ad.requested_date desc
+</select>
+
+<!-- 수신 문서함 조회 -->
+<!-- 결재 대기 중인 문서 목록 조회 -->
+<select id="selectWaitingDocuments" resultMap="approvalDocResultSet" parameterType="_int">
+	select 
+  distinct
+	       ad.doc_no
+	     , ad.form_no
+	     , ad.drafter_emp_no
+	     , ad.title
+	     , ad.doc_content
+	     , ad.requested_date
+	     , ad.completed_date
+	     , ad.version
+	     , ad.create_date
+	     , ad.update_date
+	     , ad.doc_status
+	     , ad.status
+	     , af.form_name
+	     , e.emp_name as drafter_name
+	  from approval_doc ad
+	  join approval_form af on (ad.form_no = af.form_no)
+	  join employee e on (ad.drafter_emp_no = e.emp_no)
+	  join approval_line al on (ad.doc_no = al.doc_no)
+     where al.approver_emp_no = #{empNo}
+       and al.line_status = 'WAITING'
+       and ad.status = 'Y'
+     order
+        by ad.requested_date desc
+</select>
+
+<!-- 완료 문서함 조회 -->
+<!-- 결재 완료(승인/반려)된 문서 목록 조회 -->
+<select id="selectCompletedDocuments" resultMap="approvalDocResultSet" parameterType="_int">
+	select
+  distinct
+	       ad.doc_no
+	     , ad.form_no
+	     , ad.drafter_emp_no
+	     , ad.title
+	     , ad.doc_content
+	     , ad.requested_date
+	     , ad.completed_date
+	     , ad.version
+	     , ad.create_date
+	     , ad.update_date
+	     , ad.doc_status
+	     , ad.status
+	     , af.form_name
+	     , e.emp_name as drafter_name
+	  from approval_doc ad
+	  join approval_form af on (ad.form_no = af.form_no)
+	  join employee e on (ad.drafter_emp_no = e.emp_no)
+	  join approval_line al on (ad.doc_no = al.doc_no)
+     where al.approver_emp_no = #{empNo}
+       and al.line_status in ('APPROVED', 'REJECTED')
+       and ad.doc_status in ('APPROVED', 'REJECTED')
+       and ad.status = 'Y'
+     order
+        by ad.completed_date desc
+</select>
+
+<!-- ====================== 사원 조회 관련 쿼리 ====================== -->
+
+<!-- 결재선 설정을 위한 사원 목록 조회 -->
+<!-- 결재선 설정 시 선택할 수 있는 사원 목록 조회 -->
+<select id="selectEmployeesForApprovalLine" resultMap="employeeResultSet">
+	select
+	       e.emp_no
+	     , e.emp_name
+	     , e.email
+	     , d.dept_name
+	     , p.position_name
+	  from employee e
+	  join department d on (e.dept_no = d.dept_no)
+	  join position p on (e.position_no = p.position_no)
+	 where e.status = 'Y'
+	 order
+	    by d.dept_no, p.position_no desc, e.emp_name
+</select>
+
+<!-- 사원 검색 -->
+<!-- 이름, 부서, 직급으로 사원 검색 -->
+<select id="searchEmployeesForApprovalLine" resultMap="employeeResultSet" parameterType="String">
+	select
+	       e.emp_no
+	     , e.emp_name
+	     , e.email
+	     , d.dept_name
+	     , p.position_name
+	  from employee e
+	  join department d on (e.dept_no = d.dept_no)
+	  join position p on (e.position_no = p.position_no)
+	 where e.status = 'Y'
+	   and (e.emp_name like '%' || #{keyword} || '%'
+	   		or d.dept_name like '%' || #{keyword} || '%'
+	   		or p.position_name like '%' || #{keyword} || '%'
+	   		)
+	  order
+	     by d.dept_no, p.position_no desc, e.emp_name
+</select>
+
+<!-- ====================== 첨부파일 관련 쿼리 ====================== -->
+
+<!-- 첨부파일 등록 -->
+<!-- 문서에 첨부파일 등록 -->
+<insert id="insertAttachment" parameterType="Attachment">
+	insert
+	  into attachment
+	     (
+	       attachment_no
+	     , ref_type
+	     , ref_no
+	     , uploader_emp_no
+	     , original_filename
+	     , stored_filepath
+	     , file_extension
+	     , upload_date
+	     , status
+	     )
+	values
+	     (
+	       seq_attachment.nextval
+	     , 'APPROVAL_DOC'
+	     , #{refNo}
+	     , #{uploaderEmpNo}
+	     , #{originalFilename}
+	     , #{storedFilepath}
+	     , #{fileExtension}
+	     , sysdate
+	     , 'Y'
+	     )
+	     <selectKey keyProperty="attachmentNo" resultType="_int" order="AFTER">
+           select seq_attachment.currval from dual
+         </selectKey>
+</insert>
+
+<!-- 문서 번호로 첨부파일 목록 조회 -->
+<!-- 특정 문서의 첨부파일 조회 -->
+<select id="selectAttachmentByDocNo" resultMap="attachmentResultSet" parameterType="_int">
+	select 
+	       attachment_no
+	     , ref_type
+	     , ref_no
+	     , uploader_emp_no
+	     , original_filename
+	     , stored_filepath
+	     , file_extension
+	     , upload_date
+	     , status
+	  from attachment
+	 where ref_type = 'APPROVAL_DOC'
+	   and ref_no = #{docNo} 
+	   and status = 'Y'
+     order 
+        by upload_date desc
+</select>
+
+<!-- 첨부파일 번호로 특정 첨부파일 조회 -->
+<!-- 다운로드 시 파일 정보 조회 -->
+<select id="selectAttachmentByNo" resultMap="attachmentResultSet" parameterType="_int">
+	select
+	       attachment_no
+	     , ref_type
+	     , ref_no
+	     , uploader_emp_no
+	     , original_filename
+	     , stored_filepath
+	     , file_extension
+	     , upload_date
+	     , status
+	  from attachment
+	 where attachment_no = #{attachmentNo}
+	   and status = 'Y'
+</select>
+
+<!-- 첨부파일 삭제 (논리적 삭제) -->
+<!-- 첨부파일 상태를 N으로 변경 -->
+<update id="deleteAttachment" parameterType="_int">
+	update attachment
+	   set
+	       status = 'N'
+	 where attachment_no = #{attachmentNo}
+</update>
+
+<!-- 문서번호로 첨부파일 삭제 (논리적 삭제) -->
+<update id="deleteAttachmentByDocNo" parameterType="_int">
+    update attachment
+    set status = 'N'
+    where ref_type = 'APPROVAL_DOC'
+      and ref_no = #{docNo}
+      and status = 'Y'
+</update>
+
+<!-- ====================== 통계 조회 관련 쿼리 ====================== -->
+<!-- 결재 대기 건수 조회 -->
+<select id="selectWaitingCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc ad
+    join approval_line al on ad.doc_no = al.doc_no
+    where al.approver_emp_no = #{empNo}
+      and al.line_status = 'WAITING'
+      and ad.status = 'Y'
+      and ad.doc_status = 'REQUESTED'
+</select>
+
+<!-- 진행 중 결재 건수 조회 (내가 올린 결재진행중 문서) -->
+<select id="selectProcessingCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc
+    where drafter_emp_no = #{empNo}
+      and doc_status = 'REQUESTED'
+      and status = 'Y'
+</select>
+
+<!-- 결재 완료 건수 조회 (내가 올린 승인완료 문서) -->
+<select id="selectApprovedCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc
+    where drafter_emp_no = #{empNo}
+      and doc_status = 'APPROVED'
+      and status = 'Y'
+</select>
+
+<!-- 결재 반려 건수 조회 (내가 올린 반려 문서) -->
+<select id="selectRejectedCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc
+    where drafter_emp_no = #{empNo}
+      and doc_status = 'REJECTED'
+      and status = 'Y'
+</select>
+
+<!-- 
+  결재자 관점 승인 건수 조회
+  특정 사원이 결재자로서 승인한 문서의 개수를 조회
+-->
+<select id="selectApprovedCountByApprover" parameterType="_int" resultType="_int">
+    select count(distinct ad.doc_no)
+    from approval_doc ad
+    join approval_line al on (ad.doc_no = al.doc_no)
+    where al.approver_emp_no = #{empNo}
+      and al.line_status = 'APPROVED'
+      and ad.doc_status = 'APPROVED'
+      and ad.status = 'Y'
+</select>
+
+<!-- 
+  결재자 관점 반려 건수 조회
+  특정 사원이 결재자로서 반려한 문서의 개수를 조회
+-->
+<select id="selectRejectedCountByApprover" parameterType="_int" resultType="_int">
+    select count(distinct ad.doc_no)
+    from approval_doc ad
+    join approval_line al on (ad.doc_no = al.doc_no)
+    where al.approver_emp_no = #{empNo}
+      and al.line_status = 'REJECTED'
+      and ad.doc_status = 'REJECTED'
+      and ad.status = 'Y'
+</select>
+
+<!-- 상신문서함 개수 조회 (페이징용) -->
+<select id="selectRequestedDocumentsCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc
+    where drafter_emp_no = #{empNo}
+      and doc_status in ('REQUESTED', 'APPROVED', 'REJECTED')
+      and status = 'Y'
+</select>
+
+<!-- 임시저장함 개수 조회 (페이징용) -->
+<select id="selectDraftDocumentsCount" parameterType="_int" resultType="_int">
+    select count(*)
+    from approval_doc
+    where drafter_emp_no = #{empNo}
+      and doc_status = 'DRAFT'
+      and status = 'Y'
+</select>
+
+<!-- 완료문서함 개수 조회 (페이징용) -->
+<select id="selectCompletedDocumentsCount" parameterType="_int" resultType="_int">
+    select count(distinct ad.doc_no)
+    from approval_doc ad
+    join approval_line al on ad.doc_no = al.doc_no
+    where al.approver_emp_no = #{empNo}
+      and al.line_status in ('APPROVED', 'REJECTED')
+      and ad.doc_status in ('APPROVED', 'REJECTED')
+      and ad.status = 'Y'
+</select>
+
+<!-- 수신문서함 개수 조회(페이징용) -->
+<select id="selectWaitingDocumentsCount" parameterType="_int" resultType="_int">
+    select count(distinct ad.doc_no)
+    from approval_doc ad
+    join approval_line al on ad.doc_no = al.doc_no
+    where al.approver_emp_no = #{empNo}
+      and al.line_status = 'WAITING'
+      and ad.status = 'Y'
+</select>
+
+<!-- ====================== 최근 문서 조회 관련 쿼리 ====================== -->
+
+<!-- 수신 문서함 최근 문서 조회 (LIMIT 사용) -->
+<select id="selectRecentWaitingDocuments" parameterType="hashmap" resultMap="approvalDocResultSet">
+    <![CDATA[
+    select * from (
+        select distinct
+               ad.doc_no
+             , ad.form_no
+             , ad.drafter_emp_no
+             , ad.title
+             , ad.doc_content
+             , ad.requested_date
+             , ad.completed_date
+             , ad.version
+             , ad.create_date
+             , ad.update_date
+             , ad.doc_status
+             , ad.status
+             , af.form_name
+             , e.emp_name as drafter_name
+             , d.dept_name as drafter_dept_name
+          from approval_doc ad
+          join approval_form af on (ad.form_no = af.form_no)
+          join employee e on (ad.drafter_emp_no = e.emp_no)
+          join department d on (e.dept_no = d.dept_no)
+          join approval_line al on (ad.doc_no = al.doc_no)
+         where al.approver_emp_no = #{empNo}
+           and al.line_status = 'WAITING'
+           and ad.status = 'Y'
+         order by ad.requested_date desc
+    ) where rownum <= #{limit}
+    ]]>
+</select>
+
+<!-- 내가 올린 문서함 최근 문서 조회 -->
+<select id="selectRecentMyDocuments" parameterType="hashmap" resultMap="approvalDocResultSet">
+    <![CDATA[
+    select * from (
+        select 
+               ad.doc_no
+             , ad.form_no
+             , ad.drafter_emp_no
+             , ad.title
+             , ad.doc_content
+             , ad.requested_date
+             , ad.completed_date
+             , ad.version
+             , ad.create_date
+             , ad.update_date
+             , ad.doc_status
+             , ad.status
+             , af.form_name
+          from approval_doc ad
+          join approval_form af on (ad.form_no = af.form_no)
+         where ad.drafter_emp_no = #{empNo}
+           and ad.doc_status in ('REQUESTED', 'APPROVED', 'REJECTED')
+           and ad.status = 'Y'
+         order by ad.requested_date desc
+    ) where rownum <= #{limit}
+    ]]>
+</select>
+
+<!-- 임시저장함 최근 문서 조회 -->
+<select id="selectRecentDraftDocuments" parameterType="hashmap" resultMap="approvalDocResultSet">
+    <![CDATA[
+    select * from (
+        select 
+               ad.doc_no
+             , ad.form_no
+             , ad.drafter_emp_no
+             , ad.title
+             , ad.doc_content
+             , ad.requested_date
+             , ad.completed_date
+             , ad.version
+             , ad.create_date
+             , ad.update_date
+             , ad.doc_status
+             , ad.status
+             , af.form_name
+          from approval_doc ad
+          join approval_form af on (ad.form_no = af.form_no)
+         where ad.drafter_emp_no = #{empNo}
+           and ad.doc_status = 'DRAFT'
+           and ad.status = 'Y'
+         order by ad.update_date desc
+    ) where rownum <= #{limit}
+    ]]>
+</select>
+
+<!-- 완료 문서함 최근 문서 조회 -->
+<select id="selectRecentCompletedDocuments" parameterType="hashmap" resultMap="approvalDocResultSet">
+    <![CDATA[
+    select * from (
+        select distinct
+               ad.doc_no
+             , ad.form_no
+             , ad.drafter_emp_no
+             , ad.title
+             , ad.doc_content
+             , ad.requested_date
+             , ad.completed_date
+             , ad.version
+             , ad.create_date
+             , ad.update_date
+             , ad.doc_status
+             , ad.status
+             , af.form_name
+             , e.emp_name as drafter_name
+             , d.dept_name as drafter_dept_name
+          from approval_doc ad
+          join approval_form af on (ad.form_no = af.form_no)
+          join employee e on (ad.drafter_emp_no = e.emp_no)
+          join department d on (e.dept_no = d.dept_no)
+          join approval_line al on (ad.doc_no = al.doc_no)
+         where al.approver_emp_no = #{empNo}
+           and al.line_status in ('APPROVED', 'REJECTED')  /* 상태로 판단 */
+           and ad.doc_status in ('APPROVED', 'REJECTED')
+           and ad.status = 'Y'
+         order by ad.completed_date desc
+    ) where rownum <= #{limit}
+    ]]>
+</select>
+
+<!-- 부서별 직원 목록 조회 -->
+<select id="selectEmployeesByDept" resultMap="employeeResultSet" parameterType="_int">
+    select
+           e.emp_no
+         , e.emp_name
+         , e.email
+         , d.dept_name
+         , p.position_name
+      from employee e
+      join department d on (e.dept_no = d.dept_no)
+      join position p on (e.position_no = p.position_no)
+     where e.status = 'Y'
+       and e.dept_no = #{deptNo}
+     order
+        by p.position_no desc, e.emp_name
+</select>
+
+<!-- 모든 부서 조회 -->
+<select id="selectAllDepartments" resultType="hashmap">
+    select distinct 
+           d.dept_no as "deptNo"
+         , d.dept_name as "deptName"
+      from department d
+      join employee e on (d.dept_no = e.dept_no)
+     where e.status = 'Y'
+     order by d.dept_no
+</select>
+
+<!-- 공통 검색 기능: 문서 개수 조회 -->
+<select id="selectDocumentsSearchCount" parameterType="hashmap" resultType="_int">
+    select count(*)
+    from approval_doc ad
+    join approval_form af on (ad.form_no = af.form_no)
+    join employee e on (ad.drafter_emp_no = e.emp_no)
+    join department d on (e.dept_no = d.dept_no)
+    <if test="boxType == 'waiting' or boxType == 'completed'">
+        join approval_line al on (ad.doc_no = al.doc_no)
+    </if>
+    where 1=1
+    and ad.status = 'Y'
+    
+    <!-- 각 문서함별 조건 -->
+    <if test="boxType == 'draft'">
+        and ad.drafter_emp_no = #{empNo}
+        and ad.doc_status in ('DRAFT', 'REJECTED')
+    </if>
+    <if test="boxType == 'requested'">
+        and ad.drafter_emp_no = #{empNo}
+        and ad.doc_status in ('REQUESTED', 'APPROVED', 'REJECTED')
+    </if>
+    <if test="boxType == 'waiting'">
+        and al.approver_emp_no = #{empNo}
+        and al.line_status = 'WAITING'
+    </if>
+    <if test="boxType == 'completed'">
+        and al.approver_emp_no = #{empNo}
+        and al.line_status in ('APPROVED', 'REJECTED')
+        and ad.doc_status in ('APPROVED', 'REJECTED')
+    </if>
+    
+    <!-- 상태 필터 조건 -->
+    <if test="statusFilter != null and statusFilter != ''">
+        and ad.doc_status = #{statusFilter}
+    </if>
+    
+    <!-- 검색 유형별 조건 -->
+    <if test="searchType != null and searchType == 'title' and keyword != null and keyword != ''">
+        and ad.title like '%' || #{keyword} || '%'
+    </if>
+    <if test="searchType != null and searchType == 'form' and keyword != null and keyword != ''">
+        and af.form_name like '%' || #{keyword} || '%'
+    </if>
+    <if test="searchType != null and searchType == 'drafter' and keyword != null and keyword != ''">
+        and (e.emp_name like '%' || #{keyword} || '%' or d.dept_name like '%' || #{keyword} || '%')
+    </if>
+    
+    <!-- 검색 유형이 전체(빈 값)일 때 키워드 검색 조건 추가 -->
+    <if test="(searchType == null or searchType == '') and keyword != null and keyword != ''">
+        and (ad.title like '%' || #{keyword} || '%' 
+          or af.form_name like '%' || #{keyword} || '%'
+          or e.emp_name like '%' || #{keyword} || '%'
+          or d.dept_name like '%' || #{keyword} || '%')
+    </if>
+    
+    <!-- 날짜 조건 -->
+    <if test="dateFrom != null and dateFrom != ''">
+        <choose>
+            <when test="boxType == 'draft'">
+                and ad.update_date >= to_date(#{dateFrom}, 'YYYY-MM-DD')
+            </when>
+            <otherwise>
+                and ad.requested_date >= to_date(#{dateFrom}, 'YYYY-MM-DD')
+            </otherwise>
+        </choose>
+    </if>
+    <if test="dateTo != null and dateTo != ''">
+        <choose>
+            <when test="boxType == 'draft'">
+                and ad.update_date &lt;= to_date(#{dateTo}, 'YYYY-MM-DD') + 0.99999
+            </when>
+            <otherwise>
+                and ad.requested_date &lt;= to_date(#{dateTo}, 'YYYY-MM-DD') + 0.99999
+            </otherwise>
+        </choose>
+    </if>
+</select>
+
+<!-- 공통 검색 기능: 문서 목록 조회 -->
+<select id="selectDocumentsSearch" parameterType="hashmap" resultMap="approvalDocResultSet">
+    select
+        ad.doc_no
+        , ad.form_no
+        , ad.drafter_emp_no
+        , ad.title
+        , ad.doc_content
+        , ad.requested_date
+        , ad.completed_date
+        , ad.version
+        , ad.create_date
+        , ad.update_date
+        , ad.doc_status
+        , ad.status
+        , af.form_name
+        , e.emp_name as drafter_name
+        , d.dept_name as drafter_dept_name
+        , p.position_name as drafter_position_name
+    from approval_doc ad
+    join approval_form af on (ad.form_no = af.form_no)
+    join employee e on (ad.drafter_emp_no = e.emp_no)
+    join department d on (e.dept_no = d.dept_no)
+    join position p on (e.position_no = p.position_no)
+    <if test="boxType == 'waiting' or boxType == 'completed'">
+        join approval_line al on (ad.doc_no = al.doc_no)
+    </if>
+    where 1=1
+    and ad.status = 'Y'
+    
+    <!-- 각 문서함별 조건 -->
+    <if test="boxType == 'draft'">
+        and ad.drafter_emp_no = #{empNo}
+        and ad.doc_status in ('DRAFT', 'REJECTED')
+    </if>
+    <if test="boxType == 'requested'">
+        and ad.drafter_emp_no = #{empNo}
+        and ad.doc_status in ('REQUESTED', 'APPROVED', 'REJECTED')
+    </if>
+    <if test="boxType == 'waiting'">
+        and al.approver_emp_no = #{empNo}
+        and al.line_status = 'WAITING'
+    </if>
+    <if test="boxType == 'completed'">
+        and al.approver_emp_no = #{empNo}
+        and al.line_status in ('APPROVED', 'REJECTED')
+        and ad.doc_status in ('APPROVED', 'REJECTED')
+    </if>
+    
+    <!-- 상태 필터 조건 -->
+    <if test="statusFilter != null and statusFilter != ''">
+        and ad.doc_status = #{statusFilter}
+    </if>
+    
+    <!-- 검색 유형별 조건 -->
+    <if test="searchType != null and searchType == 'title' and keyword != null and keyword != ''">
+        and ad.title like '%' || #{keyword} || '%'
+    </if>
+    <if test="searchType != null and searchType == 'form' and keyword != null and keyword != ''">
+        and af.form_name like '%' || #{keyword} || '%'
+    </if>
+    <if test="searchType != null and searchType == 'drafter' and keyword != null and keyword != ''">
+        and (e.emp_name like '%' || #{keyword} || '%' or d.dept_name like '%' || #{keyword} || '%')
+    </if>
+    
+    <!-- 검색 유형이 전체(빈 값)일 때 키워드 검색 조건 추가 -->
+    <if test="(searchType == null or searchType == '') and keyword != null and keyword != ''">
+        and (ad.title like '%' || #{keyword} || '%' 
+          or af.form_name like '%' || #{keyword} || '%'
+          or e.emp_name like '%' || #{keyword} || '%'
+          or d.dept_name like '%' || #{keyword} || '%')
+    </if>
+    
+    <!-- 날짜 조건 -->
+    <if test="dateFrom != null and dateFrom != ''">
+        <choose>
+            <when test="boxType == 'draft'">
+                and ad.update_date >= to_date(#{dateFrom}, 'YYYY-MM-DD')
+            </when>
+            <otherwise>
+                and ad.requested_date >= to_date(#{dateFrom}, 'YYYY-MM-DD')
+            </otherwise>
+        </choose>
+    </if>
+    <if test="dateTo != null and dateTo != ''">
+        <choose>
+            <when test="boxType == 'draft'">
+                and ad.update_date &lt;= to_date(#{dateTo}, 'YYYY-MM-DD') + 0.99999
+            </when>
+            <otherwise>
+                and ad.requested_date &lt;= to_date(#{dateTo}, 'YYYY-MM-DD') + 0.99999
+            </otherwise>
+        </choose>
+    </if>
+    
+    <!-- 정렬 조건 -->
+    order by
+    <choose>
+        <when test="boxType == 'draft'">
+            ad.update_date desc
+        </when>
+        <when test="boxType == 'completed'">
+            ad.completed_date desc
+        </when>
+        <otherwise>
+            ad.requested_date desc
+        </otherwise>
+    </choose>
+</select>
+
+</mapper>

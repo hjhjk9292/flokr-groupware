@@ -1,0 +1,332 @@
+.detail-wrapper {
+  max-width: 1100px;
+  margin: auto;
+  background: white;
+  border-radius: 12px;
+  padding: 20px 30px 30px 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  padding-bottom: 12px;        /* 아래 여백 조정 */
+  margin-bottom: 20px;         /* 본문과 간격 */
+  border-bottom: 1px solid #e9ecef;  /* 구분선 */
+}
+
+.title-left {
+  display: flex;
+  align-items: center;
+}
+.title-left .emoji {
+  font-size: 24px;
+  margin-right: 10px;
+}
+.header-actions {
+  position: relative;
+}
+
+.header-actions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.detail-body {
+  display: flex;
+  gap: 40px;
+  flex-grow: 1;
+  margin-top: 10px;
+}
+
+.left-pane {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.left-pane h4 {
+  margin-bottom: 5px;  /* 기존보다 좁혀줌 */
+}
+
+
+.content-box {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  min-height: 200px;
+  max-height: 350px;
+  overflow-y: auto;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.content-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-box::-webkit-scrollbar-thumb {
+  background: #c0c0c0;      /* 실제 스크롤바 색상 */
+  border-radius: 10px;
+}
+
+.content-box::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;      /* hover 시 색상 */
+}
+
+
+.right-pane {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rowLeft label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.rowRight label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.rowLeft {
+  margin-bottom: 24px;  /* ← 이게 전체 row 간격 */
+}
+
+.rowRight {
+  margin-bottom: 40px;  /* ← 이게 전체 row 간격 */
+}
+
+
+.dropdown, .date-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.status-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 20px;
+  background-color: #eee;
+  font-size: 13px;
+  color: white;
+  opacity: 0.2;  /* 기본은 흐리게 표시 */
+  cursor: default;
+  margin-right: 6px;
+  transition: opacity 0.3s, background-color 0.3s;
+}
+
+.status-tags .tag.active {
+  opacity: 1; /* 강조 */
+  color: black;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* 사원 정보 카드 스타일 */
+.employee-card {
+  display: none; /* 기본적으로 숨김 */
+  position: fixed !important; /* fixed 유지 */
+  width: 230px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  z-index: 99999 !important;
+  padding: 15px;
+  border: 1px solid #eaeaea;
+}
+
+.employee-card:before {
+  content: '';
+  position: absolute;
+  bottom: -8px !important; /* 상단이 아닌 하단에 위치 */
+  top: auto !important; /* top 속성 제거 */
+  left: 50% !important; /* 가운데 정렬 */
+  transform: translateX(-50%) !important; /* X축 가운데 정렬 */
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white !important; /* 위쪽 방향이 아닌 아래쪽 방향 */
+  border-bottom: none !important; /* 기존 하단 화살표 제거 */
+}
+
+.card-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #808080 !important;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+  margin: 0 auto 15px;
+}
+
+.card-info {
+  text-align: center;
+}
+
+.emp-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.emp-position {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.emp-phone, .emp-email {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+
+.요청    { background: #b0bec5; }
+.진행중  { background: #90caf9; }
+.피드백  { background: #f8bbd0; }
+.보류    { background: #ffe082; }
+.완료    { background: #a5d6a7; }
+
+.detail-assignees {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.detail-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: #808080; /* 기본 회색 */
+  position: relative; /* 카드 위치 기준점 */
+  cursor: pointer;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.detail-avatar.red {
+  background-color: #e74c3c;
+}
+
+.detail-avatar.blue {
+  background-color: #3498db;
+}
+
+.detail-avatar.green {
+  background-color: #2ecc71;
+}
+
+.detail-avatar.purple {
+  background-color: #9b59b6;
+}
+
+.detail-avatar.orange {
+  background-color: #e67e22;
+}
+
+.detail-avatar.teal {
+  background-color: #1abc9c;
+}
+
+.detail-avatar.empty {
+  background-color: #ddd;
+  color: #666;
+  font-size: 0.8em;
+}
+
+.btn-group {
+  margin-top: 25px;
+  text-align: right;
+}
+.gray-btn, .red-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.gray-btn {
+  background: #ced4da;
+  color: #212529;
+}
+.red-btn {
+  background: #fa5252;
+  color: white;
+}
+
+.file-link {
+  color: #3366cc;
+  text-decoration: underline;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.no-file {
+  color: #999;
+  font-size: 14px;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 100;
+  width: 120px;
+}
+
+.dropdown-options ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-options li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-options li:last-child {
+  border-bottom: none;
+}
+
+.dropdown-options li:hover {
+  background-color: #f5f5f5;
+}
+
