@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "DEPARTMENT")
@@ -34,6 +35,7 @@ public class Department {
     @Builder.Default
     private String status = "Y";
 
+    @JsonManagedReference // "부서"가 "직원" 목록을 관리 (직렬화 시 순환 시작 지점)
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Employee> employees;
 }

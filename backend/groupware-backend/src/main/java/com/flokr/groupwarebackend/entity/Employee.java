@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "EMPLOYEE")
@@ -37,10 +39,12 @@ public class Employee {
     @Column(name = "PHONE", length = 20)
     private String phone;
 
+    @JsonBackReference // "직원"이 "부서"를 참조 (이전 추가됨)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPT_NO", nullable = false, foreignKey = @ForeignKey(name = "FK_employee_department"))
     private Department department;
 
+    @JsonBackReference // 추가: "직원"이 "직급"을 참조 (직렬화 시 순환 끊음)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POSITION_NO", nullable = false, foreignKey = @ForeignKey(name = "FK_employee_position"))
     private Position position;
