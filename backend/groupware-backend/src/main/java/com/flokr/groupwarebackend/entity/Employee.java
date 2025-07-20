@@ -45,13 +45,15 @@ public class Employee {
     
     @Column(name = "profile_image_url", length = 255)
     private String profileImageUrl;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private EmployeeStatus status = EmployeeStatus.ACTIVE;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @Builder.Default
     private EmployeeRole role = EmployeeRole.USER;
     
     @ManyToOne(fetch = FetchType.LAZY)

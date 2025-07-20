@@ -37,6 +37,7 @@ public class ChatRoom {
     private Integer maxParticipants;
     
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
     
     @ManyToOne(fetch = FetchType.LAZY)

@@ -35,6 +35,7 @@ public class ChatMessage {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)
+    @Builder.Default
     private MessageType messageType = MessageType.TEXT;
     
     @Column(name = "file_url", length = 500)
@@ -44,6 +45,7 @@ public class ChatMessage {
     private String fileName;
     
     @Column(name = "is_edited", nullable = false)
+    @Builder.Default
     private Boolean isEdited = false;
     
     @Column(name = "edited_at")

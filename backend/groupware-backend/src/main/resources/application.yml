@@ -19,3 +19,7 @@ server:
 logging:
   level:
     com.flokr.groupware: DEBUG
+# JWT 설정
+jwt:
+  secret: flokr-groupware-jwt-secret-key-for-authentication-system-very-long-secret-key-must-be-at-least-256-bits
+  token-validity-in-seconds: 86400  # 24시간

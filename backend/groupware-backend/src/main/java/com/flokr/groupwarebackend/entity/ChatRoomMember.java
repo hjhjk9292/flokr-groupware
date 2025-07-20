@@ -32,9 +32,11 @@ public class ChatRoomMember {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @Builder.Default
     private MemberRole role = MemberRole.MEMBER;
     
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
     
     @Column(name = "last_read_at")
