@@ -46,7 +46,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(employee.getEmpId())
-                .claim(AUTHORITIES_KEY, "ROLE_" + employee.getRole().name())
+                .claim(AUTHORITIES_KEY, "ROLE_" + employee.getRoleEnum().name())
                 .claim(USER_ID_KEY, employee.getEmpId())
                 .claim(USER_NAME_KEY, employee.getEmpName())
                 .claim(DEPARTMENT_KEY, employee.getDepartment() != null ? employee.getDepartment().getDeptName() : "")

@@ -1,25 +1,28 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/flokr_groupware
-    username: root
-    password: root123!
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
     properties:
       hibernate:
+        show_sql: true
         format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/flokr_groupware?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: "root123!"
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-server:
-  port: 8080
+# JWT 설정
+jwt:
+  secret: flokr-groupware-jwt-secret-key-for-authentication-system-very-long-secret-key-must-be-at-least-256-bits
+  token-validity-in-seconds: 86400
 
 logging:
   level:
     com.flokr.groupware: DEBUG
-# JWT 설정
-jwt:
-  secret: flokr-groupware-jwt-secret-key-for-authentication-system-very-long-secret-key-must-be-at-least-256-bits
-  token-validity-in-seconds: 86400  # 24시간
+    org.hibernate.SQL: DEBUG

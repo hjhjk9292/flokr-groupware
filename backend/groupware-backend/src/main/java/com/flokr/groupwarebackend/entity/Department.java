@@ -11,46 +11,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "departments")
+@Table(name = "DEPARTMENT")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Department {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dept_id")
-    private Long deptId;
-    
-    @Column(name = "dept_name", nullable = false, length = 100)
+    @Column(name = "DEPT_NO")
+    private Long deptNo;
+
+    @Column(name = "DEPT_NAME", nullable = false, length = 100)
     private String deptName;
-    
-    @Column(name = "dept_code", unique = true, length = 20)
-    private String deptCode;
-    
-    @Column(name = "description", length = 500)
-    private String description;
-    
-    @Column(name = "parent_dept_id")
-    private Long parentDeptId;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id", foreignKey = @ForeignKey(name = "FK_department_manager"))
-    private Employee manager;
-    
+
+    @CreationTimestamp
+    @Column(name = "CREATE_DATE", nullable = false, updatable = false)
+    private LocalDateTime createDate;
+
+    @Column(name = "STATUS", length = 1, columnDefinition = "CHAR(1)")
+    @Builder.Default
+    private String status = "Y";
+
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Employee> employees;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

@@ -1,8 +1,6 @@
 package com.flokr.groupwarebackend.repository;
 
 import com.flokr.groupwarebackend.entity.Notification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,33 +12,30 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    
-    // 수신자별 알림 조회 (페이징)
-    Page<Notification> findByReceiver_EmpIdOrderByCreatedAtDesc(String receiverId, Pageable pageable);
-    
-    // 읽지 않은 알림 조회
-    List<Notification> findByReceiver_EmpIdAndIsReadFalseOrderByCreatedAtDesc(String receiverId);
-    
-    // 읽지 않은 알림 개수
-    long countByReceiver_EmpIdAndIsReadFalse(String receiverId);
-    
+
+    // 수신자별 읽지 않은 알림 개수
+    long countByRecipient_EmpNoAndReadDateIsNull(Long empNo);
+
+    // 수신자별 읽지 않은 알림 조회
+    List<Notification> findByRecipient_EmpNoAndReadDateIsNullOrderByCreateDateDesc(Long empNo);
+
+    // 수신자별 모든 알림 조회 (최신순)
+    List<Notification> findByRecipient_EmpNoOrderByCreateDateDesc(Long empNo);
+
     // 알림 타입별 조회
-    List<Notification> findByReceiver_EmpIdAndTypeOrderByCreatedAtDesc(String receiverId, Notification.NotificationType type);
-    
-    // 우선순위별 알림 조회
-    List<Notification> findByReceiver_EmpIdAndPriorityOrderByCreatedAtDesc(String receiverId, Notification.NotificationPriority priority);
-    
+    List<Notification> findByRecipient_EmpNoAndTypeOrderByCreateDateDesc(Long empNo, String type);
+
     // 특정 기간의 알림 조회
-    List<Notification> findByReceiver_EmpIdAndCreatedAtBetweenOrderByCreatedAtDesc(
-        String receiverId, LocalDateTime startDate, LocalDateTime endDate);
-    
+    List<Notification> findByRecipient_EmpNoAndCreateDateBetweenOrderByCreateDateDesc(
+            Long empNo, LocalDateTime startDate, LocalDateTime endDate);
+
     // 알림 읽음 처리
     @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true, n.readAt = :readAt WHERE n.notificationId = :notificationId")
-    void markAsRead(@Param("notificationId") Long notificationId, @Param("readAt") LocalDateTime readAt);
-    
+    @Query("UPDATE Notification n SET n.readDate = :readDate WHERE n.notificationNo = :notificationNo")
+    void markAsRead(@Param("notificationNo") Long notificationNo, @Param("readDate") LocalDateTime readDate);
+
     // 수신자의 모든 알림 읽음 처리
     @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true, n.readAt = :readAt WHERE n.receiver.empId = :receiverId AND n.isRead = false")
-    void markAllAsRead(@Param("receiverId") String receiverId, @Param("readAt") LocalDateTime readAt);
+    @Query("UPDATE Notification n SET n.readDate = :readDate WHERE n.recipient.empNo = :empNo AND n.readDate IS NULL")
+    void markAllAsRead(@Param("empNo") Long empNo, @Param("readDate") LocalDateTime readDate);
 }

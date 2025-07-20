@@ -11,57 +11,43 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "chat_rooms")
+@Table(name = "CHAT_ROOM")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ChatRoom {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
-    private Long roomId;
-    
-    @Column(name = "room_name", nullable = false, length = 100)
+    @Column(name = "ROOM_NO")
+    private Long roomNo;
+
+    @Column(name = "ROOM_NAME", length = 100)
     private String roomName;
-    
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "room_type", nullable = false)
+    @Column(name = "ROOM_TYPE", nullable = false, length = 50)
     private RoomType roomType;
-    
-    @Column(name = "description", length = 500)
-    private String description;
-    
-    @Column(name = "max_participants")
-    private Integer maxParticipants;
-    
-    @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = true;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", nullable = false, foreignKey = @ForeignKey(name = "FK_chatroom_creator"))
+    @JoinColumn(name = "CREATED_BY_EMP_NO", foreignKey = @ForeignKey(name = "FK_chatroom_creator"))
     private Employee createdBy;
-    
+
+    @CreationTimestamp
+    @Column(name = "CREATE_DATE")
+    private LocalDateTime createDate;
+
+    @Column(name = "STATUS", length = 1, columnDefinition = "CHAR(1)")
+    @Builder.Default
+    private String status = "Y";
+
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatRoomMember> members;
-    
+
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messages;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    
+
     public enum RoomType {
         PUBLIC, PRIVATE, DEPARTMENT, PROJECT
     }

@@ -11,42 +11,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "positions")
+@Table(name = "POSITION")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Position {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "position_id")
-    private Long positionId;
-    
-    @Column(name = "position_name", nullable = false, length = 50)
+    @Column(name = "POSITION_NO")
+    private Long positionNo;
+
+    @Column(name = "POSITION_NAME", nullable = false, length = 100)
     private String positionName;
-    
-    @Column(name = "position_level", nullable = false)
-    private Integer positionLevel;
-    
-    @Column(name = "base_salary")
-    private Long baseSalary;
-    
-    @Column(name = "description", length = 500)
-    private String description;
-    
+
+    @CreationTimestamp
+    @Column(name = "CREATE_DATE", nullable = false, updatable = false)
+    private LocalDateTime createDate;
+
+    @Column(name = "STATUS", length = 1, columnDefinition = "CHAR(1)")
+    @Builder.Default
+    private String status = "Y";
+
     @OneToMany(mappedBy = "position", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Employee> employees;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

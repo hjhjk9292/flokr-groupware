@@ -10,59 +10,57 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notifications")
+@Table(name = "NOTIFICATION")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Notification {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
-    private Long notificationId;
-    
+    @Column(name = "NOTIFICATION_NO")
+    private Long notificationNo;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id", nullable = false, foreignKey = @ForeignKey(name = "FK_notification_receiver"))
-    private Employee receiver;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", foreignKey = @ForeignKey(name = "FK_notification_sender"))
-    private Employee sender;
-    
-    @Column(name = "title", nullable = false, length = 200)
+    @JoinColumn(name = "RECIPIENT_EMP_NO", nullable = false, foreignKey = @ForeignKey(name = "FK_notification_recipient"))
+    private Employee recipient;
+
+    @Column(name = "TYPE", nullable = false, length = 50)
+    private String type;
+
+    @Column(name = "TITLE", nullable = false, length = 255)
     private String title;
-    
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+
+    @Column(name = "NOTIFICATION_CONTENT", columnDefinition = "TEXT")
     private String content;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private NotificationType type;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "priority", nullable = false)
-    @Builder.Default
-    private NotificationPriority priority = NotificationPriority.NORMAL;
-    
-    @Column(name = "is_read", nullable = false)
-    @Builder.Default
-    private Boolean isRead = false;
-    
-    @Column(name = "read_at")
-    private LocalDateTime readAt;
-    
-    @Column(name = "related_url", length = 500)
-    private String relatedUrl;
-    
+
+    @Column(name = "REF_TYPE", length = 50)
+    private String refType;
+
+    @Column(name = "REF_NO", length = 255)
+    private String refNo;
+
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
+    @Column(name = "CREATE_DATE")
+    private LocalDateTime createDate;
+
+    @Column(name = "read_DATE")
+    private LocalDateTime readDate;
+
+    // Helper methods
+    public boolean isRead() {
+        return readDate != null;
+    }
+
+    public void markAsRead() {
+        this.readDate = LocalDateTime.now();
+    }
+
     public enum NotificationType {
         APPROVAL, SCHEDULE, TASK, ANNOUNCEMENT, SYSTEM, CHAT, ATTENDANCE
     }
-    
+
     public enum NotificationPriority {
         LOW, NORMAL, HIGH, URGENT
     }
