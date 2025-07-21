@@ -1,0 +1,746 @@
+/* src/components/UserDashboard.css */
+
+.user-dashboard-container {
+    min-height: 100vh;
+    background-color: var(--bg-secondary);
+  }
+  
+  .user-dashboard-main {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+    height: calc(100vh - 140px);
+    overflow: hidden;
+  }
+  
+  /* 왼쪽 컬럼 */
+  .user-left-column {
+    flex-basis: 35%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* 가운데 컬럼 */
+  .user-center-column {
+    flex-basis: 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* 오른쪽 컬럼 */
+  .user-right-column {
+    flex-basis: 20%;
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    height: fit-content;
+  }
+  
+  /* 공통 섹션 스타일 */
+  .user-calendar-section,
+  .user-notices-section {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  
+  .user-section-title {
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--primary-color);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  /* 프로필 + 출퇴근 통합 섹션 */
+  .user-profile-attendance-section {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+  }
+  
+  .user-profile-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 20px;
+  }
+  
+  .user-section-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0 -10px 20px -10px;
+  }
+  
+  .user-attendance-area {
+    flex: 1;
+  }
+  
+  .user-profile-avatar {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  
+  .user-status-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid white;
+    animation: pulse 2s infinite;
+  }
+  
+  .user-status-indicator.online {
+    background-color: #28a745;
+  }
+  
+  .user-status-indicator.away {
+    background-color: #ffc107;
+  }
+  
+  .user-status-indicator.busy {
+    background-color: #dc3545;
+  }
+  
+  .user-status-indicator.offline {
+    background-color: #6c757d;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+  }
+  
+  .user-profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+  }
+  
+  .user-profile-title {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0 0 12px 0;
+  }
+  
+  .user-profile-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .user-btn-small {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 15px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .user-btn-small:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 출퇴근 섹션 */
+  .user-current-date {
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 15px 0;
+  }
+  
+  .user-time-info {
+    display: flex;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px 15px;
+    margin-bottom: 15px;
+    transition: var(--transition);
+  }
+  
+  .user-time-info:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .user-time-item {
+    flex: 1;
+    text-align: center;
+    padding: 0 10px;
+  }
+  
+  .user-time-item + .user-time-item {
+    border-left: 1px solid var(--border-color);
+  }
+  
+  .user-time-label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  
+  .user-time-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-primary);
+  }
+  
+  .user-action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .user-btn-large {
+    flex: 1;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .user-btn-large:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-btn-large:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .user-btn-checkin {
+    background-color: white;
+    color: var(--primary-color);
+    border-color: var(--border-color);
+  }
+  
+  .user-btn-checkout {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
+  /* 업무 목록 섹션 */
+  .user-tasks-section {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    height: fit-content;
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+  }
+  
+  .user-tasks-table table,
+  .user-notices-table table,
+  .user-team-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .user-tasks-table th,
+  .user-tasks-table td,
+  .user-notices-table th,
+  .user-notices-table td,
+  .user-team-table th,
+  .user-team-table td {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+  }
+  
+  .user-tasks-table th,
+  .user-notices-table th,
+  .user-team-table th {
+    background-color: var(--bg-secondary);
+    font-size: 11px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .user-tasks-table tr:last-child td,
+  .user-notices-table tr:last-child td,
+  .user-team-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .user-tasks-table tr:hover,
+  .user-notices-table tr:hover,
+  .user-team-table tr:hover {
+    background-color: var(--bg-secondary);
+  }
+  
+  .user-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .user-status:hover {
+    transform: scale(1.05);
+  }
+  
+  .user-status.status-inprogress {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+  
+  .user-status.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .user-status.status-pending {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .user-status.status-hold {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+  }
+  
+  /* 우선순위 표시 */
+  .user-priority-indicator {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 캘린더 섹션 */
+  .user-calendar-section {
+    flex-basis: 65%;
+  }
+  
+  .user-calendar-placeholder h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+  
+  .user-calendar-grid {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .user-calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: var(--bg-secondary);
+  }
+  
+  .user-calendar-header span {
+    padding: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border-color);
+  }
+  
+  .user-calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  
+  .user-calendar-day {
+    min-height: 45px;
+    padding: 5px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .user-calendar-day:hover {
+    background-color: var(--bg-secondary);
+    transform: scale(1.02);
+  }
+  
+  .user-calendar-day.today {
+    background-color: rgba(0, 53, 97, 0.1);
+    font-weight: bold;
+    border: 2px solid var(--primary-color);
+  }
+  
+  .user-calendar-event {
+    font-size: 9px;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-top: 2px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* 공지사항 섹션 */
+  .user-notices-section {
+    flex-grow: 1;
+  }
+  
+  .user-notice-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .user-new-badge {
+    background-color: #dc3545;
+    color: white;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+  }
+  
+  /* 팀원 주소록 */
+  .user-member-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .user-member-avatar {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  
+  .user-member-status {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  
+  .user-member-status.online {
+    background-color: #28a745;
+  }
+  
+  .user-member-status.away {
+    background-color: #ffc107;
+  }
+  
+  .user-member-status.busy {
+    background-color: #dc3545;
+  }
+  
+  .user-member-status.offline {
+    background-color: #6c757d;
+  }
+  
+  .user-member-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-member-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  
+  .user-member-position {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  
+  .user-grade-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background-color: #e7f1ff;
+    color: var(--primary-color);
+    border-radius: 15px;
+    font-size: 10px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .user-grade-badge:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .user-chat-icon {
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 16px;
+  }
+  
+  .user-chat-icon:hover {
+    color: var(--primary-color);
+    transform: scale(1.2);
+  }
+  
+  .user-options-icon {
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 16px;
+  }
+  
+  .user-options-icon:hover {
+    color: var(--text-primary);
+    transform: rotate(90deg);
+  }
+  
+  /* 로딩 애니메이션 */
+  .user-loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 성공/실패 메시지 */
+  .user-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .user-toast.success {
+    background-color: #28a745;
+  }
+  
+  .user-toast.error {
+    background-color: #dc3545;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* 반응형 디자인 */
+  @media (max-width: 1200px) {
+    .user-dashboard-main {
+      gap: 15px;
+      padding: 15px;
+    }
+    
+    .user-profile-avatar {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+    }
+    
+    .user-calendar-day {
+      min-height: 40px;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .user-dashboard-main {
+      flex-direction: column;
+      height: auto;
+      overflow: visible;
+    }
+    
+    .user-left-column,
+    .user-center-column,
+    .user-right-column {
+      flex-basis: auto;
+    }
+    
+    .user-profile-attendance-section {
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-profile-area {
+      flex-basis: 40%;
+      padding-bottom: 0;
+    }
+    
+    .user-section-divider {
+      width: 1px;
+      height: 100px;
+      margin: 0 20px;
+    }
+    
+    .user-attendance-area {
+      flex-basis: 60%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .user-dashboard-main {
+      padding: 10px;
+      gap: 10px;
+    }
+    
+    .user-profile-attendance-section {
+      flex-direction: column;
+    }
+    
+    .user-section-divider {
+      width: 100%;
+      height: 1px;
+      margin: 20px -10px;
+    }
+    
+    .user-time-info {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .user-time-item + .user-time-item {
+      border-left: none;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+    
+    .user-action-buttons {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .user-calendar-body {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+    }
+    
+    .user-calendar-day {
+      min-height: 35px;
+      font-size: 11px;
+    }
+    
+    .user-calendar-event {
+      font-size: 8px;
+      padding: 1px 2px;
+    }
+  }
+  
+  /* 다크 모드 지원 */
+  @media (prefers-color-scheme: dark) {
+    .user-status-indicator {
+      border-color: #2c2c2c;
+    }
+    
+    .user-member-status {
+      border-color: #2c2c2c;
+    }
+    
+    .user-new-badge {
+      background-color: #ff4757;
+    }
+    
+    .user-calendar-day.today {
+      background-color: rgba(0, 123, 255, 0.2);
+    }
+  }
+  
+  /* 접근성 개선 */
+  .user-btn-large:focus,
+  .user-btn-small:focus,
+  .user-status:focus,
+  .user-chat-icon:focus,
+  .user-options-icon:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+  
+  /* 인쇄용 스타일 */
+  @media print {
+    .user-dashboard-container {
+      background-color: white;
+    }
+    
+    .user-action-buttons,
+    .user-chat-icon,
+    .user-options-icon {
+      display: none;
+    }
+    
+    .user-dashboard-main {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
