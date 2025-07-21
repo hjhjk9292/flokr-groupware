@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime; // LocalDateTime 임포트 추가
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-// 수정 전: public interface EmployeeRepository extends JpaRepository<Employee, String> {
 public interface EmployeeRepository extends JpaRepository<Employee, Long> { // 기본 키 타입을 String -> Long으로 변경
 
     // PK로 조회 (EMP_NO 기준)
@@ -40,4 +40,22 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> { // �
 
     // 관리자 권한 직원 조회
     List<Employee> findByIsAdmin(String isAdmin);
+
+    // 사번 자동 생성을 위한 마지막 사번 조회 (레거시 로직 참고)
+    // 패턴: {부서번호}{연도2자리}{순번3자리} (예: 10225001)
+    @Query(value = "SELECT emp_id FROM EMPLOYEE " +
+            "WHERE SUBSTRING(emp_id, 1, LENGTH(:deptNo)) = :deptNo " + // 부서번호로 시작
+            "AND SUBSTRING(emp_id, LENGTH(:deptNo) + 1, 2) = :yearPrefix " + // 연도2자리 확인
+            "ORDER BY emp_id DESC LIMIT 1",
+            nativeQuery = true)
+    Optional<String> findTopByEmpIdStartingWithDeptNoAndYearPrefix(@Param("deptNo") String deptNo, @Param("yearPrefix") String yearPrefix);
+
+    // 전체 직원 수 조회 (대시보드 통계용)
+    long count();
+
+    // 활성 직원 수 조회 (대시보드 통계용)
+    long countByStatus(String status);
+
+    // 특정 기간에 입사한 직원 수 조회 (월별 신규 입사자 통계용)
+    long countByHireDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }
