@@ -1,0 +1,85 @@
+// src/App.js - Import 경로 수정
+import React, { useState, useEffect } from 'react';
+import LoginForm from './components/LoginForm'; // ← 여기 수정!
+import AdminDashboard from './components/AdminDashboard';
+import './App.css';
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 앱 시작 시 기존 토큰 확인
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    const storedUserData = localStorage.getItem('userData');
+
+    if (token && storedUserData) {
+      try {
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('사용자 데이터 파싱 오류:', error);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userData');
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUserData(userData);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setUserData(null);
+    setIsAuthenticated(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner"></div>
+        <p>로딩 중...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="App">
+      {isAuthenticated && userData ? (
+        <div>
+          {/* 관리자와 일반 사용자 구분 */}
+          {userData.role === 'ADMIN' || userData.isAdmin === 'Y' ? (
+            <AdminDashboard userData={userData} onLogout={handleLogout} />
+          ) : (
+            // UserDashboard 완성까지 임시 화면
+            <div style={{padding: '20px', textAlign: 'center'}}>
+              <h2>사용자 대시보드 준비 중...</h2>
+              <p>현재 사용자 대시보드를 개발 중입니다.</p>
+              <button 
+                onClick={handleLogout}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#003561',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                로그아웃
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <LoginForm onLogin={handleLogin} />
+      )}
+    </div>
+  );
+}
+
+export default App;
