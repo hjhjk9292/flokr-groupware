@@ -1,21 +1,88 @@
-/.metadata/
-/Servers/
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
+# Eclipse/STS files
+.metadata/
 .project
 .classpath
 .settings/
+/Servers/
 
-/flokrGroupware/target/
-/build/
-/bin/
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-application-prod.properties
+# Spring Boot Backend
+backend/groupware-backend/target/
+backend/groupware-backend/*.jar
+backend/groupware-backend/*.war
+backend/groupware-backend/*.ear
+backend/groupware-backend/*.class
+backend/groupware-backend/application-local.properties
+backend/groupware-backend/application-dev.properties
+backend/groupware-backend/application-prod.properties
+
+# React Frontend  
+frontend/groupware-frontend/node_modules/
+frontend/groupware-frontend/build/
+frontend/groupware-frontend/dist/
+frontend/groupware-frontend/.env
+frontend/groupware-frontend/.env.local
+frontend/groupware-frontend/.env.development.local
+frontend/groupware-frontend/.env.test.local
+frontend/groupware-frontend/.env.production.local
+frontend/groupware-frontend/npm-debug.log*
+frontend/groupware-frontend/yarn-debug.log*
+frontend/groupware-frontend/yarn-error.log*
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Security files
 *.pem
 *.key
 
-*.log
-*.tmp
-*.bak
-*.swp
-*.class
-Thumbs.db
+# Maven/Gradle
+target/
+build/
+bin/
+
+# Package files
+*.tgz
+*.tar.gz
+
+# IntelliJ IDEA
+/shelf/
+/workspace.xml
+/httpRequests/
+/mavenHomeManager.xml
+/dataSources/
+/dataSources.local.xml
+
+# Gradle build files"
+.gradle/
+backend/groupware-backend/.gradle/
+
+# Vercel deployment files
+.vercel
+frontend/groupware-frontend/.vercel/
