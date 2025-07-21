@@ -50,8 +50,8 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
       {/* 상단 헤더 - 관리자/사용자 공통 */}
       <header className="header-top">
         <div className="header-logo">
-          <img src="/images/Flokr_logo.png" alt="Flokr" className="header-logo-img" />
-          <span className="header-logo-text">FLOKR 그룹웨어</span>
+          <img src="/images/logo.png" alt="Flokr" className="header-logo-img" />
+          <span className="header-logo-text">Flokr</span>
         </div>
         <div className="header-right-section">
           {/* 검색바 */}
