@@ -21,13 +21,13 @@
 
 /* 로고 스타일 */
 .login-logo {
-  margin-bottom: 32px;
+  margin-bottom: 10px;
 }
 
 .logo-image {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 16px;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 10px;
   display: block;
   object-fit: contain;
 }
@@ -41,7 +41,7 @@
 
 /* 헤더 스타일 */
 .login-header {
-  margin-bottom: 32px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
@@ -270,10 +270,6 @@
   .logo-image {
     width: 50px;
     height: 50px;
-  }
-
-  .logo-text {
-    font-size: 20px;
   }
 
   .login-header h2 {

@@ -93,7 +93,6 @@ const LoginForm = ({ onLogin }) => {
             alt="Flokr"
             className="logo-image"
           />
-          <h1 className="logo-text">FLOKR 그룹웨어</h1>
         </div>
 
         <div className="login-header">
@@ -175,12 +174,10 @@ const LoginForm = ({ onLogin }) => {
         </form>
 
         <div className="test-account">
-          <p>테스트 계정:</p>
+          <p>테스트 계정</p>
           <div className="test-credentials">
             <span className="test-item">
               <strong>아이디:</strong> admin
-            </span>
-            <span className="test-item">
               <strong>비밀번호:</strong> 1234
             </span>
           </div>

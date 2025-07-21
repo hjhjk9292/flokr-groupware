@@ -25,7 +25,7 @@
   }
   
   .header-logo-text {
-    font-size: var(--text-xl);
+    font-size: var(--text-3xl);
     font-weight: var(--font-bold);
   }
   
