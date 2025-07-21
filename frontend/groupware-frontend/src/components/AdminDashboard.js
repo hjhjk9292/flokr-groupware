@@ -8,7 +8,7 @@ const AdminDashboard = ({ userData, onLogout }) => {
     totalEmployees: 0,
     activeEmployees: 0,
     totalDepartments: 0,
-    totalPositions: 0
+    totalNotices: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -21,22 +21,22 @@ const AdminDashboard = ({ userData, onLogout }) => {
       const token = localStorage.getItem('accessToken');
       
       // 통계 API 호출들
-      const [employeesRes, departmentsRes, positionsRes] = await Promise.all([
+      const [employeesRes, departmentsRes, noticesRes] = await Promise.all([
         fetch('/api/employees/stats/total', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
         fetch('/api/departments', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('/api/positions', {
+        fetch('/api/notices', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
 
-      const [employeesData, departmentsData, positionsData] = await Promise.all([
+      const [employeesData, departmentsData, noticesData] = await Promise.all([
         employeesRes.json(),
         departmentsRes.json(),
-        positionsRes.json()
+        noticesRes.json()
       ]);
 
       // 활성 직원 수 조회
@@ -49,7 +49,7 @@ const AdminDashboard = ({ userData, onLogout }) => {
         totalEmployees: employeesData.success ? employeesData.data : 0,
         activeEmployees: activeEmployeesData.success ? activeEmployeesData.data : 0,
         totalDepartments: departmentsData.success ? departmentsData.data.length : 0,
-        totalPositions: positionsData.success ? positionsData.data.length : 0
+        totalNotices: noticesData.success ? noticesData.data.length : 0
       });
     } catch (error) {
       console.error('대시보드 데이터 로딩 오류:', error);
@@ -116,12 +116,12 @@ const AdminDashboard = ({ userData, onLogout }) => {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon positions">
-              <i className="fas fa-award"></i>
+            <div className="stat-icon notices">
+              <i className="fas fa-bullhorn"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-title">직급 수</div>
-              <div className="stat-value">{stats.totalPositions}개</div>
+              <div className="stat-title">공지사항 수</div>
+              <div className="stat-value">{stats.totalNotices}개</div>
             </div>
           </div>
         </div>

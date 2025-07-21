@@ -1,7 +1,8 @@
-// src/App.js - Import 경로 수정
+// src/App.js
 import React, { useState, useEffect } from 'react';
-import LoginForm from './components/LoginForm'; // ← 여기 수정!
+import LoginForm from './components/LoginForm';
 import AdminDashboard from './components/AdminDashboard';
+import UserDashboard from './components/UserDashboard';
 import './App.css';
 
 function App() {
@@ -55,24 +56,7 @@ function App() {
           {userData.role === 'ADMIN' || userData.isAdmin === 'Y' ? (
             <AdminDashboard userData={userData} onLogout={handleLogout} />
           ) : (
-            // UserDashboard 완성까지 임시 화면
-            <div style={{padding: '20px', textAlign: 'center'}}>
-              <h2>사용자 대시보드 준비 중...</h2>
-              <p>현재 사용자 대시보드를 개발 중입니다.</p>
-              <button 
-                onClick={handleLogout}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#003561',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                로그아웃
-              </button>
-            </div>
+            <UserDashboard userData={userData} onLogout={handleLogout} />
           )}
         </div>
       ) : (
