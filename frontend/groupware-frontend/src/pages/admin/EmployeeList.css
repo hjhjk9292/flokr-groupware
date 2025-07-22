@@ -1,0 +1,714 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f5f7fb;
+    color: #333;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.employee-list-container {
+    min-height: 100vh;
+    background-color: #f5f7fb;
+}
+
+.employee-container {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.page-title h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #003561;
+}
+
+.page-title p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* 검색 필터 스타일 */
+.search-filter {
+    background-color: #f5f7fb;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.form-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+}
+
+.form-control {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background-color: white;
+    min-width: 120px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.mr-3 {
+    margin-right: 1rem;
+}
+
+/* 상태 필터 스타일 */
+.status-filter {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.custom-control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding-left: 1.5rem;
+    margin-right: 1rem;
+    min-height: 1.5rem;
+}
+
+.custom-control-input {
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    width: 1rem;
+    height: 1.25rem;
+    opacity: 0;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    color: #fff;
+    border-color: #003561;
+    background-color: #003561;
+}
+
+.custom-control-label {
+    position: relative;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    user-select: none;
+    cursor: pointer;
+}
+
+.custom-control-label::before {
+    position: absolute;
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+    content: "";
+    background-color: #fff;
+    border: 1px solid #adb5bd;
+    border-radius: 50%;
+}
+
+.custom-control-label::after {
+    position: absolute;
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    content: "";
+    background: no-repeat 50%/50% 50%;
+}
+
+.custom-control-input:checked ~ .custom-control-label::after {
+    background-image: radial-gradient(circle, white 30%, transparent 30%);
+}
+
+.custom-control-inline {
+    display: inline-flex;
+    margin-right: 1rem;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+/* 테이블 스타일 */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+.employee-table th {
+    background-color: #f5f7fb;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.875rem;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.employee-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.employee-table tr:hover {
+    background-color: #f5f7fb;
+}
+
+/* 상태 배지 */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-active {
+    background-color: #e6f8f1;
+    color: #00b97c;
+}
+
+.status-inactive {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* 프로필 이미지 */
+.profile-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
+
+.profile-default {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #eee;
+}
+
+.profile-default span {
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* 액션 버튼 */
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    background-color: #f1f5f9;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.25rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+}
+
+.action-btn:hover {
+    background-color: #e2e8f0;
+    text-decoration: none;
+}
+
+.action-btn.detail {
+    background-color: #003561;
+    color: white;
+}
+
+.action-btn.detail:hover {
+    background-color: #002b4e;
+    color: white;
+}
+
+.action-btn.edit {
+    background-color: #ebf5ff;
+    color: #0078ff;
+}
+
+.action-btn.edit:hover {
+    background-color: #dbeafe;
+    color: #0078ff;
+}
+
+.action-btn.delete {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.action-btn.delete:hover {
+    background-color: #fecaca;
+    color: #ef4444;
+}
+
+/* 페이지네이션 */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+}
+
+.page-item {
+    list-style: none;
+}
+
+.page-link {
+    padding: 8px 12px;
+    background-color: white;
+    color: #333;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    min-width: 40px;
+    text-align: center;
+}
+
+.page-link:hover {
+    background-color: #f1f5f9;
+    text-decoration: none;
+    color: #333;
+}
+
+.page-item.active .page-link {
+    background-color: #003561;
+    border-color: #003561;
+    color: white;
+}
+
+.page-item.active .page-link:hover {
+    background-color: #002b4e;
+    border-color: #002b4e;
+    color: white;
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background-color: #003561;
+    color: white;
+    border-color: #003561;
+}
+
+.btn-primary:hover {
+    background-color: #002b4e;
+    border-color: #002b4e;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-outline-secondary {
+    background-color: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f1f5f9;
+    border-color: #d1d5db;
+    text-decoration: none;
+    color: #64748b;
+}
+
+/* 유틸리티 클래스 */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.mr-1 {
+    margin-right: 0.25rem;
+}
+
+/* 로딩 및 에러 상태 */
+.employee-list-loading,
+.employee-list-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: #666;
+    background-color: white;
+    margin: 2rem auto;
+    max-width: 1280px;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #003561;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.employee-list-error p {
+    color: #ef4444;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .employee-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .form-inline {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        width: 100%;
+        margin-bottom: 1rem;
+        justify-content: space-between;
+    }
+    
+    .form-control {
+        min-width: 200px;
+    }
+    
+    .custom-control-inline {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-container {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
+    
+    .employee-table {
+        font-size: 0.75rem;
+    }
+    
+    .employee-table th,
+    .employee-table td {
+        padding: 0.5rem;
+    }
+    
+    .action-btn {
+        padding: 0.2rem 0.4rem;
+        margin-right: 0.2rem;
+        font-size: 0.7rem;
+        min-width: 24px;
+        height: 24px;
+    }
+    
+    .profile-img,
+    .profile-default {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .profile-default span {
+        font-size: 14px;
+    }
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #003561;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #f1f5f9;
+    color: #374151;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    border-radius: 0 0 8px 8px;
+}
+
+/* 사원 상세보기 스타일 */
+.employee-detail {
+    width: 100%;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.detail-col {
+    flex: 1;
+}
+
+.detail-col label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.detail-col p {
+    margin: 0;
+    padding: 0.75rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #1f2937;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+}
+
+.profile-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: #1f2937;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.profile-info p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+/* 사원 수정 폼 스타일 */
+.edit-form {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.form-col label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-col input,
+.form-col select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background-color: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-col input:focus,
+.form-col select:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 0.5rem;
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+    }
+    
+    .detail-row,
+    .form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .profile-section {
+        flex-direction: column;
+        text-align: center;
+    }
+}

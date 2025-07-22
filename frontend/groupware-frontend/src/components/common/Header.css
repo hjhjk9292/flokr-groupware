@@ -17,6 +17,7 @@
     font-size: var(--text-xl);
     font-weight: var(--font-bold);
     color: var(--primary-color);
+    cursor: pointer;
   }
   
   .header-logo-img {

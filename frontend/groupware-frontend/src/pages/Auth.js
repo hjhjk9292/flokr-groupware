@@ -1,8 +1,12 @@
-// src/components/LoginForm.js
-import React, { useState, useEffect } from 'react';
-import './LoginForm.css';
+// frontend/groupware-frontend/src/pages/Auth.js
 
-const LoginForm = ({ onLogin }) => {
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Auth.css';
+
+const Auth = ({ onLogin }) => { // 컴포넌트 이름 변경
+  const navigate = useNavigate();
+
   const [credentials, setCredentials] = useState({
     empId: '',
     password: ''
@@ -11,7 +15,6 @@ const LoginForm = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  // 컴포넌트 마운트 시 저장된 ID 불러오기
   useEffect(() => {
     const savedEmpId = localStorage.getItem('rememberedEmpId');
     if (savedEmpId) {
@@ -22,12 +25,7 @@ const LoginForm = ({ onLogin }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // ID 저장하기가 체크된 상태에서 ID 입력 시 실시간 저장
+    setCredentials(prev => ({ ...prev, [name]: value }));
     if (name === 'empId' && rememberMe) {
       localStorage.setItem('rememberedEmpId', value);
     }
@@ -36,12 +34,9 @@ const LoginForm = ({ onLogin }) => {
   const handleRememberMeChange = (e) => {
     const checked = e.target.checked;
     setRememberMe(checked);
-
     if (checked) {
-      // 체크 시 현재 ID 저장
       localStorage.setItem('rememberedEmpId', credentials.empId);
     } else {
-      // 체크 해제 시 저장된 ID 삭제
       localStorage.removeItem('rememberedEmpId');
     }
   };
@@ -54,25 +49,28 @@ const LoginForm = ({ onLogin }) => {
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // JWT 토큰과 사용자 정보 저장
         localStorage.setItem('accessToken', data.data.accessToken);
         localStorage.setItem('userData', JSON.stringify(data.data));
 
-        // ID 저장하기 처리
         if (rememberMe) {
           localStorage.setItem('rememberedEmpId', credentials.empId);
         }
 
         onLogin(data.data);
+        
+        if (data.data.role === 'ADMIN' || data.data.isAdmin === 'Y') {
+            navigate('/admin');
+        } else {
+            navigate('/user');
+        }
+
       } else {
         setError(data.message || '로그인에 실패했습니다.');
       }
@@ -192,4 +190,4 @@ const LoginForm = ({ onLogin }) => {
   );
 };
 
-export default LoginForm;
+export default Auth;

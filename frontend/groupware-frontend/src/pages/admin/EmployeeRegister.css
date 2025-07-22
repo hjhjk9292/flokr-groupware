@@ -1,0 +1,317 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f5f7fb;
+    color: #333;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.employee-register-container {
+    min-height: 100vh;
+    background-color: #f5f7fb;
+}
+
+.register-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.register-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #003561;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.register-group {
+    margin-bottom: 15px;
+}
+
+.register-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.register-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.register-input:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+}
+
+.register-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.2s;
+}
+
+.register-select:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+}
+
+.register-row {
+    display: flex;
+    margin-left: -10px;
+    margin-right: -10px;
+    gap: 0;
+}
+
+.register-col {
+    padding-left: 10px;
+    padding-right: 10px;
+    flex: 1;
+}
+
+/* 전화번호 입력 그룹 */
+.phone-input-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 5px;
+}
+
+.phone-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+
+.phone-input:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 2px rgba(0, 53, 97, 0.1);
+}
+
+.phone-separator {
+    font-weight: bold;
+    color: #666;
+    flex-shrink: 0;
+}
+
+/* 버튼 스타일 */
+.register-btn-container {
+    margin-top: 20px;
+    text-align: right;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.register-btn-primary {
+    background-color: #003561;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.register-btn-primary:hover:not(:disabled) {
+    background-color: #002b4e;
+}
+
+.register-btn-primary:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.register-btn-secondary {
+    background-color: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.register-btn-secondary:hover:not(:disabled) {
+    background-color: #f1f5f9;
+}
+
+.register-btn-secondary:disabled {
+    background-color: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* 자동 생성 정보 스타일 */
+.preview-info {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.password-hint {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin: 5px 0;
+}
+
+.auto-generate-info {
+    font-size: 13px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.email-info {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin: 5px 0;
+}
+
+.preview-info strong {
+    color: #003561;
+    font-weight: 600;
+}
+
+/* 메시지 스타일 */
+.loading-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    color: #0284c7;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e0f2fe;
+    border-top: 2px solid #0284c7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    color: #dc2626;
+}
+
+.error-message i {
+    font-size: 16px;
+}
+
+.success-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    color: #16a34a;
+}
+
+.success-message i {
+    font-size: 16px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .register-container {
+        margin: 20px;
+        padding: 15px;
+    }
+    
+    .register-row {
+        flex-direction: column;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .register-col {
+        padding-left: 0;
+        padding-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .phone-input-group {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 5px;
+    }
+    
+    .phone-input {
+        flex: 1;
+    }
+    
+    .register-btn-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .register-btn-primary,
+    .register-btn-secondary {
+        width: 100%;
+    }
+}
+
+/* 폼 유효성 검사 스타일 */
+.register-input:invalid {
+    border-color: #ef4444;
+}
+
+.register-select:invalid {
+    border-color: #ef4444;
+}
+
+.register-input:valid {
+    border-color: #10b981;
+}
+
+.register-select:valid {
+    border-color: #10b981;
+}

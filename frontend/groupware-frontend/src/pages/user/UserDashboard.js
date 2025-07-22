@@ -1,6 +1,6 @@
-// src/components/UserDashboard.js
+// src/pages/user/UserDashboardPage.js
 import React, { useState, useEffect } from 'react';
-import Header from './common/Header';
+import Header from '../../components/common/Header';
 import './UserDashboard.css';
 
 const UserDashboard = ({ userData, onLogout }) => {

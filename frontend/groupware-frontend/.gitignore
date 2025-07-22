@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+ # 새로운 줄 추가
+# IntelliJ IDEA files
+.idea/
