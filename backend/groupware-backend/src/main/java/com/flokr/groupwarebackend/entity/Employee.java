@@ -6,10 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "EMPLOYEE")
@@ -39,13 +38,15 @@ public class Employee {
     @Column(name = "PHONE", length = 20)
     private String phone;
 
-    @JsonBackReference // "직원"이 "부서"를 참조 (이전 추가됨)
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 부서 정보 - JSON 직렬화 포함하도록 수정
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "employees"})
+    @ManyToOne(fetch = FetchType.EAGER) // LAZY -> EAGER로 변경하여 N+1 문제 해결
     @JoinColumn(name = "DEPT_NO", nullable = false, foreignKey = @ForeignKey(name = "FK_employee_department"))
     private Department department;
 
-    @JsonBackReference // 추가: "직원"이 "직급"을 참조 (직렬화 시 순환 끊음)
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 직급 정보 - JSON 직렬화 포함하도록 수정
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "employees"})
+    @ManyToOne(fetch = FetchType.EAGER) // LAZY -> EAGER로 변경하여 N+1 문제 해결
     @JoinColumn(name = "POSITION_NO", nullable = false, foreignKey = @ForeignKey(name = "FK_employee_position"))
     private Position position;
 
@@ -101,6 +102,24 @@ public class Employee {
 
     public String getProfileImgPath() {
         return profileImageUrl;
+    }
+
+    // 부서/직급 번호를 직접 반환하는 헬퍼 메서드 (프론트엔드 호환성)
+    public Long getDeptNo() {
+        return department != null ? department.getDeptNo() : null;
+    }
+
+    public Long getPositionNo() {
+        return position != null ? position.getPositionNo() : null;
+    }
+
+    // 부서/직급 이름을 직접 반환하는 헬퍼 메서드 (프론트엔드 호환성)
+    public String getDeptName() {
+        return department != null ? department.getDeptName() : null;
+    }
+
+    public String getPositionName() {
+        return position != null ? position.getPositionName() : null;
     }
 
     public enum EmployeeStatus {
