@@ -223,7 +223,13 @@ public class EmployeeService {
      */
     @Transactional(readOnly = true)
     public List<Employee> getEmployeesByDepartmentAndPosition(Long deptNo, Long positionNo) {
-        return employeeRepository.findByDepartmentAndPosition(deptNo, positionNo);
+        if (positionNo == null) {
+            // 직급 조건이 없으면 해당 부서의 모든 직원 반환
+            return employeeRepository.findByDepartment_DeptNo(deptNo);
+        } else {
+            // 기존 로직 유지
+            return employeeRepository.findByDepartmentAndPosition(deptNo, positionNo);
+        }
     }
 
     /**

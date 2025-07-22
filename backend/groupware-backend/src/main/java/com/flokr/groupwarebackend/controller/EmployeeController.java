@@ -12,8 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -25,16 +27,63 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     /**
-     * 모든 활성 직원 목록 조회
+     * 사원 목록 조회 (검색 필터 포함) - 기존 getAllActiveEmployees 메서드를 확장
      */
     @GetMapping // GET /api/employees
-    public ResponseEntity<ApiResponse<List<Employee>>> getAllActiveEmployees() {
+    public ResponseEntity<ApiResponse<List<Employee>>> getEmployeesWithFilters(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String empId,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long deptNo,
+            @RequestParam(defaultValue = "1") int currentPage) {
         try {
-            log.info("Request to get all active employees.");
-            List<Employee> employees = employeeService.getAllActiveEmployees();
-            return ResponseEntity.ok(ApiResponse.success("활성 직원 목록 조회", employees));
+            log.info("Request to get employees with filters - name: {}, empId: {}, email: {}, status: {}, deptNo: {}",
+                    name, empId, email, status, deptNo);
+
+            List<Employee> employees;
+
+            // 검색 조건에 따라 다른 Service 메서드 호출
+            if (name != null && !name.trim().isEmpty()) {
+                employees = employeeService.searchEmployeesByName(name.trim());
+                log.info("Search by name '{}' returned {} employees", name.trim(), employees.size());
+            } else if (empId != null && !empId.trim().isEmpty()) {
+                employees = employeeService.getEmployeeByEmpId(empId.trim())
+                        .map(Arrays::asList)
+                        .orElse(Collections.emptyList());
+                log.info("Search by empId '{}' returned {} employees", empId.trim(), employees.size());
+            } else if (email != null && !email.trim().isEmpty()) {
+                employees = employeeService.getEmployeeByEmail(email.trim())
+                        .map(Arrays::asList)
+                        .orElse(Collections.emptyList());
+                log.info("Search by email '{}' returned {} employees", email.trim(), employees.size());
+            } else if (deptNo != null) {
+                // 부서별 조회 시 positionNo는 null로 설정하여 모든 직급 포함
+                employees = employeeService.getEmployeesByDepartmentAndPosition(deptNo, null);
+                log.info("Search by deptNo '{}' returned {} employees", deptNo, employees.size());
+            } else {
+                // 기본: 모든 활성 직원
+                employees = employeeService.getAllActiveEmployees();
+                log.info("Retrieved all active employees: {} employees", employees.size());
+            }
+
+            // 상태 필터 적용 (Y: 활성, N: 비활성, null/빈값: 활성만)
+            if (status != null && !status.trim().isEmpty()) {
+                employees = employees.stream()
+                        .filter(emp -> status.equals(emp.getStatus()))
+                        .collect(Collectors.toList());
+                log.info("After status filter '{}': {} employees", status, employees.size());
+            } else {
+                // 기본적으로 활성 직원만 반환 (status가 null이거나 빈값일 때)
+                employees = employees.stream()
+                        .filter(emp -> "Y".equals(emp.getStatus()))
+                        .collect(Collectors.toList());
+                log.info("Applied default active filter: {} employees", employees.size());
+            }
+
+            return ResponseEntity.ok(ApiResponse.success("직원 목록 조회 성공", employees));
         } catch (Exception e) {
-            log.error("Error getting all active employees: {}", e.getMessage(), e);
+            log.error("Error getting employees with filters: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(ApiResponse.error("직원 목록 조회 실패", "INTERNAL_SERVER_ERROR"));
         }
     }
@@ -61,7 +110,7 @@ public class EmployeeController {
     @PostMapping // POST /api/employees
     public ResponseEntity<ApiResponse<Employee>> createEmployee(@Valid @RequestBody EmployeeRequest request) {
         try {
-            log.info("Request to create employee: {}", request.getEmpName()); // Log empName instead of empId as empId is auto-generated
+            log.info("Request to create employee: {}", request.getEmpName());
             Employee createdEmployee = employeeService.createEmployee(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("직원 생성 성공", createdEmployee));
         } catch (ValidationException e) {
@@ -79,7 +128,7 @@ public class EmployeeController {
     @PutMapping("/{empNo}") // PUT /api/employees/{empNo}
     public ResponseEntity<ApiResponse<Employee>> updateEmployee(@PathVariable Long empNo, @Valid @RequestBody EmployeeRequest request) {
         try {
-            log.info("Request to update employee empNo {}: {}", empNo, request.getEmpName()); // Log empName instead of empId
+            log.info("Request to update employee empNo {}: {}", empNo, request.getEmpName());
             return employeeService.updateEmployee(empNo, request)
                     .map(updatedEmployee -> ResponseEntity.ok(ApiResponse.success("직원 수정 성공", updatedEmployee)))
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("직원을 찾을 수 없음", "EMPLOYEE_NOT_FOUND")));
@@ -112,7 +161,7 @@ public class EmployeeController {
     }
 
     /**
-     * 이름으로 직원 검색
+     * 이름으로 직원 검색 (하위 호환성)
      */
     @GetMapping("/search") // GET /api/employees/search?name=홍길동
     public ResponseEntity<ApiResponse<List<Employee>>> searchEmployeesByName(@RequestParam String name) {
@@ -180,10 +229,9 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<Long>> getEmployeeCountByDepartment(@PathVariable Long deptNo) {
         try {
             log.info("Request for employee count by department: {}", deptNo);
-            // DepartmentService에서 부서 존재 여부를 확인하고 직원 수를 반환하도록 로직이 이미 있음
             long count = employeeService.getEmployeeCountByDepartment(deptNo);
             return ResponseEntity.ok(ApiResponse.success("부서별 직원 수 조회 성공", count));
-        } catch (ValidationException e) { // Service에서 던진 ValidationException을 처리
+        } catch (ValidationException e) {
             log.warn("Employee count by department validation failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body(ApiResponse.error("부서별 직원 수 조회 유효성 검증 실패", e.getMessage()));
         } catch (Exception e) {
