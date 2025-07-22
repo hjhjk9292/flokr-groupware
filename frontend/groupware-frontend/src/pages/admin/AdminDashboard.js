@@ -1,9 +1,17 @@
-// src/components/AdminDashboard.js
+// frontend/groupware-frontend/src/pages/admin/AdminDashboardPage.js
+
 import React, { useState, useEffect } from 'react';
-import Header from './common/Header';
+import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위해 useNavigate 훅 추가
+
+import Header from '../../components/common/Header';
+import EmployeeListPage from './EmployeeList';
+import EmployeeRegisterPage from './EmployeeRegister';
 import './AdminDashboard.css';
 
-const AdminDashboard = ({ userData, onLogout }) => {
+const AdminDashboardPage = ({ userData, onLogout }) => {
+  const navigate = useNavigate(); // useNavigate 훅 사용
+
+  // 이 컴포넌트 내부에서 라우팅을 직접 관리하는 대신, React Router를 활용
   const [stats, setStats] = useState({
     totalEmployees: 0,
     activeEmployees: 0,
@@ -13,22 +21,23 @@ const AdminDashboard = ({ userData, onLogout }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(); // 대시보드 데이터는 컴포넌트 마운트 시 한 번만 가져오도록
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('accessToken');
       
-      // 통계 API 호출들
+      // 통계 API 호출
       const [employeesRes, departmentsRes, noticesRes] = await Promise.all([
-        fetch('/api/employees/stats/total', {
+        fetch('http://localhost:8080/api/employees/stats/total', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('/api/departments', {
+        fetch('http://localhost:8080/api/departments', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('/api/notices', {
+        fetch('http://localhost:8080/api/notices', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -39,8 +48,7 @@ const AdminDashboard = ({ userData, onLogout }) => {
         noticesRes.json()
       ]);
 
-      // 활성 직원 수 조회
-      const activeEmployeesRes = await fetch('/api/employees/stats/active', {
+      const activeEmployeesRes = await fetch('http://localhost:8080/api/employees/stats/active', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const activeEmployeesData = await activeEmployeesRes.json();
@@ -58,6 +66,8 @@ const AdminDashboard = ({ userData, onLogout }) => {
     }
   };
 
+  // 페이지 네비게이션 navigate 훅 직접 사용
+  // 해당 페이지로 이동하는 함수들 직접 연결
   if (loading) {
     return (
       <div className="admin-dashboard-loading">
@@ -69,23 +79,29 @@ const AdminDashboard = ({ userData, onLogout }) => {
 
   return (
     <div className="admin-dashboard-container">
-      {/* 공통 헤더 사용 */}
+      {/* 공통 헤더는 항상 표시하거나, AdminLayout 컴포넌트를 만들어서 관리할 수 있습니다. */}
+      {/* 여기서는 Header 컴포넌트가 App.js의 <AdminDashboardPage>에 속하므로 그대로 둡니다. */}
       <Header 
         userData={userData}
         onLogout={onLogout}
         isAdmin={true}
+        // onNavigate prop은 더 이상 필요 없으며, Header 내부에서 navigate 훅을 사용해야 합니다.
       />
 
-      {/* 메인 콘텐츠 */}
+      {/* 라우팅은 App.js에서 이미 처리하고 있으므로, AdminDashboardPage는 대시보드 내용만 렌더링합니다. */}
       <main className="admin-dashboard-main">
         <div className="admin-dashboard-title">
           <h1>관리자 대시보드</h1>
           <p>조직 관리와 시스템 설정을 할 수 있습니다.</p>
         </div>
 
-        {/* 통계 카드들 */}
+        {/* 통계 카드들 - 클릭 가능 */}
         <div className="stats-grid">
-          <div className="stat-card">
+          <div 
+            className="stat-card clickable" 
+            onClick={() => navigate('/admin/employees/list')} // useNavigate 훅 사용
+            title="사원 목록으로 이동"
+          >
             <div className="stat-icon employees">
               <i className="fas fa-users"></i>
             </div>
@@ -95,7 +111,11 @@ const AdminDashboard = ({ userData, onLogout }) => {
             </div>
           </div>
 
-          <div className="stat-card">
+          <div 
+            className="stat-card clickable" 
+            onClick={() => navigate('/admin/employees/list')} // useNavigate 훅 사용
+            title="활성 직원 목록으로 이동"
+          >
             <div className="stat-icon active">
               <i className="fas fa-user-check"></i>
             </div>
@@ -140,7 +160,12 @@ const AdminDashboard = ({ userData, onLogout }) => {
               부서와 직급 정보를 관리하고 조직도를 설정합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">조직도 관리</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/organization')} // 예시 경로
+              >
+                조직도 관리
+              </button>
             </div>
           </div>
 
@@ -156,8 +181,18 @@ const AdminDashboard = ({ userData, onLogout }) => {
               신규 직원 정보를 등록하고 관리합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">사원 등록</button>
-              <button className="feature-btn secondary">사원 목록</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/employees/register')} // useNavigate 훅 사용
+              >
+                사원 등록
+              </button>
+              <button 
+                className="feature-btn secondary"
+                onClick={() => navigate('/admin/employees/list')} // useNavigate 훅 사용
+              >
+                사원 목록
+              </button>
             </div>
           </div>
 
@@ -173,8 +208,18 @@ const AdminDashboard = ({ userData, onLogout }) => {
               공지사항을 등록하고 관리합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">공지 등록</button>
-              <button className="feature-btn secondary">공지 목록</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/notices/create')} // 예시 경로
+              >
+                공지 등록
+              </button>
+              <button 
+                className="feature-btn secondary"
+                onClick={() => navigate('/admin/notices/list')} // 예시 경로
+              >
+                공지 목록
+              </button>
             </div>
           </div>
 
@@ -190,8 +235,18 @@ const AdminDashboard = ({ userData, onLogout }) => {
               사용자 계정 정보와 접속 상태를 관리합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">사용자 정보 관리</button>
-              <button className="feature-btn secondary">접속 사용자 관리</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/users/manage')} // 예시 경로
+              >
+                사용자 정보 관리
+              </button>
+              <button 
+                className="feature-btn secondary"
+                onClick={() => navigate('/admin/users/sessions')} // 예시 경로
+              >
+                접속 사용자 관리
+              </button>
             </div>
           </div>
 
@@ -207,8 +262,18 @@ const AdminDashboard = ({ userData, onLogout }) => {
               회의실, 공용 장비 등 사내 시설을 관리합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">시설 현황</button>
-              <button className="feature-btn secondary">예약 관리</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/facilities/status')} // 예시 경로
+              >
+                시설 현황
+              </button>
+              <button 
+                className="feature-btn secondary"
+                onClick={() => navigate('/admin/facilities/reservations')} // 예시 경로
+              >
+                예약 관리
+              </button>
             </div>
           </div>
 
@@ -224,7 +289,12 @@ const AdminDashboard = ({ userData, onLogout }) => {
               시스템 알림을 설정하고 관리합니다.
             </p>
             <div className="feature-actions">
-              <button className="feature-btn primary">알림 설정</button>
+              <button 
+                className="feature-btn primary"
+                onClick={() => navigate('/admin/notifications/settings')} // 예시 경로
+              >
+                알림 설정
+              </button>
             </div>
           </div>
         </div>
@@ -233,4 +303,4 @@ const AdminDashboard = ({ userData, onLogout }) => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboardPage;
