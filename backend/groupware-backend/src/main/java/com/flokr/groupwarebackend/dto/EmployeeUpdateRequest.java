@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeRequest {
+public class EmployeeUpdateRequest {
 
     @NotBlank(message = "직원명은 필수입니다.")
     private String empName;
 
-    // 비밀번호 필드는 선택사항으로 변경 (@NotBlank 제거)
-    private String password;
+    // 수정 시에는 비밀번호가 선택사항 (@NotBlank 제거)
+    private String password; // KEEP_CURRENT_PASSWORD 또는 새 비밀번호
 
     @Email(message = "유효한 이메일 형식이 아닙니다.")
     private String email;

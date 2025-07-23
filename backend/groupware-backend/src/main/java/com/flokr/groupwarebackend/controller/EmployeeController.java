@@ -2,6 +2,7 @@ package com.flokr.groupwarebackend.controller;
 
 import com.flokr.groupwarebackend.dto.ApiResponse;
 import com.flokr.groupwarebackend.dto.EmployeeRequest;
+import com.flokr.groupwarebackend.dto.EmployeeUpdateRequest;
 import com.flokr.groupwarebackend.entity.Employee;
 import com.flokr.groupwarebackend.service.EmployeeService;
 import jakarta.validation.Valid;
@@ -19,17 +20,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/employees") // 직원 관련 API의 기본 경로
+@RequestMapping("/api/employees")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}) // 필요시 CORS 설정
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    /**
-     * 사원 목록 조회 (검색 필터 포함) - 기존 getAllActiveEmployees 메서드를 확장
-     */
-    @GetMapping // GET /api/employees
+    @GetMapping
     public ResponseEntity<ApiResponse<List<Employee>>> getEmployeesWithFilters(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String empId,
@@ -43,7 +41,6 @@ public class EmployeeController {
 
             List<Employee> employees;
 
-            // 검색 조건에 따라 다른 Service 메서드 호출
             if (name != null && !name.trim().isEmpty()) {
                 employees = employeeService.searchEmployeesByName(name.trim());
                 log.info("Search by name '{}' returned {} employees", name.trim(), employees.size());
@@ -58,23 +55,19 @@ public class EmployeeController {
                         .orElse(Collections.emptyList());
                 log.info("Search by email '{}' returned {} employees", email.trim(), employees.size());
             } else if (deptNo != null) {
-                // 부서별 조회 시 positionNo는 null로 설정하여 모든 직급 포함
                 employees = employeeService.getEmployeesByDepartmentAndPosition(deptNo, null);
                 log.info("Search by deptNo '{}' returned {} employees", deptNo, employees.size());
             } else {
-                // 기본: 모든 활성 직원
                 employees = employeeService.getAllActiveEmployees();
                 log.info("Retrieved all active employees: {} employees", employees.size());
             }
 
-            // 상태 필터 적용 (Y: 활성, N: 비활성, null/빈값: 활성만)
             if (status != null && !status.trim().isEmpty()) {
                 employees = employees.stream()
                         .filter(emp -> status.equals(emp.getStatus()))
                         .collect(Collectors.toList());
                 log.info("After status filter '{}': {} employees", status, employees.size());
             } else {
-                // 기본적으로 활성 직원만 반환 (status가 null이거나 빈값일 때)
                 employees = employees.stream()
                         .filter(emp -> "Y".equals(emp.getStatus()))
                         .collect(Collectors.toList());
@@ -88,10 +81,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 직원 번호(PK)로 직원 조회
-     */
-    @GetMapping("/{empNo}") // GET /api/employees/{empNo}
+    @GetMapping("/{empNo}")
     public ResponseEntity<ApiResponse<Employee>> getEmployeeByEmpNo(@PathVariable Long empNo) {
         try {
             log.info("Request to get employee by empNo: {}", empNo);
@@ -104,10 +94,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 새로운 직원 생성
-     */
-    @PostMapping // POST /api/employees
+    @PostMapping
     public ResponseEntity<ApiResponse<Employee>> createEmployee(@Valid @RequestBody EmployeeRequest request) {
         try {
             log.info("Request to create employee: {}", request.getEmpName());
@@ -122,11 +109,9 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 기존 직원 정보 수정
-     */
-    @PutMapping("/{empNo}") // PUT /api/employees/{empNo}
-    public ResponseEntity<ApiResponse<Employee>> updateEmployee(@PathVariable Long empNo, @Valid @RequestBody EmployeeRequest request) {
+    // 🔥 이 메소드만 수정됨!
+    @PutMapping("/{empNo}")
+    public ResponseEntity<ApiResponse<Employee>> updateEmployee(@PathVariable Long empNo, @Valid @RequestBody EmployeeUpdateRequest request) {
         try {
             log.info("Request to update employee empNo {}: {}", empNo, request.getEmpName());
             return employeeService.updateEmployee(empNo, request)
@@ -141,10 +126,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 직원 삭제(비활성화) (실제 데이터는 유지하고 상태만 'N'으로 변경)
-     */
-    @DeleteMapping("/{empNo}") // DELETE /api/employees/{empNo}
+    @DeleteMapping("/{empNo}")
     public ResponseEntity<ApiResponse<String>> deleteEmployee(@PathVariable Long empNo) {
         try {
             log.info("Request to delete employee empNo: {}", empNo);
@@ -160,10 +142,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 이름으로 직원 검색 (하위 호환성)
-     */
-    @GetMapping("/search") // GET /api/employees/search?name=홍길동
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<Employee>>> searchEmployeesByName(@RequestParam String name) {
         try {
             log.info("Request to search employees by name: {}", name);
@@ -175,10 +154,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 부서 및 직급으로 직원 조회
-     */
-    @GetMapping("/filter") // GET /api/employees/filter?deptNo=1&positionNo=3
+    @GetMapping("/filter")
     public ResponseEntity<ApiResponse<List<Employee>>> getEmployeesByDepartmentAndPosition(
             @RequestParam Long deptNo,
             @RequestParam Long positionNo) {
@@ -192,10 +168,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 관리자 대시보드 통계 API - 총 직원 수 조회
-     */
-    @GetMapping("/stats/total") // GET /api/employees/stats/total
+    @GetMapping("/stats/total")
     public ResponseEntity<ApiResponse<Long>> getTotalEmployeeCount() {
         try {
             log.info("Request for total employee count.");
@@ -207,10 +180,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 관리자 대시보드 통계 API - 활성 직원 수 조회
-     */
-    @GetMapping("/stats/active") // GET /api/employees/stats/active
+    @GetMapping("/stats/active")
     public ResponseEntity<ApiResponse<Long>> getActiveEmployeeCount() {
         try {
             log.info("Request for active employee count.");
@@ -222,10 +192,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 관리자 대시보드 통계 API - 부서별 직원 수 조회
-     */
-    @GetMapping("/stats/by-dept/{deptNo}") // GET /api/employees/stats/by-dept/{deptNo}
+    @GetMapping("/stats/by-dept/{deptNo}")
     public ResponseEntity<ApiResponse<Long>> getEmployeeCountByDepartment(@PathVariable Long deptNo) {
         try {
             log.info("Request for employee count by department: {}", deptNo);
@@ -240,10 +207,7 @@ public class EmployeeController {
         }
     }
 
-    /**
-     * 관리자 대시보드 통계 API - 특정 월 신규 입사자 수 조회
-     */
-    @GetMapping("/stats/new-hires/monthly") // GET /api/employees/stats/new-hires/monthly?year=2025&month=1
+    @GetMapping("/stats/new-hires/monthly")
     public ResponseEntity<ApiResponse<Long>> getNewHiresCountMonthly(@RequestParam int year, @RequestParam int month) {
         try {
             log.info("Request for new hires count for {}-{}", year, month);

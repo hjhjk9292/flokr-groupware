@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header';
 import './EmployeeRegister.css';
@@ -6,7 +6,6 @@ import './EmployeeRegister.css';
 const EmployeeRegister = ({ userData, onLogout }) => {
   const navigate = useNavigate();
 
-  // 폼 상태
   const [employee, setEmployee] = useState({
     empName: '',
     hireDate: '',
@@ -17,16 +16,13 @@ const EmployeeRegister = ({ userData, onLogout }) => {
     positionNo: ''
   });
 
-  // 기본 데이터
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
 
-  // UI 상태
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // 사번 미리보기
   const [empPreview, setEmpPreview] = useState({
     empId: '',
     email: '',
@@ -35,19 +31,28 @@ const EmployeeRegister = ({ userData, onLogout }) => {
 
   const currentYear = new Date().getFullYear().toString().substr(2);
 
-  // 초기 데이터 로드
+  const generateEmpPreview = useCallback(() => {
+    const sequenceStr = '001';
+    const newEmpId = employee.deptNo + currentYear + sequenceStr;
+    
+    setEmpPreview({
+      empId: newEmpId,
+      email: `${newEmpId}@flokr.com`,
+      password: `${newEmpId}init`
+    });
+  }, [employee.deptNo, currentYear]);
+
   useEffect(() => {
     fetchCommonData();
   }, []);
 
-  // 부서 선택 시 사번 미리보기
   useEffect(() => {
     if (employee.deptNo) {
       generateEmpPreview();
     } else {
       setEmpPreview({ empId: '', email: '', password: '' });
     }
-  }, [employee.deptNo]);
+  }, [employee.deptNo, generateEmpPreview]);
 
   const fetchCommonData = async () => {
     setLoading(true);
@@ -63,7 +68,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
         fetch('http://localhost:8080/api/positions', { headers })
       ]);
 
-      // 부서 데이터 처리
       if (deptResponse.ok) {
         const deptData = await deptResponse.json();
         if (deptData.success) {
@@ -75,7 +79,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
         setError('인증이 만료되었습니다. 다시 로그인해주세요.');
       }
 
-      // 직급 데이터 처리
       if (posResponse.ok) {
         const posData = await posResponse.json();
         if (posData.success) {
@@ -93,18 +96,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateEmpPreview = () => {
-    // 클라이언트에서 사번 예시 생성 (백엔드 API가 없을 경우)
-    const sequenceStr = '001'; // 예시 순번
-    const newEmpId = employee.deptNo + currentYear + sequenceStr;
-    
-    setEmpPreview({
-      empId: newEmpId,
-      email: `${newEmpId}@flokr.com`,
-      password: `${newEmpId}init`
-    });
   };
 
   const handleChange = (e) => {
@@ -162,40 +153,39 @@ const EmployeeRegister = ({ userData, onLogout }) => {
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      // 전화번호 조합
       const phone = employee.phone2 && employee.phone3 
         ? `${employee.phone1}-${employee.phone2}-${employee.phone3}`
         : null;
 
-      // 백엔드 EmployeeRequest DTO에 맞는 데이터 구성
       const employeeData = {
         empName: employee.empName.trim(),
-        password: 'temp123', // 임시 비밀번호 (백엔드에서 자동 생성된 것으로 덮어씀)
-        hireDate: employee.hireDate + 'T00:00:00', // LocalDateTime 형식
+        password: 'temp123', // 임시 값, 백엔드에서 자동으로 "사번+init"으로 변경됨
+        hireDate: employee.hireDate + 'T00:00:00',
         phone: phone,
         deptNo: parseInt(employee.deptNo),
         positionNo: parseInt(employee.positionNo),
         isAdmin: 'N'
       };
 
-      console.log('사원 등록 데이터:', employeeData);
+      console.log('사원 등록 요청 데이터:', employeeData);
 
       const registerResponse = await fetch('http://localhost:8080/api/employees', {
         method: 'POST',
         headers,
         body: JSON.stringify(employeeData)
       });
-
-      console.log('등록 응답 상태:', registerResponse.status);
       
       if (registerResponse.ok) {
         const data = await registerResponse.json();
-        console.log('등록 응답 데이터:', data);
+        console.log('등록 성공 응답:', data);
         
         if (data.success) {
-          setSuccess('사원이 성공적으로 등록되었습니다.');
+          const createdEmployee = data.data;
+          const actualEmpId = createdEmployee?.empId || '확인필요';
+          const actualPassword = actualEmpId + 'init';
           
-          // 폼 초기화
+          setSuccess(`사원이 성공적으로 등록되었습니다!\n실제 생성된 사번: ${actualEmpId}\n초기 비밀번호: ${actualPassword}`);
+          
           setEmployee({
             empName: '',
             hireDate: '',
@@ -207,10 +197,9 @@ const EmployeeRegister = ({ userData, onLogout }) => {
           });
           setEmpPreview({ empId: '', email: '', password: '' });
           
-          // 2초 후 목록 페이지로 이동
           setTimeout(() => {
             navigate('/admin/employees/list');
-          }, 2000);
+          }, 4000); // 4초로 늘려서 정보 확인 시간 제공
         } else {
           setError(data.message || '사원 등록에 실패했습니다.');
         }
@@ -218,7 +207,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
         setError('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await registerResponse.json().catch(() => ({}));
-        console.error('등록 오류 응답:', errorData);
         setError(errorData.message || `서버 오류 (${registerResponse.status}): 사원 등록에 실패했습니다.`);
       }
     } catch (err) {
@@ -391,7 +379,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
             </p>
           </div>
           
-          {/* 관리자 여부 필드 제거, 기본값 N으로 설정 */}
           <input type="hidden" name="isAdmin" value="N" />
           
           <div className="register-btn-container">

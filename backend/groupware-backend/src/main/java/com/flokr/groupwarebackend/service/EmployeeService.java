@@ -1,6 +1,7 @@
 package com.flokr.groupwarebackend.service;
 
 import com.flokr.groupwarebackend.dto.EmployeeRequest;
+import com.flokr.groupwarebackend.dto.EmployeeUpdateRequest;
 import com.flokr.groupwarebackend.entity.Department;
 import com.flokr.groupwarebackend.entity.Employee;
 import com.flokr.groupwarebackend.entity.Position;
@@ -97,14 +98,8 @@ public class EmployeeService {
         // 사번 자동 생성 (레거시 로직 참고, 동시성 고려)
         newEmployee.setEmpId(generateNewEmpId(request.getDeptNo()));
 
-        // 비밀번호 설정 (요청에 평문 비밀번호가 있다면 사용, 없으면 자동 생성)
-        String initialPassword;
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            initialPassword = request.getPassword(); // 관리자가 직접 설정한 경우
-        } else {
-            // 레거시와 동일하게 사번 + "init"으로 초기 비밀번호 생성
-            initialPassword = newEmployee.getEmpId() + "init";
-        }
+        // 비밀번호 설정: 항상 사번+init으로 생성 (디버깅을 위해 단순화)
+        String initialPassword = newEmployee.getEmpId() + "init";
         newEmployee.setPasswordHash(passwordEncoder.encode(initialPassword)); // 비밀번호 암호화
 
         // 이메일 설정 (요청에 이메일이 없다면 자동 생성)
@@ -126,7 +121,20 @@ public class EmployeeService {
         newEmployee.setCreateDate(LocalDateTime.now());
         // updateDate는 @PreUpdate로 자동 설정
 
-        return employeeRepository.save(newEmployee);
+        Employee savedEmployee = employeeRepository.save(newEmployee);
+
+        // 🔍 디버깅 정보 출력
+        log.info("=== 사원 생성 디버깅 ===");
+        log.info("생성된 사번: {}", savedEmployee.getEmpId());
+        log.info("설정한 비밀번호: {}", initialPassword);
+        log.info("해시된 비밀번호: {}", savedEmployee.getPasswordHash());
+
+        // 🔍 비밀번호 매칭 테스트
+        boolean passwordMatches = passwordEncoder.matches(initialPassword, savedEmployee.getPasswordHash());
+        log.info("비밀번호 매칭 테스트: {}", passwordMatches);
+        log.info("====================");
+
+        return savedEmployee;
     }
 
     // 사번 자동 생성 로직 (레거시 참고, 동시성 안전)
@@ -155,7 +163,7 @@ public class EmployeeService {
      * @return 수정된 직원 엔티티 (직원이 존재하지 않으면 Optional.empty)
      */
     @Transactional
-    public Optional<Employee> updateEmployee(Long empNo, EmployeeRequest request) {
+    public Optional<Employee> updateEmployee(Long empNo, EmployeeUpdateRequest request) {
         return employeeRepository.findById(empNo).map(employee -> {
             // 부서와 직급 엔티티 유효성 검증 및 조회
             Department department = departmentRepository.findById(request.getDeptNo())
@@ -173,10 +181,16 @@ public class EmployeeService {
             }
 
             employee.setEmpName(request.getEmpName());
-            // 비밀번호는 변경 요청이 있을 때만 수정 (평문 -> 해시)
-            if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+
+            // 비밀번호 처리: null 체크 추가하여 안전하게 처리
+            if (request.getPassword() != null && !request.getPassword().isEmpty()
+                    && !"KEEP_CURRENT_PASSWORD".equals(request.getPassword())) {
                 employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+                log.info("Password updated for employee: {}", employee.getEmpId());
+            } else if (request.getPassword() != null && "KEEP_CURRENT_PASSWORD".equals(request.getPassword())) {
+                log.info("Password kept unchanged for employee: {}", employee.getEmpId());
             }
+
             employee.setEmail(request.getEmail());
             employee.setPhone(request.getPhone());
             employee.setDepartment(department);

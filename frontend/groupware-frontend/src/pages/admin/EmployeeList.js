@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header';
 import './EmployeeList.css';
@@ -6,20 +6,17 @@ import './EmployeeList.css';
 const EmployeeList = ({ userData, onLogout }) => {
   const navigate = useNavigate();
   
-  // 상태 관리
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // 모달 상태
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editForm, setEditForm] = useState({});
   
-  // 검색 필터 상태
   const [filters, setFilters] = useState({
     deptNo: '',
     searchType: 'name',
@@ -27,20 +24,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     statusFilter: 'active'
   });
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
-    await Promise.all([
-      fetchDepartments(),
-      fetchPositions(),
-      fetchEmployees()
-    ]);
-  };
-
-  const fetchDepartments = async () => {
+  const fetchDepartments = useCallback(async () => {
     try {
       const token = localStorage.getItem('accessToken');
       const headers = {};
@@ -54,9 +38,9 @@ const EmployeeList = ({ userData, onLogout }) => {
     } catch (err) {
       console.error('부서 목록 로딩 오류:', err);
     }
-  };
+  }, []);
 
-  const fetchPositions = async () => {
+  const fetchPositions = useCallback(async () => {
     try {
       const token = localStorage.getItem('accessToken');
       const headers = {};
@@ -70,9 +54,9 @@ const EmployeeList = ({ userData, onLogout }) => {
     } catch (err) {
       console.error('직급 목록 로딩 오류:', err);
     }
-  };
+  }, []);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -93,15 +77,11 @@ const EmployeeList = ({ userData, onLogout }) => {
       }
       
       const url = `http://localhost:8080/api/employees${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-      console.log('Fetching employees from:', url);
-      
       const response = await fetch(url, { headers });
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Employee data received:', data);
         if (data.success) {
-          console.log('첫 번째 사원 데이터 구조:', data.data[0]); // 데이터 구조 확인
           setEmployees(data.data || []);
         } else {
           setError(data.message || '사원 목록을 불러오는데 실패했습니다.');
@@ -117,9 +97,20 @@ const EmployeeList = ({ userData, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  // 검색 핸들러
+  const loadInitialData = useCallback(async () => {
+    await Promise.all([
+      fetchDepartments(),
+      fetchPositions(),
+      fetchEmployees()
+    ]);
+  }, [fetchDepartments, fetchPositions, fetchEmployees]);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -136,10 +127,9 @@ const EmployeeList = ({ userData, onLogout }) => {
       keyword: '',
       statusFilter: 'active'
     });
-    setTimeout(fetchEmployees, 100); // 상태 업데이트 후 검색
+    setTimeout(fetchEmployees, 100);
   };
 
-  // 모달 관련 핸들러
   const handleView = (empNo) => {
     const employee = employees.find(emp => emp.empNo === empNo);
     if (employee) {
@@ -184,29 +174,33 @@ const EmployeeList = ({ userData, onLogout }) => {
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      // EmployeeRequest DTO에 맞는 완전한 데이터 구성
+      // 관리자인지 확인 (empId가 'admin'이거나 isAdmin이 'Y'인 경우)
+      const isAdmin = selectedEmployee.empId === 'admin' || selectedEmployee.isAdmin === 'Y';
+      
       const updateData = {
         empName: editForm.empName,
-        password: selectedEmployee.empId + 'init', // DTO에서 @NotBlank이므로 필수
         email: editForm.email,
         phone: editForm.phone,
-        hireDate: selectedEmployee.hireDate, // 기존 입사일 유지
+        hireDate: selectedEmployee.hireDate,
         deptNo: parseInt(editForm.deptNo),
         positionNo: parseInt(editForm.positionNo),
         isAdmin: selectedEmployee.isAdmin || 'N',
         status: selectedEmployee.status || 'Y'
       };
 
+      // 관리자가 아닌 경우에만 비밀번호 필드 추가
+      if (!isAdmin) {
+        updateData.password = selectedEmployee.empId + 'init';
+      }
+
       console.log('수정 데이터:', updateData);
-      console.log('토큰 존재:', !!token);
+      console.log('관리자 여부:', isAdmin);
 
       const response = await fetch(`http://localhost:8080/api/employees/${selectedEmployee.empNo}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(updateData)
       });
-
-      console.log('응답 상태:', response.status);
 
       if (response.ok) {
         const data = await response.json();
@@ -218,11 +212,9 @@ const EmployeeList = ({ userData, onLogout }) => {
           alert(data.message || '수정에 실패했습니다.');
         }
       } else if (response.status === 401) {
-        console.error('인증 실패 - 토큰:', token ? '존재함' : '없음');
         alert('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('수정 실패:', errorData);
         alert(errorData.message || `수정에 실패했습니다. (${response.status})`);
       }
     } catch (err) {
@@ -259,7 +251,6 @@ const EmployeeList = ({ userData, onLogout }) => {
     }
   };
 
-  // 프로필 표시 함수
   const getProfileDisplay = (emp) => {
     if (emp.profileImageUrl || emp.profileImgPath) {
       return (
@@ -320,13 +311,11 @@ const EmployeeList = ({ userData, onLogout }) => {
       <Header userData={userData} onLogout={onLogout} isAdmin={true} />
       
       <div className="employee-container">
-        {/* 페이지 제목 */}
         <div className="page-title">
           <h2>사원 목록</h2>
           <p>등록된 사원 정보를 조회하고 관리할 수 있습니다.</p>
         </div>
 
-        {/* 검색 필터 */}
         <div className="search-filter">
           <form onSubmit={handleSearch} className="form-inline">
             <div className="form-group mr-3">
@@ -420,7 +409,6 @@ const EmployeeList = ({ userData, onLogout }) => {
           </form>
         </div>
 
-        {/* 사원 목록 테이블 */}
         <div className="table-container">
           <table className="employee-table">
             <thead>
@@ -494,7 +482,6 @@ const EmployeeList = ({ userData, onLogout }) => {
           </table>
         </div>
 
-        {/* 신규 등록 버튼 */}
         <div className="text-right mt-3">
           <button 
             onClick={() => navigate('/admin/employees/register')}
@@ -505,7 +492,6 @@ const EmployeeList = ({ userData, onLogout }) => {
         </div>
       </div>
 
-      {/* 사원 상세보기/수정 모달 */}
       {showModal && selectedEmployee && (
         <div className="modal-overlay" onClick={handleModalClose}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
