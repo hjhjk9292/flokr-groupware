@@ -10,7 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "CHAT_MESSAGE")
+@Table(name = "chat_message")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "CHAT_ROOM")
+@Table(name = "chat_room")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

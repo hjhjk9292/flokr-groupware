@@ -26,6 +26,7 @@ public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final String USER_ID_KEY = "userId";
+    private static final String EMP_NO_KEY = "empNo";
     private static final String USER_NAME_KEY = "userName";
     private static final String DEPARTMENT_KEY = "department";
 
@@ -39,7 +40,7 @@ public class JwtTokenProvider {
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
     }
 
-    // JWT 토큰 생성
+    // JWT 토큰 생성 - EMP_NO 추가
     public String createToken(Employee employee) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
@@ -48,6 +49,7 @@ public class JwtTokenProvider {
                 .setSubject(employee.getEmpId())
                 .claim(AUTHORITIES_KEY, "ROLE_" + employee.getRoleEnum().name())
                 .claim(USER_ID_KEY, employee.getEmpId())
+                .claim(EMP_NO_KEY, employee.getEmpNo())
                 .claim(USER_NAME_KEY, employee.getEmpName())
                 .claim(DEPARTMENT_KEY, employee.getDepartment() != null ? employee.getDepartment().getDeptName() : "")
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -55,7 +57,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // JWT 토큰에서 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
 
@@ -68,19 +69,33 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    // JWT 토큰에서 사용자 ID 추출
     public String getUserId(String token) {
         Claims claims = parseClaims(token);
         return claims.get(USER_ID_KEY, String.class);
     }
+    
+    public Long getEmpNo(String token) {
+        Claims claims = parseClaims(token);
+        Object empNoObj = claims.get(EMP_NO_KEY);
 
-    // JWT 토큰에서 사용자 이름 추출
+        if (empNoObj == null) {
+            throw new RuntimeException("토큰에 직원 번호가 없습니다.");
+        }
+
+        if (empNoObj instanceof Integer) {
+            return ((Integer) empNoObj).longValue();
+        } else if (empNoObj instanceof Long) {
+            return (Long) empNoObj;
+        } else {
+            return Long.parseLong(empNoObj.toString());
+        }
+    }
+
     public String getUserName(String token) {
         Claims claims = parseClaims(token);
         return claims.get(USER_NAME_KEY, String.class);
     }
 
-    // JWT 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -97,7 +112,6 @@ public class JwtTokenProvider {
         return false;
     }
 
-    // Claims 파싱
     private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
