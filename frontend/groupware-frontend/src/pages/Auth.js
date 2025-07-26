@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 
-const Auth = ({ onLogin }) => { // 컴포넌트 이름 변경
+const Auth = ({ onLogin }) => {
   const navigate = useNavigate();
 
   const [credentials, setCredentials] = useState({
@@ -54,23 +54,11 @@ const Auth = ({ onLogin }) => { // 컴포넌트 이름 변경
       });
 
       const data = await response.json();
+      
+      console.log('API 응답 데이터:', data); 
 
-      if (data.success) {
-        localStorage.setItem('accessToken', data.data.accessToken);
-        localStorage.setItem('userData', JSON.stringify(data.data));
-
-        if (rememberMe) {
-          localStorage.setItem('rememberedEmpId', credentials.empId);
-        }
-
+      if (data.success && data.data) {
         onLogin(data.data);
-        
-        if (data.data.role === 'ADMIN' || data.data.isAdmin === 'Y') {
-            navigate('/admin');
-        } else {
-            navigate('/user');
-        }
-
       } else {
         setError(data.message || '로그인에 실패했습니다.');
       }

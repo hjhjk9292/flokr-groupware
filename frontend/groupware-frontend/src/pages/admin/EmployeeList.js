@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/admin/EmployeeList.js
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/common/Header';
+import { getAuthHeaders } from '../../utils/authUtils'; // ✅ getAuthHeaders 임포트
 import './EmployeeList.css';
 
 const EmployeeList = ({ userData, onLogout }) => {
   const navigate = useNavigate();
   
-  // 상태 관리
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // 모달 상태
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editForm, setEditForm] = useState({});
   
-  // 검색 필터 상태
   const [filters, setFilters] = useState({
     deptNo: '',
     searchType: 'name',
@@ -27,25 +26,27 @@ const EmployeeList = ({ userData, onLogout }) => {
     statusFilter: 'active'
   });
 
-  // 초기 데이터 로드
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    // ✅ userData가 있을 때만 데이터 로드를 시작하도록 수정
+    if (userData) {
+      loadInitialData();
+    }
+  }, [userData]);
 
   const loadInitialData = async () => {
+    setLoading(true);
     await Promise.all([
       fetchDepartments(),
       fetchPositions(),
       fetchEmployees()
     ]);
+    setLoading(false);
   };
 
   const fetchDepartments = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const headers = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
+      // ✅ getAuthHeaders() 사용
+      const headers = getAuthHeaders();
       const response = await fetch('http://localhost:8080/api/departments', { headers });
       if (response.ok) {
         const data = await response.json();
@@ -58,10 +59,8 @@ const EmployeeList = ({ userData, onLogout }) => {
 
   const fetchPositions = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const headers = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
+      // ✅ getAuthHeaders() 사용
+      const headers = getAuthHeaders();
       const response = await fetch('http://localhost:8080/api/positions', { headers });
       if (response.ok) {
         const data = await response.json();
@@ -77,10 +76,8 @@ const EmployeeList = ({ userData, onLogout }) => {
     setError(null);
     
     try {
-      const token = localStorage.getItem('accessToken');
-      const headers = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
+      // ✅ getAuthHeaders() 사용
+      const headers = getAuthHeaders();
       const queryParams = new URLSearchParams();
       if (filters.keyword) {
         if (filters.searchType === 'name') queryParams.append('name', filters.keyword);
@@ -101,7 +98,7 @@ const EmployeeList = ({ userData, onLogout }) => {
         const data = await response.json();
         console.log('Employee data received:', data);
         if (data.success) {
-          console.log('첫 번째 사원 데이터 구조:', data.data[0]); // 데이터 구조 확인
+          console.log('첫 번째 사원 데이터 구조:', data.data[0]);
           setEmployees(data.data || []);
         } else {
           setError(data.message || '사원 목록을 불러오는데 실패했습니다.');
@@ -109,7 +106,9 @@ const EmployeeList = ({ userData, onLogout }) => {
       } else if (response.status === 401) {
         setError('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
-        setError('서버에서 데이터를 가져오는데 실패했습니다.');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('서버 응답 오류:', errorData);
+        setError(errorData.message || '서버에서 데이터를 가져오는데 실패했습니다.');
       }
     } catch (err) {
       console.error('사원 목록 로딩 오류:', err);
@@ -119,7 +118,6 @@ const EmployeeList = ({ userData, onLogout }) => {
     }
   };
 
-  // 검색 핸들러
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -136,10 +134,9 @@ const EmployeeList = ({ userData, onLogout }) => {
       keyword: '',
       statusFilter: 'active'
     });
-    setTimeout(fetchEmployees, 100); // 상태 업데이트 후 검색
+    setTimeout(fetchEmployees, 100);
   };
 
-  // 모달 관련 핸들러
   const handleView = (empNo) => {
     const employee = employees.find(emp => emp.empNo === empNo);
     if (employee) {
@@ -180,17 +177,14 @@ const EmployeeList = ({ userData, onLogout }) => {
     e.preventDefault();
     
     try {
-      const token = localStorage.getItem('accessToken');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      // EmployeeRequest DTO에 맞는 완전한 데이터 구성
+      // ✅ getAuthHeaders() 사용
+      const headers = getAuthHeaders();
       const updateData = {
         empName: editForm.empName,
-        password: selectedEmployee.empId + 'init', // DTO에서 @NotBlank이므로 필수
+        password: selectedEmployee.empId + 'init',
         email: editForm.email,
         phone: editForm.phone,
-        hireDate: selectedEmployee.hireDate, // 기존 입사일 유지
+        hireDate: selectedEmployee.hireDate,
         deptNo: parseInt(editForm.deptNo),
         positionNo: parseInt(editForm.positionNo),
         isAdmin: selectedEmployee.isAdmin || 'N',
@@ -198,7 +192,6 @@ const EmployeeList = ({ userData, onLogout }) => {
       };
 
       console.log('수정 데이터:', updateData);
-      console.log('토큰 존재:', !!token);
 
       const response = await fetch(`http://localhost:8080/api/employees/${selectedEmployee.empNo}`, {
         method: 'PUT',
@@ -218,7 +211,6 @@ const EmployeeList = ({ userData, onLogout }) => {
           alert(data.message || '수정에 실패했습니다.');
         }
       } else if (response.status === 401) {
-        console.error('인증 실패 - 토큰:', token ? '존재함' : '없음');
         alert('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await response.json().catch(() => ({}));
@@ -234,10 +226,8 @@ const EmployeeList = ({ userData, onLogout }) => {
   const handleDelete = async (empNo, empName) => {
     if (window.confirm(`${empName} 님을 퇴사 처리하시겠습니까?`)) {
       try {
-        const token = localStorage.getItem('accessToken');
-        const headers = {};
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
+        // ✅ getAuthHeaders() 사용
+        const headers = getAuthHeaders();
         const response = await fetch(`http://localhost:8080/api/employees/${empNo}`, {
           method: 'DELETE',
           headers
@@ -259,7 +249,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     }
   };
 
-  // 프로필 표시 함수
+  // ... (이하 UI 코드 생략)
   const getProfileDisplay = (emp) => {
     if (emp.profileImageUrl || emp.profileImgPath) {
       return (
@@ -270,7 +260,6 @@ const EmployeeList = ({ userData, onLogout }) => {
         />
       );
     }
-    
     const colors = ['#4285f4', '#34a853', '#ea4335', '#fbbc05', '#9c27b0'];
     const firstChar = (emp.empName || '?').charAt(0);
     const colorIndex = Math.abs(firstChar.charCodeAt(0)) % 5;
@@ -291,42 +280,13 @@ const EmployeeList = ({ userData, onLogout }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="employee-list-container">
-        <Header userData={userData} onLogout={onLogout} isAdmin={true} />
-        <div className="employee-list-loading">
-          <div className="loading-spinner"></div>
-          <p>사원 목록 로딩 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="employee-list-container">
-        <Header userData={userData} onLogout={onLogout} isAdmin={true} />
-        <div className="employee-list-error">
-          <p>오류: {error}</p>
-          <button onClick={fetchEmployees} className="btn btn-primary">다시 시도</button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="employee-list-container">
-      <Header userData={userData} onLogout={onLogout} isAdmin={true} />
-      
       <div className="employee-container">
-        {/* 페이지 제목 */}
         <div className="page-title">
           <h2>사원 목록</h2>
           <p>등록된 사원 정보를 조회하고 관리할 수 있습니다.</p>
         </div>
-
-        {/* 검색 필터 */}
         <div className="search-filter">
           <form onSubmit={handleSearch} className="form-inline">
             <div className="form-group mr-3">
@@ -420,7 +380,6 @@ const EmployeeList = ({ userData, onLogout }) => {
           </form>
         </div>
 
-        {/* 사원 목록 테이블 */}
         <div className="table-container">
           <table className="employee-table">
             <thead>
@@ -493,8 +452,6 @@ const EmployeeList = ({ userData, onLogout }) => {
             </tbody>
           </table>
         </div>
-
-        {/* 신규 등록 버튼 */}
         <div className="text-right mt-3">
           <button 
             onClick={() => navigate('/admin/employees/register')}
@@ -504,8 +461,6 @@ const EmployeeList = ({ userData, onLogout }) => {
           </button>
         </div>
       </div>
-
-      {/* 사원 상세보기/수정 모달 */}
       {showModal && selectedEmployee && (
         <div className="modal-overlay" onClick={handleModalClose}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -515,7 +470,6 @@ const EmployeeList = ({ userData, onLogout }) => {
                 <i className="fas fa-times"></i>
               </button>
             </div>
-            
             <div className="modal-body">
               {modalType === 'view' ? (
                 <div className="employee-detail">
@@ -639,7 +593,6 @@ const EmployeeList = ({ userData, onLogout }) => {
                       <div className="form-col"></div>
                     </div>
                   </div>
-                  
                   <div className="modal-actions">
                     <button type="submit" className="btn btn-primary">수정 완료</button>
                     <button type="button" className="btn btn-outline-secondary" onClick={handleModalClose}>취소</button>
@@ -647,7 +600,6 @@ const EmployeeList = ({ userData, onLogout }) => {
                 </form>
               )}
             </div>
-            
             {modalType === 'view' && (
               <div className="modal-actions">
                 <button 
@@ -674,5 +626,4 @@ const EmployeeList = ({ userData, onLogout }) => {
     </div>
   );
 };
-
 export default EmployeeList;

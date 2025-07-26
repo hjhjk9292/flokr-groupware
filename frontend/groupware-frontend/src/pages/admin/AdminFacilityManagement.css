@@ -1,0 +1,67 @@
+.admin-facility-page {
+    min-height: 100vh;
+    background-color: #f5f7fb;
+  }
+  
+  .admin-facility-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+  
+  .admin-facility-header {
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  
+  .admin-facility-header h1 {
+    color: #003561;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .admin-facility-header h1 i {
+    font-size: 32px;
+  }
+  
+  .admin-facility-header p {
+    color: #64748b;
+    font-size: 16px;
+    margin: 0;
+    font-weight: 400;
+  }
+  
+  /* Font Awesome 아이콘 지원 */
+  .fa-building {
+    color: #003561;
+    opacity: 0.8;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-facility-container {
+      padding: 24px 16px;
+    }
+    
+    .admin-facility-header {
+      margin-bottom: 24px;
+    }
+    
+    .admin-facility-header h1 {
+      font-size: 24px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .admin-facility-header h1 i {
+      font-size: 28px;
+    }
+    
+    .admin-facility-header p {
+      font-size: 14px;
+    }
+  }

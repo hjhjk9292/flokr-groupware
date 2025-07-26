@@ -1,6 +1,5 @@
 // src/pages/user/UserDashboardPage.js
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/common/Header';
 import './UserDashboard.css';
 
 const UserDashboard = ({ userData, onLogout }) => {
@@ -297,13 +296,6 @@ const UserDashboard = ({ userData, onLogout }) => {
 
   return (
     <div className="user-dashboard-container">
-      {/* 공통 헤더 */}
-      <Header 
-        userData={userData}
-        onLogout={onLogout}
-        isAdmin={false}
-      />
-
       {/* 메인 콘텐츠 */}
       <div className="user-dashboard-main">
         {/* 왼쪽 컬럼 */}

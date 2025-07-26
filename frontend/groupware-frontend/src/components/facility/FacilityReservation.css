@@ -1,0 +1,684 @@
+/* Main container */
+.facility-reservation-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    background-color: #f5f7fb;
+  }
+  
+  /* Page header */
+  .facility-header {
+    margin-bottom: 2rem;
+  }
+  
+  .facility-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #003561;
+    margin-bottom: 0.5rem;
+  }
+  
+  .facility-header p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+  
+  /* Tab navigation */
+  .facility-tabs {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  .facility-nav-tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .facility-nav-link {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #64748b;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .facility-nav-link:hover {
+    color: #003561;
+    background-color: #f8fafc;
+  }
+  
+  .facility-nav-link.active {
+    color: #003561;
+    background-color: #fff;
+    border-bottom-color: #003561;
+    font-weight: 600;
+  }
+  
+  .facility-nav-link i {
+    font-size: 1rem;
+  }
+  
+  /* Search container */
+  .facility-search-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-input-group {
+    position: relative;
+    max-width: 400px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    transition: border-color 0.2s ease;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 3px rgba(0, 53, 97, 0.1);
+  }
+  
+  .search-input::placeholder {
+    color: #9ca3af;
+  }
+  
+  /* Tab content */
+  .facility-tab-content {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+  }
+  
+  /* Loading and error states */
+  .loading-container, .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #003561;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
+  }
+  
+  .error-message {
+    color: #64748b;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  
+  .retry-btn {
+    background-color: #003561;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .retry-btn:hover {
+    background-color: #002a4d;
+  }
+  
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #64748b;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+  }
+  
+  /* Facility grid */
+  .facility-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .facility-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .facility-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  .facility-icon-container {
+    height: 140px;
+    background: linear-gradient(135deg, #003561 0%, #004a7c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: #fff;
+  }
+  
+  .facility-icon {
+    font-size: 3rem;
+  }
+  
+  .facility-status-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .facility-status-badge.active {
+    background-color: #10b981;
+  }
+  
+  .facility-content {
+    padding: 1.25rem;
+  }
+  
+  .facility-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+  
+  .facility-info {
+    margin-bottom: 1.25rem;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+  
+  .info-item i {
+    width: 16px;
+    color: #94a3b8;
+  }
+  
+  .reserve-btn {
+    width: 100%;
+    background-color: #003561;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .reserve-btn:hover {
+    background-color: #002a4d;
+  }
+  
+  /* Reservation table */
+  .reservation-table-container {
+    overflow-x: auto;
+  }
+  
+  .reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  .reservation-table th,
+  .reservation-table td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .reservation-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .reservation-table tr:hover {
+    background-color: #f8fafc;
+  }
+  
+  .facility-cell .facility-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+  
+  .facility-cell .facility-location {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+  
+  .datetime-cell .date {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+  
+  .datetime-cell .time {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+  
+  .purpose-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Status badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .status-icon {
+    margin-right: 0.35rem;
+  }
+  
+  .status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  .status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+  
+  .status-rejected {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .status-cancelled {
+    background-color: #e5e7eb;
+    color: #4b5563;
+  }
+  
+  .status-unknown {
+    background-color: #e5e7eb;
+    color: #4b5563;
+  }
+  
+  /* Action buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .cancel-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #fecaca;
+  }
+  
+  .cancel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .modal-close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+  
+  .modal-close-btn:hover {
+    color: #1f2937;
+    background-color: #f1f5f9;
+  }
+  
+  .modal-body {
+    padding: 1.25rem;
+  }
+  
+  .facility-info-card {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+  }
+  
+  .info-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  .info-row i {
+    color: #64748b;
+    width: 16px;
+  }
+  
+  .reservation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  .required {
+    color: #ef4444;
+  }
+  
+  .form-input, .form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    transition: border-color 0.2s ease;
+  }
+  
+  .form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #003561;
+    box-shadow: 0 0 0 3px rgba(0, 53, 97, 0.1);
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .btn-secondary {
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #d1d5db;
+  }
+  
+  .btn-primary {
+    background-color: #003561;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #002a4d;
+  }
+  
+  .button-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .facility-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .modal-container {
+      width: 95%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .facility-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .facility-nav-link {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+    
+    .facility-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .modal-footer {
+      flex-direction: column-reverse;
+    }
+    
+    .modal-footer button {
+      width: 100%;
+    }
+
+    /* 인증 알림 스타일 */
+    .auth-alert {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .auth-alert p {
+        margin: 0;
+    }
+    
+    /* 비활성화된 버튼 스타일 */
+    .reserve-btn:disabled {
+        background-color: #cbd5e0;
+        cursor: not-allowed;
+    }
+    
+    .reserve-btn:disabled:hover {
+        background-color: #cbd5e0;
+    }
+    
+    /* 로그인 필요 아이콘 */
+    .fas.fa-lock {
+        color: #3182ce;
+    }
+  }

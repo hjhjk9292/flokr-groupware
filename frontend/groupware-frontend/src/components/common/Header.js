@@ -1,36 +1,44 @@
 // frontend/groupware-frontend/src/components/common/Header.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import './Header.css';
 
 const Header = ({ userData, onLogout, isAdmin = false }) => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(0);
+  const { notifications, notificationList, loading, fetchUnreadNotifications, markAsRead, markAllAsRead } = useNotification();
   const [chatMessages, setChatMessages] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    fetchNotificationCount();
-    fetchChatCount();
-  }, []);
+  const handleNotificationButtonClick = async () => {
+    if (!showNotifications) {
+      await fetchUnreadNotifications();
+    }
+    setShowNotifications(!showNotifications);
+  };
 
-  const fetchNotificationCount = async () => {
+  const handleNotificationClick = async (notification) => {
     try {
-      // TODO: 실제 알림 API 호출 구현
-      setNotifications(0); // 임시값
+      await markAsRead(notification.notificationNo);
     } catch (error) {
-      console.error('알림 수 조회 오류:', error);
-      setNotifications(0);
+      console.error('알림 읽음 처리 오류:', error);
+    }
+    setShowNotifications(false);
+
+    if (notification.refType === 'FACILITY_RESERVATION') {
+      const path = isAdmin ? '/admin/facilities' : '/user/facilities';
+      navigate(path);
+    } else {
+      // 다른 알림 타입에 따른 이동 로직 추가
     }
   };
 
-  const fetchChatCount = async () => {
+  const handleMarkAllRead = async () => {
     try {
-      // TODO: 실제 채팅 API 호출 구현
-      setChatMessages(0); // 임시값
+      await markAllAsRead();
     } catch (error) {
-      console.error('채팅 수 조회 오류:', error);
-      setChatMessages(0);
+      console.error('모든 알림 읽음 처리 오류:', error);
     }
   };
 
@@ -38,12 +46,19 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
     onLogout();
   };
 
-  // 로고 클릭 시 역할에 따라 대시보드 페이지로 이동
   const handleLogoClick = () => {
     if (isAdmin) {
       navigate('/admin');
     } else {
       navigate('/user');
+    }
+  };
+
+  const handleFacilityNavigation = () => {
+    if (isAdmin) {
+      navigate('/admin/facilities');
+    } else {
+      navigate('/user/facilities');
     }
   };
 
@@ -55,34 +70,91 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
             <img src="/images/logo.png" alt="Flokr" className="header-logo-img" />
             <span className="header-logo-text">Flokr</span>
           </div>
-          <nav className="main-nav">
-            {/* 네비게이션 항목들 (향후 React Router Link 컴포넌트로 변경 권장) */}
-          </nav>
         </div>
         <div className="header-right-section">
-          {/* 검색바 */}
           <div className="header-search-container">
             <input type="text" className="header-search-bar" placeholder="검색..." />
             <i className="fas fa-search header-search-icon"></i>
           </div>
-          
-          {/* 알림 */}
-          <div className="header-icon-badge">
-            <i className="fas fa-bell header-icon"></i>
+
+          <div className="header-icon-badge notification-container">
+            <i
+              className="fas fa-bell header-icon"
+              onClick={handleNotificationButtonClick}
+            ></i>
             {notifications > 0 && (
-              <span className="header-badge">{notifications > 99 ? '99+' : notifications}</span>
+              <span id="notification-badge" className="header-badge">
+                {notifications > 99 ? '99+' : notifications}
+              </span>
+            )}
+
+            {showNotifications && (
+              <div className="notification-dropdown">
+                <div className="notification-header">
+                  <h3>알림</h3>
+                  {notifications > 0 && (
+                    <button
+                      onClick={handleMarkAllRead}
+                      className="mark-all-read-btn"
+                    >
+                      모두 읽음
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="close-notification-btn"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="notification-content">
+                  {loading ? (
+                    <div className="notification-loading">
+                      <div className="loading-spinner"></div>
+                      <p>로딩 중...</p>
+                    </div>
+                  ) : notificationList.length === 0 ? (
+                    <div className="no-notifications">
+                      <i className="fas fa-bell" style={{fontSize: '48px', color: '#ddd'}}></i>
+                      <p>새로운 알림이 없습니다</p>
+                    </div>
+                  ) : (
+                    <div className="notification-list">
+                      {notificationList.map((notification) => (
+                        <div
+                          key={notification.notificationNo}
+                          className="notification-item"
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className="notification-icon">
+                            <i className={`fas ${
+                              notification.type === 'FACILITY' ? 'fa-building' : 'fa-info-circle'
+                            }`}></i>
+                          </div>
+                          <div className="notification-body">
+                            <h4 className="notification-title">{notification.title}</h4>
+                            <p className="notification-message">{notification.content}</p>
+                            <span className="notification-time">
+                              {new Date(notification.createDate).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
-          
-          {/* 채팅 */}
+
           <div className="header-icon-badge">
             <i className="fas fa-comments header-icon"></i>
             {chatMessages > 0 && (
               <span className="header-badge">{chatMessages > 99 ? '99+' : chatMessages}</span>
             )}
           </div>
-          
-          {/* 사용자 프로필 - userData가 존재할 때만 안전하게 접근 */}
+
           <div className="header-profile">
             <div className="header-profile-avatar">
               {userData?.empName?.charAt(0) || ''}
@@ -94,7 +166,7 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
               </span>
             </div>
           </div>
-          
+
           <button onClick={handleLogoutClick} className="header-btn-sm">
             <i className="fas fa-sign-out-alt"></i>
             로그아웃
@@ -102,11 +174,9 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
         </div>
       </header>
 
-      {/* 네비게이션 바 - 관리자/사용자 분기 */}
       <nav className="header-nav-bar">
         <div className="header-nav-container">
           {isAdmin ? (
-            // 관리자 네비게이션 (href를 React Router 경로로 직접 지정)
             <>
               <a href="/admin" className="header-nav-item header-active">
                 <i className="fas fa-tachometer-alt header-nav-icon"></i>
@@ -128,17 +198,19 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
                 <i className="fas fa-user-shield header-nav-icon"></i>
                 사용자 관리
               </a>
-              <a href="/admin/facilities" className="header-nav-item">
+              <button
+                onClick={handleFacilityNavigation}
+                className="header-nav-item header-nav-button"
+              >
                 <i className="fas fa-building header-nav-icon"></i>
                 시설 관리
-              </a>
+              </button>
               <a href="/admin/notifications" className="header-nav-item">
                 <i className="fas fa-bell header-nav-icon"></i>
                 알림 관리
               </a>
             </>
           ) : (
-            // 사용자 네비게이션
             <>
               <a href="/user" className="header-nav-item header-active">
                 <i className="fas fa-home header-nav-icon"></i>
@@ -164,10 +236,24 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
                 <i className="fas fa-calendar header-nav-icon"></i>
                 일정 관리
               </a>
+              <button
+                onClick={handleFacilityNavigation}
+                className="header-nav-item header-nav-button"
+              >
+                <i className="fas fa-building header-nav-icon"></i>
+                시설 예약
+              </button>
             </>
           )}
         </div>
       </nav>
+
+      {showNotifications && (
+        <div
+          className="notification-overlay"
+          onClick={() => setShowNotifications(false)}
+        />
+      )}
     </>
   );
 };
