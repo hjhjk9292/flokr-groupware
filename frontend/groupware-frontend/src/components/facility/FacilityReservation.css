@@ -1,684 +1,819 @@
+/* FacilityReservation.css */
+
 /* Main container */
-.facility-reservation-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    background-color: #f5f7fb;
+.user-facility-page {
+  min-height: 100vh;
+  background-color: #f5f7fb;
+}
+
+.user-facility-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.user-facility-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.user-facility-header h1 {
+  color: #003561;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.user-facility-header h1 i {
+  font-size: 32px;
+}
+
+.user-facility-header p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* 탭 네비게이션 */
+.facility-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.tab-button:hover {
+  border-color: #003561;
+  color: #003561;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 53, 97, 0.15);
+}
+
+.tab-button.active {
+  border-color: #003561;
+  background: linear-gradient(135deg, #003561 0%, #004d8a 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 53, 97, 0.3);
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* 탭 컨텐츠 */
+.tab-content {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  border: none;
+}
+
+/* 알림 */
+.alert {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+/* 검색 및 필터 */
+.filter-container {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filter-item {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #003561;
+  box-shadow: 0 0 0 3px rgba(0, 53, 97, 0.1);
+}
+
+/* 시설 그리드 */
+.facility-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.facility-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.facility-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.facility-icon-container {
+  height: 140px;
+  background: linear-gradient(135deg, #003561 0%, #004d8a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: white;
+}
+
+.facility-type-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.facility-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.status-available {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.facility-content {
+  padding: 20px;
+}
+
+.facility-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.facility-info {
+  margin-bottom: 20px;
+}
+
+.facility-info p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.facility-description {
+  color: #94a3b8 !important;
+  font-style: italic;
+}
+
+.facility-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* 테이블 스타일 */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  background: white;
+}
+
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 14px;
+  margin: 0;
+}
+
+.reservation-table th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.reservation-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: #1f2937;
+}
+
+.reservation-table tbody tr:hover td {
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease;
+}
+
+.reservation-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.text-center {
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* 테이블 셀 개별 스타일 */
+
+/* 예약 번호 */
+.reservation-number {
+  font-size: 12px;
+  color: #94a3b8;
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.facility-cell {
+  min-width: 120px;
+}
+
+.facility-cell .facility-name {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+/* 예약 시간 표시 */
+.reservation-time {
+  min-width: 180px;
+  text-align: center;
+}
+
+.start-time, .end-time {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.time-divider {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 4px 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.purpose-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* 상태 뱃지 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.status-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.status-approved {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.status-canceled {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #b91c1c;
+  border: 1px solid #ef4444;
+}
+
+/* 액션 버튼 - 개선된 버전 */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 140px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.edit-btn {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #0891b2;
+}
+
+.edit-btn:hover {
+  background-color: #bae6fd;
+  border-color: #0e7490;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(14, 116, 144, 0.2);
+}
+
+.cancel-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #f87171;
+}
+
+.cancel-btn:hover {
+  background-color: #fecaca;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* 기본 버튼 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #003561 0%, #004d8a 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 53, 97, 0.2);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #002a4d 0%, #003d73 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 53, 97, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #334155;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 로딩 상태 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #003561;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 빈 상태 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  grid-column: 1 / -1;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #1f2937;
+  background-color: #f1f5f9;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+/* 폼 스타일 */
+.facility-info-section,
+.form-section {
+  margin-bottom: 20px;
+}
+
+.facility-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.detail-icon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* 수정 알림 */
+.edit-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  color: #92400e;
+}
+
+.notice-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.edit-notice p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 인증 필요 */
+.auth-required {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.auth-icon {
+  width: 64px;
+  height: 64px;
+  color: #cbd5e1;
+  margin-bottom: 24px;
+}
+
+.auth-required h2 {
+  color: #1f2937;
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.auth-required p {
+  color: #64748b;
+  margin: 0;
+  font-size: 16px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .user-facility-container {
+    padding: 24px 16px;
   }
   
-  /* Page header */
-  .facility-header {
-    margin-bottom: 2rem;
-  }
-  
-  .facility-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #003561;
-    margin-bottom: 0.5rem;
-  }
-  
-  .facility-header p {
-    color: #64748b;
-    font-size: 1rem;
-  }
-  
-  /* Tab navigation */
-  .facility-tabs {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-  }
-  
-  .facility-nav-tabs {
-    display: flex;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  
-  .facility-nav-link {
-    flex: 1;
-    padding: 1rem 1.5rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #64748b;
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  
-  .facility-nav-link:hover {
-    color: #003561;
-    background-color: #f8fafc;
-  }
-  
-  .facility-nav-link.active {
-    color: #003561;
-    background-color: #fff;
-    border-bottom-color: #003561;
-    font-weight: 600;
-  }
-  
-  .facility-nav-link i {
-    font-size: 1rem;
-  }
-  
-  /* Search container */
-  .facility-search-container {
-    margin-bottom: 1.5rem;
-  }
-  
-  .search-input-group {
-    position: relative;
-    max-width: 400px;
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 0.9rem;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background-color: #fff;
-    transition: border-color 0.2s ease;
-  }
-  
-  .search-input:focus {
-    outline: none;
-    border-color: #003561;
-    box-shadow: 0 0 0 3px rgba(0, 53, 97, 0.1);
-  }
-  
-  .search-input::placeholder {
-    color: #9ca3af;
-  }
-  
-  /* Tab content */
-  .facility-tab-content {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-  }
-  
-  /* Loading and error states */
-  .loading-container, .error-container {
-    display: flex;
+  .filter-row {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    text-align: center;
   }
   
-  .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e2e8f0;
-    border-top: 3px solid #003561;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+  .filter-item {
+    min-width: 100%;
   }
   
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  .error-icon {
-    font-size: 3rem;
-    color: #ef4444;
-    margin-bottom: 1rem;
-  }
-  
-  .error-message {
-    color: #64748b;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-  }
-  
-  .retry-btn {
-    background-color: #003561;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s ease;
-  }
-  
-  .retry-btn:hover {
-    background-color: #002a4d;
-  }
-  
-  /* Empty state */
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    text-align: center;
-    color: #64748b;
-  }
-  
-  .empty-icon {
-    font-size: 3rem;
-    color: #94a3b8;
-    margin-bottom: 1rem;
-  }
-  
-  /* Facility grid */
   .facility-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
   
-  .facility-card {
-    background-color: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    border: 1px solid #e2e8f0;
+  .modal-content {
+    width: 95%;
+    margin: 20px;
   }
   
-  .facility-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  }
-  
-  .facility-icon-container {
-    height: 140px;
-    background: linear-gradient(135deg, #003561 0%, #004a7c 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    color: #fff;
-  }
-  
-  .facility-icon {
-    font-size: 3rem;
-  }
-  
-  .facility-status-badge {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #fff;
-  }
-  
-  .facility-status-badge.active {
-    background-color: #10b981;
-  }
-  
-  .facility-content {
-    padding: 1.25rem;
-  }
-  
-  .facility-name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 1rem;
-  }
-  
-  .facility-info {
-    margin-bottom: 1.25rem;
-  }
-  
-  .info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #64748b;
-  }
-  
-  .info-item i {
-    width: 16px;
-    color: #94a3b8;
-  }
-  
-  .reserve-btn {
+  .tab-button {
     width: 100%;
-    background-color: #003561;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    max-width: 300px;
     justify-content: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s ease;
   }
   
-  .reserve-btn:hover {
-    background-color: #002a4d;
+  .facility-tabs {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
   }
   
-  /* Reservation table */
-  .reservation-table-container {
-    overflow-x: auto;
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+    min-width: auto;
+  }
+  
+  .action-btn {
+    width: 100%;
+    justify-content: center;
   }
   
   .reservation-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: 12px;
   }
   
   .reservation-table th,
   .reservation-table td {
-    padding: 1rem 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 8px;
   }
   
-  .reservation-table th {
-    background-color: #f8fafc;
-    font-weight: 600;
-    color: #374151;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .reservation-time {
+    min-width: 140px;
   }
   
-  .reservation-table tr:hover {
-    background-color: #f8fafc;
+  .start-time, .end-time {
+    font-size: 12px;
   }
-  
-  .facility-cell .facility-name {
-    font-weight: 500;
-    color: #1f2937;
-    margin-bottom: 0.25rem;
-  }
-  
-  .facility-cell .facility-location {
-    font-size: 0.8rem;
-    color: #64748b;
-  }
-  
-  .datetime-cell .date {
-    font-weight: 500;
-    color: #1f2937;
-    margin-bottom: 0.25rem;
-  }
-  
-  .datetime-cell .time {
-    font-size: 0.8rem;
-    color: #64748b;
-  }
-  
-  .purpose-cell {
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  /* Status badges */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .status-icon {
-    margin-right: 0.35rem;
-  }
-  
-  .status-pending {
-    background-color: #fef3c7;
-    color: #92400e;
-  }
-  
-  .status-approved {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-  
-  .status-rejected {
-    background-color: #fee2e2;
-    color: #b91c1c;
-  }
-  
-  .status-cancelled {
-    background-color: #e5e7eb;
-    color: #4b5563;
-  }
-  
-  .status-unknown {
-    background-color: #e5e7eb;
-    color: #4b5563;
-  }
-  
-  /* Action buttons */
-  .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .cancel-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .cancel-btn:hover {
-    background-color: #fecaca;
-  }
-  
-  .cancel-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .modal-container {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  
-  .modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .modal-close-btn {
-    background: none;
-    border: none;
-    color: #64748b;
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9999px;
-    transition: all 0.2s ease;
-  }
-  
-  .modal-close-btn:hover {
-    color: #1f2937;
-    background-color: #f1f5f9;
-  }
-  
-  .modal-body {
-    padding: 1.25rem;
-  }
-  
-  .facility-info-card {
-    background-color: #f8fafc;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  
-  .info-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #4b5563;
-  }
-  
-  .info-row:last-child {
-    margin-bottom: 0;
-  }
-  
-  .info-row i {
-    color: #64748b;
-    width: 16px;
-  }
-  
-  .reservation-form {
-    display: flex;
+}
+
+@media (max-width: 480px) {
+  .user-facility-header h1 {
+    font-size: 24px;
     flex-direction: column;
-    gap: 1rem;
+    gap: 8px;
   }
   
-  .form-group {
-    margin-bottom: 0.5rem;
-  }
-  
-  .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #4b5563;
-  }
-  
-  .required {
-    color: #ef4444;
-  }
-  
-  .form-input, .form-textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background-color: #fff;
-    transition: border-color 0.2s ease;
-  }
-  
-  .form-input:focus, .form-textarea:focus {
-    outline: none;
-    border-color: #003561;
-    box-shadow: 0 0 0 3px rgba(0, 53, 97, 0.1);
-  }
-  
-  .form-row {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .form-row .form-group {
-    flex: 1;
-  }
-  
-  .form-textarea {
-    resize: vertical;
-    min-height: 100px;
+  .facility-grid {
+    grid-template-columns: 1fr;
   }
   
   .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding: 1.25rem;
-    border-top: 1px solid #e2e8f0;
+    flex-direction: column;
+    gap: 8px;
   }
   
-  .btn-secondary {
-    background-color: #e5e7eb;
-    color: #4b5563;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
   }
   
-  .btn-secondary:hover {
-    background-color: #d1d5db;
+  .reservation-table th,
+  .reservation-table td {
+    padding: 8px 6px;
   }
   
-  .btn-primary {
-    background-color: #003561;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s ease;
+  .purpose-cell {
+    max-width: 120px;
   }
   
-  .btn-primary:hover {
-    background-color: #002a4d;
+  .reservation-time {
+    min-width: 120px;
   }
-  
-  .button-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 0.5rem;
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 768px) {
-    .facility-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-    
-    .form-row {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .modal-container {
-      width: 95%;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .facility-header h1 {
-      font-size: 1.5rem;
-    }
-    
-    .facility-nav-link {
-      padding: 0.75rem 1rem;
-      font-size: 0.85rem;
-    }
-    
-    .facility-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .modal-footer {
-      flex-direction: column-reverse;
-    }
-    
-    .modal-footer button {
-      width: 100%;
-    }
-
-    /* 인증 알림 스타일 */
-    .auth-alert {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeeba;
-        border-radius: 8px;
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .auth-alert p {
-        margin: 0;
-    }
-    
-    /* 비활성화된 버튼 스타일 */
-    .reserve-btn:disabled {
-        background-color: #cbd5e0;
-        cursor: not-allowed;
-    }
-    
-    .reserve-btn:disabled:hover {
-        background-color: #cbd5e0;
-    }
-    
-    /* 로그인 필요 아이콘 */
-    .fas.fa-lock {
-        color: #3182ce;
-    }
-  }
+}

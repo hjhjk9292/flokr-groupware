@@ -85,6 +85,73 @@ public class FacilityService {
         return convertToReservationResponse(saved);
     }
 
+    /**
+     * 예약 상세 조회 (사용자용)
+     */
+    @Transactional(readOnly = true)
+    public ReservationResponse getReservationDetail(Long reservationNo, Long empNo) {
+        FacilityReservation reservation = reservationRepository.findById(reservationNo)
+                .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo));
+
+        // 본인 예약이거나 관리자인 경우만 조회 가능
+        if (!reservation.getReserverEmpNo().equals(empNo)) {
+            Employee employee = employeeRepository.findById(empNo)
+                    .orElseThrow(() -> new EntityNotFoundException("직원 정보를 찾을 수 없습니다."));
+
+            if (!"Y".equals(employee.getIsAdmin())) {
+                throw new IllegalArgumentException("본인의 예약만 조회할 수 있습니다.");
+            }
+        }
+
+        return convertToReservationResponse(reservation);
+    }
+
+    /**
+     * 예약 수정 (사용자용) - 승인 대기 상태에서만 수정 가능
+     */
+    public ReservationResponse updateMyReservation(Long reservationNo, ReservationRequest request, Long empNo) {
+        validateReservationRequest(request);
+
+        FacilityReservation reservation = reservationRepository.findById(reservationNo)
+                .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo));
+
+        // 권한 확인 (본인 예약만 수정 가능)
+        if (!reservation.getReserverEmpNo().equals(empNo)) {
+            throw new IllegalArgumentException("본인의 예약만 수정할 수 있습니다.");
+        }
+
+        // 상태 확인 (승인 대기 중인 예약만 수정 가능)
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            if (reservation.getStatus() == ReservationStatus.APPROVED) {
+                throw new IllegalArgumentException("승인된 예약은 수정할 수 없습니다. 취소 후 새로 예약해주세요.");
+            } else if (reservation.getStatus() == ReservationStatus.CANCELED) {
+                throw new IllegalArgumentException("취소된 예약은 수정할 수 없습니다.");
+            } else {
+                throw new IllegalArgumentException("현재 상태에서는 예약을 수정할 수 없습니다.");
+            }
+        }
+
+        // 시간 충돌 확인 (자신의 예약은 제외)
+        List<FacilityReservation> conflicts = reservationRepository
+                .findConflictingReservationsExcluding(request.getFacilityNo(),
+                        request.getStartTime(), request.getEndTime(), reservationNo);
+
+        if (!conflicts.isEmpty()) {
+            throw new ReservationConflictException("해당 시간에 이미 다른 예약이 있습니다.");
+        }
+
+        // 예약 정보 업데이트
+        reservation.setStartTime(request.getStartTime());
+        reservation.setEndTime(request.getEndTime());
+        reservation.setPurpose(request.getPurpose());
+        // 승인 대기 상태 유지 (상태 변경 없음)
+
+        FacilityReservation updated = reservationRepository.save(reservation);
+        sendReservationUpdateNotification(updated);
+
+        return convertToReservationResponse(updated);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     public ReservationResponse updateReservationStatus(Long reservationNo,
                                                        ReservationStatus status, String comment) {
@@ -284,6 +351,42 @@ public class FacilityService {
 
         } catch (Exception e) {
             log.error("예약 상태 변경 알림 전송 실패", e);
+        }
+    }
+
+
+    /**
+     * 예약 수정 알림
+     */
+    private void sendReservationUpdateNotification(FacilityReservation reservation) {
+        try {
+            List<Employee> admins = employeeRepository.findByIsAdmin("Y");
+
+            String title = "시설 예약 수정";
+            String content = String.format("%s님이 %s 예약을 수정했습니다.\n일시: %s",
+                    reservation.getReserverName(),
+                    reservation.getFacilityName(),
+                    reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
+
+            for (Employee admin : admins) {
+                Notification notification = new Notification(
+                        admin.getEmpNo(),
+                        "FACILITY",
+                        title,
+                        content,
+                        "FACILITY_RESERVATION",
+                        reservation.getReservationNo().toString(),
+                        "NORMAL"
+                );
+
+                notificationRepository.save(notification);
+                sendWebSocketNotification(admin.getEmpNo(), notification);
+
+                log.info("예약 수정 알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
+                        admin.getEmpNo(), reservation.getReservationNo());
+            }
+        } catch (Exception e) {
+            log.error("예약 수정 알림 전송 실패", e);
         }
     }
 

@@ -1,14 +1,18 @@
+// FacilityReservation.js
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, MapPin, Calendar, Clock, X } from 'lucide-react';
+import { Building2, Users, MapPin, Calendar, Clock, X, Edit2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { facilityApi } from '../../api/facilityApi';
 import { isAuthenticated, handleAuthError } from '../../utils/authUtils';
+import './FacilityReservation.css';
 
 const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
   const [facilities, setFacilities] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showReserveModal, setShowReserveModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,26 +25,17 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
 
   // 시설 목록 조회
   const fetchFacilities = async () => {
-    console.log('사용자 시설 데이터 요청 시작...');
-    
     try {
       setLoading(true);
       setError(null);
       
-      console.log('API 호출 전 - 로딩:', true, '에러:', null);
-      
       const response = await facilityApi.getFacilities();
-      console.log('사용자 시설 API 응답:', response);
       
-      // 응답 데이터 타입별 처리
       if (Array.isArray(response)) {
-        console.log('배열 데이터 설정:', response.length, '개 시설');
         setFacilities(response);
       } else if (response && response.data && Array.isArray(response.data)) {
-        console.log('객체.data 배열 설정:', response.data.length, '개 시설');
         setFacilities(response.data);
       } else {
-        console.warn('예상치 못한 응답 구조:', typeof response, response);
         setFacilities([]);
       }
     } catch (error) {
@@ -52,21 +47,16 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
         return;
       }
     } finally {
-      console.log('사용자 시설 API 호출 완료 - 로딩 false');
       setLoading(false);
     }
   };
 
   // 사용자 예약 목록 조회
   const fetchMyReservations = async () => {
-    console.log('내 예약 목록 조회 시작...');
-    
     try {
       setLoading(true);
       setError(null);
       const response = await facilityApi.getMyReservations();
-      
-      console.log('내 예약 조회 응답:', response);
       
       if (Array.isArray(response)) {
         setReservations(response);
@@ -102,8 +92,6 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
       return;
     }
 
-    console.log('예약 신청 데이터:', reservationForm);
-
     try {
       setLoading(true);
       const reservationData = {
@@ -115,18 +103,10 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
       alert('예약이 신청되었습니다. 승인을 기다려주세요.');
       
       setShowReserveModal(false);
-      setReservationForm({
-        facilityNo: '',
-        startTime: '',
-        endTime: '',
-        purpose: ''
-      });
-      setSelectedFacility(null);
+      resetReservationForm();
       
-      // 예약 목록 새로고침
-      if (activeTab === 'reservations') {
-        await fetchMyReservations();
-      }
+      // 예약 신청 후 예약 내역 새로고침
+      await fetchMyReservations();
     } catch (error) {
       console.error('예약 신청 오류:', error);
       
@@ -135,6 +115,47 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
       }
       
       alert(`예약 신청에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 예약 수정
+  const handleEditReservation = async () => {
+    if (!reservationForm.startTime || !reservationForm.endTime || !reservationForm.purpose) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (new Date(reservationForm.startTime) >= new Date(reservationForm.endTime)) {
+      alert('종료 시간은 시작 시간보다 늦어야 합니다.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      await facilityApi.updateMyReservation(selectedReservation.reservationNo, {
+        facilityNo: selectedReservation.facilityNo,
+        startTime: reservationForm.startTime,
+        endTime: reservationForm.endTime,
+        purpose: reservationForm.purpose
+      });
+      
+      alert('예약이 수정되었습니다.');
+      
+      setShowEditModal(false);
+      resetReservationForm();
+      await fetchMyReservations();
+      
+    } catch (error) {
+      console.error('예약 수정 오류:', error);
+      
+      if (handleAuthError(error)) {
+        return;
+      }
+      
+      alert(`예약 수정에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
     } finally {
       setLoading(false);
     }
@@ -164,21 +185,62 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
     }
   };
 
+  // 예약 폼 초기화
+  const resetReservationForm = () => {
+    setReservationForm({
+      facilityNo: '',
+      startTime: '',
+      endTime: '',
+      purpose: ''
+    });
+    setSelectedFacility(null);
+    setSelectedReservation(null);
+  };
+
   // 초기 데이터 로드
   useEffect(() => {
-    console.log('사용자 컴포넌트 마운트, 활성 탭:', activeTab);
-    
     if (!isAuthenticated()) {
       setError('로그인이 필요합니다.');
       return;
     }
 
-    if (activeTab === 'facilities') {
-      fetchFacilities();
-    } else if (activeTab === 'reservations') {
-      fetchMyReservations();
+    const loadInitialData = async () => {
+      await Promise.all([
+        fetchFacilities(),
+        fetchMyReservations()
+      ]);
+    };
+
+    loadInitialData();
+  }, []);
+
+  // URL 파라미터로 초기 탭 설정
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    if (tabParam === 'reservations') {
+      setActiveTab('reservations');
+    } else {
+      setActiveTab('facilities');
     }
-  }, [activeTab]);
+  }, []);
+
+  // 탭 변경 시 URL 업데이트 및 데이터 새로고침
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.pushState({}, '', url);
+    
+    // 탭 변경 시 해당 탭의 데이터 새로고침
+    if (tabName === 'reservations') {
+      fetchMyReservations();
+    } else if (tabName === 'facilities') {
+      fetchFacilities();
+    }
+  };
 
   // 날짜/시간 포맷팅
   const formatDateTime = (dateTime) => {
@@ -200,26 +262,39 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PENDING':
-        return <span className="status-badge status-pending">승인 대기</span>;
+        return (
+          <span className="status-badge status-pending">
+            <AlertCircle className="status-icon" />
+            승인 대기
+          </span>
+        );
       case 'APPROVED':
-        return <span className="status-badge status-approved">승인 완료</span>;
+        return (
+          <span className="status-badge status-approved">
+            <CheckCircle className="status-icon" />
+            승인 완료
+          </span>
+        );
       case 'CANCELED':
-        return <span className="status-badge status-canceled">취소됨</span>;
+        return (
+          <span className="status-badge status-canceled">
+            <XCircle className="status-icon" />
+            승인 거절
+          </span>
+        );
       default:
-        return <span className="status-badge status-pending">승인 대기</span>;
+        return (
+          <span className="status-badge status-pending">
+            <AlertCircle className="status-icon" />
+            승인 대기
+          </span>
+        );
     }
   };
 
   // 시설 타입에 따른 아이콘
   const getFacilityIcon = (facilityName) => {
-    const name = facilityName?.toLowerCase() || '';
-    if (name.includes('회의') || name.includes('미팅')) {
-      return <Building2 className="facility-type-icon" />;
-    } else if (name.includes('강의') || name.includes('교육')) {
-      return <Users className="facility-type-icon" />;
-    } else {
-      return <Building2 className="facility-type-icon" />;
-    }
+    return <Building2 className="facility-type-icon" />;
   };
 
   // 필터링된 시설 목록
@@ -229,7 +304,6 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
 
   // 예약 모달 열기
   const openReserveModal = (facility) => {
-    console.log('예약 모달 열기:', facility);
     setSelectedFacility(facility);
     setReservationForm({
       facilityNo: facility.facilityNo,
@@ -238,6 +312,42 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
       purpose: ''
     });
     setShowReserveModal(true);
+  };
+
+  // 예약 수정 모달 열기
+  const openEditModal = (reservation) => {
+    setSelectedReservation(reservation);
+    
+    const startTime = new Date(reservation.startTime);
+    const endTime = new Date(reservation.endTime);
+    
+    setReservationForm({
+      facilityNo: reservation.facilityNo,
+      startTime: formatDateTimeLocal(startTime),
+      endTime: formatDateTimeLocal(endTime),
+      purpose: reservation.purpose
+    });
+    setShowEditModal(true);
+  };
+
+  // datetime-local input에 맞는 형식으로 변환
+  const formatDateTimeLocal = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // 예약 수정/취소 가능 여부 확인
+  const canModifyReservation = (reservation) => {
+    return reservation.status === 'PENDING';
+  };
+
+  const canCancelReservation = (reservation) => {
+    return reservation.status === 'PENDING' || reservation.status === 'APPROVED';
   };
 
   // 로그인 확인
@@ -270,14 +380,14 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
         <div className="facility-tabs">
           <button
             className={`tab-button ${activeTab === 'facilities' ? 'active' : ''}`}
-            onClick={() => setActiveTab('facilities')}
+            onClick={() => handleTabChange('facilities')}
           >
             <Building2 className="tab-icon" />
             시설 예약
           </button>
           <button
             className={`tab-button ${activeTab === 'reservations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reservations')}
+            onClick={() => handleTabChange('reservations')}
           >
             <Calendar className="tab-icon" />
             예약 내역
@@ -377,65 +487,86 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
                 <p>로딩 중...</p>
               </div>
             ) : (
-              <div className="reservation-grid">
-                {reservations.length === 0 ? (
-                  <div className="empty-state">
-                    <Calendar className="empty-icon" />
-                    <p>예약 내역이 없습니다.</p>
-                  </div>
-                ) : (
-                  reservations.map((reservation) => (
-                    <div key={reservation.reservationNo} className="reservation-card">
-                      <div className="reservation-header">
-                        <h4 className="facility-name">{reservation.facilityName}</h4>
-                        {getStatusBadge(reservation.resStatus)}
-                      </div>
-                      
-                      <div className="reservation-content">
-                        <div className="reservation-info">
-                          <div className="info-item">
-                            <Clock className="info-icon" />
-                            <div className="time-info">
-                              <div>{formatDateTime(reservation.startTime)}</div>
-                              <div className="time-end">~ {formatDateTime(reservation.endTime)}</div>
+              <div className="table-responsive">
+                <table className="reservation-table">
+                  <thead>
+                    <tr>
+                      <th>시설명</th>
+                      <th>예약 시간</th>
+                      <th>사용 목적</th>
+                      <th>예약 상태</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reservations.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="text-center">
+                          예약 내역이 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      reservations.map((reservation) => (
+                        <tr key={reservation.reservationNo}>
+                          <td>
+                            <div className="facility-cell">
+                              <div className="facility-name">{reservation.facilityName}</div>
                             </div>
-                          </div>
-                          
-                          <div className="info-item">
-                            <span className="info-label">사용 목적:</span>
-                            <span className="info-value">{reservation.purpose}</span>
-                          </div>
-                          
-                          <div className="info-item">
-                            <span className="info-label">예약 일시:</span>
-                            <span className="info-value">{formatDateTime(reservation.createDate)}</span>
-                          </div>
-                        </div>
-                        
-                        {reservation.resStatus === 'PENDING' && (
-                          <div className="reservation-actions">
-                            <button
-                              onClick={() => handleCancelReservation(reservation.reservationNo)}
-                              className="btn btn-sm btn-danger"
-                              disabled={loading}
-                              type="button"
-                            >
-                              <X className="btn-icon" />
-                              취소
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
+                          </td>
+                          <td>
+                            <div className="reservation-time">
+                              <div className="start-time">
+                                {formatDateTime(reservation.startTime)}
+                              </div>
+                              <div className="time-divider">~</div>
+                              <div className="end-time">
+                                {formatDateTime(reservation.endTime)}
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="purpose-cell">{reservation.purpose}</div>
+                          </td>
+                          <td>{getStatusBadge(reservation.status)}</td>
+                          <td>
+                            <div className="action-buttons">
+                              {canModifyReservation(reservation) && (
+                                <button
+                                  onClick={() => openEditModal(reservation)}
+                                  className="action-btn edit-btn"
+                                  disabled={loading}
+                                  type="button"
+                                  title="승인 대기 중인 예약만 수정 가능합니다"
+                                >
+                                  <Edit2 className="btn-icon" />
+                                  수정
+                                </button>
+                              )}
+                              {canCancelReservation(reservation) && (
+                                <button
+                                  onClick={() => handleCancelReservation(reservation.reservationNo)}
+                                  className="action-btn cancel-btn"
+                                  disabled={loading}
+                                  type="button"
+                                >
+                                  <X className="btn-icon" />
+                                  취소
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* 예약 모달 */}
+      {/* 예약 신청 모달 */}
       {showReserveModal && selectedFacility && (
         <div className="modal-overlay" onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -528,6 +659,90 @@ const FacilityReservation = ({ userData, initialTab = 'facilities' }) => {
                 type="button"
               >
                 {loading ? '처리 중...' : '예약 신청'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 예약 수정 모달 */}
+      {showEditModal && selectedReservation && (
+        <div className="modal-overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowEditModal(false);
+          }
+        }}>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{selectedReservation.facilityName} 예약 수정</h2>
+              <button 
+                onClick={() => setShowEditModal(false)} 
+                className="modal-close"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="edit-notice">
+                <AlertCircle className="notice-icon" />
+                <p>승인 대기 중인 예약만 수정할 수 있습니다.</p>
+              </div>
+              
+              <div className="form-section">
+                <div className="form-group">
+                  <label>시작 시간 *</label>
+                  <input
+                    type="datetime-local"
+                    value={reservationForm.startTime}
+                    onChange={(e) => setReservationForm({...reservationForm, startTime: e.target.value})}
+                    className="form-control"
+                    min={new Date().toISOString().slice(0, 16)}
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>종료 시간 *</label>
+                  <input
+                    type="datetime-local"
+                    value={reservationForm.endTime}
+                    onChange={(e) => setReservationForm({...reservationForm, endTime: e.target.value})}
+                    className="form-control"
+                    min={reservationForm.startTime || new Date().toISOString().slice(0, 16)}
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>사용 목적 *</label>
+                  <textarea
+                    value={reservationForm.purpose}
+                    onChange={(e) => setReservationForm({...reservationForm, purpose: e.target.value})}
+                    className="form-control"
+                    placeholder="사용 목적을 입력하세요"
+                    rows="3"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="btn btn-secondary"
+                disabled={loading}
+                type="button"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleEditReservation}
+                className="btn btn-primary"
+                disabled={loading}
+                type="button"
+              >
+                {loading ? '처리 중...' : '수정 완료'}
               </button>
             </div>
           </div>
