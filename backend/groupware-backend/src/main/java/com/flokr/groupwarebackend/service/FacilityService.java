@@ -85,15 +85,11 @@ public class FacilityService {
         return convertToReservationResponse(saved);
     }
 
-    /**
-     * 예약 상세 조회 (사용자용)
-     */
     @Transactional(readOnly = true)
     public ReservationResponse getReservationDetail(Long reservationNo, Long empNo) {
         FacilityReservation reservation = reservationRepository.findById(reservationNo)
                 .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo));
 
-        // 본인 예약이거나 관리자인 경우만 조회 가능
         if (!reservation.getReserverEmpNo().equals(empNo)) {
             Employee employee = employeeRepository.findById(empNo)
                     .orElseThrow(() -> new EntityNotFoundException("직원 정보를 찾을 수 없습니다."));
@@ -106,21 +102,16 @@ public class FacilityService {
         return convertToReservationResponse(reservation);
     }
 
-    /**
-     * 예약 수정 (사용자용) - 승인 대기 상태에서만 수정 가능
-     */
     public ReservationResponse updateMyReservation(Long reservationNo, ReservationRequest request, Long empNo) {
         validateReservationRequest(request);
 
         FacilityReservation reservation = reservationRepository.findById(reservationNo)
                 .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo));
 
-        // 권한 확인 (본인 예약만 수정 가능)
         if (!reservation.getReserverEmpNo().equals(empNo)) {
             throw new IllegalArgumentException("본인의 예약만 수정할 수 있습니다.");
         }
 
-        // 상태 확인 (승인 대기 중인 예약만 수정 가능)
         if (reservation.getStatus() != ReservationStatus.PENDING) {
             if (reservation.getStatus() == ReservationStatus.APPROVED) {
                 throw new IllegalArgumentException("승인된 예약은 수정할 수 없습니다. 취소 후 새로 예약해주세요.");
@@ -131,7 +122,6 @@ public class FacilityService {
             }
         }
 
-        // 시간 충돌 확인 (자신의 예약은 제외)
         List<FacilityReservation> conflicts = reservationRepository
                 .findConflictingReservationsExcluding(request.getFacilityNo(),
                         request.getStartTime(), request.getEndTime(), reservationNo);
@@ -140,11 +130,9 @@ public class FacilityService {
             throw new ReservationConflictException("해당 시간에 이미 다른 예약이 있습니다.");
         }
 
-        // 예약 정보 업데이트
         reservation.setStartTime(request.getStartTime());
         reservation.setEndTime(request.getEndTime());
         reservation.setPurpose(request.getPurpose());
-        // 승인 대기 상태 유지 (상태 변경 없음)
 
         FacilityReservation updated = reservationRepository.save(reservation);
         sendReservationUpdateNotification(updated);
@@ -153,18 +141,29 @@ public class FacilityService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ReservationResponse updateReservationStatus(Long reservationNo,
                                                        ReservationStatus status, String comment) {
 
+        log.info("예약 상태 변경 시작 - 예약번호: {}, 상태: {}", reservationNo, status);
+
         FacilityReservation reservation = reservationRepository.findById(reservationNo)
-                .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo));
+                .orElseThrow(() -> {
+                    log.error("예약을 찾을 수 없습니다. ID: {}", reservationNo);
+                    return new EntityNotFoundException("예약을 찾을 수 없습니다. ID: " + reservationNo);
+                });
+
+        log.info("예약 정보 조회 성공: 기존상태={}, 예약자={}",
+                reservation.getStatus(), reservation.getReserverEmpNo());
 
         ReservationStatus oldStatus = reservation.getStatus();
         reservation.setStatus(status);
 
         FacilityReservation updated = reservationRepository.save(reservation);
+        log.info("예약 상태 DB 저장 완료: {} -> {}", oldStatus, status);
 
         if (oldStatus != status) {
+            log.info("상태 변경 감지 - 즉시 알림 전송");
             sendReservationStatusUpdateNotification(updated, comment);
         }
 
@@ -234,7 +233,6 @@ public class FacilityService {
         facility.setDescription(request.getDescription());
 
         Facility saved = facilityRepository.save(facility);
-
         log.info("새 시설 추가됨: {}", saved.getFacilityName());
 
         return convertToResponse(saved);
@@ -260,7 +258,6 @@ public class FacilityService {
         facility.setDescription(request.getDescription());
 
         Facility updated = facilityRepository.save(facility);
-
         log.info("시설 수정됨: {}", updated.getFacilityName());
 
         return convertToResponse(updated);
@@ -284,7 +281,6 @@ public class FacilityService {
 
         String facilityName = facility.getFacilityName();
         facilityRepository.delete(facility);
-
         log.info("시설 삭제됨: {}", facilityName);
     }
 
@@ -299,21 +295,25 @@ public class FacilityService {
                     reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
 
             for (Employee admin : admins) {
-                Notification notification = new Notification(
-                        admin.getEmpNo(),
-                        "FACILITY",
-                        title,
-                        content,
-                        "FACILITY_RESERVATION",
-                        reservation.getReservationNo().toString(),
-                        "HIGH"
-                );
+                try {
+                    Notification notification = new Notification(
+                            admin.getEmpNo(),
+                            "FACILITY",
+                            title,
+                            content,
+                            "FACILITY_RESERVATION",
+                            reservation.getReservationNo().toString(),
+                            "HIGH"
+                    );
 
-                notificationRepository.save(notification);
-                sendWebSocketNotification(admin.getEmpNo(), notification);
+                    notificationRepository.save(notification);
+                    sendWebSocketNotification(admin, notification);
 
-                log.info("알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
-                        admin.getEmpNo(), reservation.getReservationNo());
+                    log.info("알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
+                            admin.getEmpNo(), reservation.getReservationNo());
+                } catch (Exception e) {
+                    log.error("관리자 {}에게 알림 전송 실패", admin.getEmpNo(), e);
+                }
             }
         } catch (Exception e) {
             log.error("예약 요청 알림 전송 실패", e);
@@ -322,68 +322,89 @@ public class FacilityService {
 
     private void sendReservationStatusUpdateNotification(FacilityReservation reservation, String comment) {
         try {
+            log.info("예약 상태 변경 알림 전송 시작 - 예약번호: {}, 상태: {}",
+                    reservation.getReservationNo(), reservation.getStatus());
+
+            Employee reserver = employeeRepository.findById(reservation.getReserverEmpNo())
+                    .orElse(null);
+
+            if (reserver == null) {
+                log.error("예약자 정보를 찾을 수 없습니다. empNo: {}", reservation.getReserverEmpNo());
+                return;
+            }
+
+            log.info("예약자 정보 조회 성공: empId={}, empName={}", reserver.getEmpId(), reserver.getEmpName());
+
             String statusText = getStatusText(reservation.getStatus());
+            String notificationType = reservation.getStatus() == ReservationStatus.APPROVED ?
+                    "FACILITY_APPROVED" : "FACILITY_REJECTED";
+
             String title = "시설 예약 " + statusText;
-            String content = String.format("시설 예약이 %s되었습니다.\n시설: %s\n일시: %s",
+            String content = String.format("시설 예약이 %s되었습니다. 시설: %s 일시: %s",
                     statusText,
                     reservation.getFacilityName(),
                     reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
 
             if (comment != null && !comment.trim().isEmpty()) {
-                content += "\n사유: " + comment;
+                content += " 사유: " + comment;
             }
 
-            Notification notification = new Notification(
-                    reservation.getReserverEmpNo(),
-                    "FACILITY",
-                    title,
-                    content,
-                    "FACILITY_RESERVATION",
-                    reservation.getReservationNo().toString(),
-                    reservation.getStatus() == ReservationStatus.APPROVED ? "NORMAL" : "HIGH"
-            );
+            log.info("알림 내용 생성 완료 - 제목: {}, 타입: {}", title, notificationType);
 
-            notificationRepository.save(notification);
-            sendWebSocketNotification(reservation.getReserverEmpNo(), notification);
-
-            log.info("예약 상태 변경 알림 저장 및 전송 완료 - 사용자: {}, 예약: {}",
-                    reservation.getReserverEmpNo(), reservation.getReservationNo());
-
-        } catch (Exception e) {
-            log.error("예약 상태 변경 알림 전송 실패", e);
-        }
-    }
-
-
-    /**
-     * 예약 수정 알림
-     */
-    private void sendReservationUpdateNotification(FacilityReservation reservation) {
-        try {
-            List<Employee> admins = employeeRepository.findByIsAdmin("Y");
-
-            String title = "시설 예약 수정";
-            String content = String.format("%s님이 %s 예약을 수정했습니다.\n일시: %s",
-                    reservation.getReserverName(),
-                    reservation.getFacilityName(),
-                    reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
-
-            for (Employee admin : admins) {
+            try {
                 Notification notification = new Notification(
-                        admin.getEmpNo(),
+                        reservation.getReserverEmpNo(),
                         "FACILITY",
                         title,
                         content,
                         "FACILITY_RESERVATION",
                         reservation.getReservationNo().toString(),
-                        "NORMAL"
+                        reservation.getStatus() == ReservationStatus.APPROVED ? "NORMAL" : "HIGH"
                 );
 
-                notificationRepository.save(notification);
-                sendWebSocketNotification(admin.getEmpNo(), notification);
+                Notification savedNotification = notificationRepository.save(notification);
+                log.info("알림 DB 저장 완료 - 알림번호: {}", savedNotification.getNotificationNo());
 
-                log.info("예약 수정 알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
-                        admin.getEmpNo(), reservation.getReservationNo());
+                sendWebSocketNotificationWithType(reserver, savedNotification, notificationType);
+            } catch (Exception e) {
+                log.error("알림 생성/저장 실패 - 예약번호: {}", reservation.getReservationNo(), e);
+            }
+
+        } catch (Exception e) {
+            log.error("예약 상태 변경 알림 전송 실패 - 예약번호: {}", reservation.getReservationNo(), e);
+        }
+    }
+
+    private void sendReservationUpdateNotification(FacilityReservation reservation) {
+        try {
+            List<Employee> admins = employeeRepository.findByIsAdmin("Y");
+
+            String title = "시설 예약 수정";
+            String content = String.format("%s님이 %s 예약을 수정했습니다. 일시: %s",
+                    reservation.getReserverName(),
+                    reservation.getFacilityName(),
+                    reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
+
+            for (Employee admin : admins) {
+                try {
+                    Notification notification = new Notification(
+                            admin.getEmpNo(),
+                            "FACILITY",
+                            title,
+                            content,
+                            "FACILITY_RESERVATION",
+                            reservation.getReservationNo().toString(),
+                            "NORMAL"
+                    );
+
+                    notificationRepository.save(notification);
+                    sendWebSocketNotification(admin, notification);
+
+                    log.info("예약 수정 알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
+                            admin.getEmpNo(), reservation.getReservationNo());
+                } catch (Exception e) {
+                    log.error("관리자 {}에게 수정 알림 전송 실패", admin.getEmpNo(), e);
+                }
             }
         } catch (Exception e) {
             log.error("예약 수정 알림 전송 실패", e);
@@ -395,35 +416,42 @@ public class FacilityService {
             List<Employee> admins = employeeRepository.findByIsAdmin("Y");
 
             String title = "시설 예약 취소";
-            String content = String.format("%s님이 %s 예약을 취소했습니다.\n일시: %s",
+            String content = String.format("%s님이 %s 예약을 취소했습니다. 일시: %s",
                     reservation.getReserverName(),
                     reservation.getFacilityName(),
                     reservation.getStartTime().format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));
 
             for (Employee admin : admins) {
-                Notification notification = new Notification(
-                        admin.getEmpNo(),
-                        "FACILITY",
-                        title,
-                        content,
-                        "FACILITY_RESERVATION",
-                        reservation.getReservationNo().toString(),
-                        "NORMAL"
-                );
+                try {
+                    Notification notification = new Notification(
+                            admin.getEmpNo(),
+                            "FACILITY",
+                            title,
+                            content,
+                            "FACILITY_RESERVATION",
+                            reservation.getReservationNo().toString(),
+                            "NORMAL"
+                    );
 
-                notificationRepository.save(notification);
-                sendWebSocketNotification(admin.getEmpNo(), notification);
+                    notificationRepository.save(notification);
+                    sendWebSocketNotification(admin, notification);
 
-                log.info("예약 취소 알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
-                        admin.getEmpNo(), reservation.getReservationNo());
+                    log.info("예약 취소 알림 저장 및 전송 완료 - 관리자: {}, 예약: {}",
+                            admin.getEmpNo(), reservation.getReservationNo());
+                } catch (Exception e) {
+                    log.error("관리자 {}에게 취소 알림 전송 실패", admin.getEmpNo(), e);
+                }
             }
         } catch (Exception e) {
             log.error("예약 취소 알림 전송 실패", e);
         }
     }
 
-    private void sendWebSocketNotification(Long empNo, Notification notification) {
+    private void sendWebSocketNotification(Employee employee, Notification notification) {
         try {
+            log.info("WebSocket 알림 전송 시작 - 수신자: {}, 알림: {}",
+                    employee.getEmpId(), notification.getTitle());
+
             Map<String, Object> message = new HashMap<>();
             message.put("notificationNo", notification.getNotificationNo());
             message.put("type", notification.getType());
@@ -433,33 +461,56 @@ public class FacilityService {
             message.put("createDate", notification.getCreateDate());
             message.put("refType", notification.getRefType());
             message.put("refNo", notification.getRefNo());
+            message.put("recipientEmpNo", notification.getRecipientEmpNo());
+            message.put("isRead", false);
+            message.put("readDate", null);
 
-            messagingTemplate.convertAndSendToUser(
-                    empNo.toString(),
-                    "/queue/notification",
-                    message
-            );
+            String personalDestination = "/user/" + employee.getEmpId() + "/queue/notifications";
+            messagingTemplate.convertAndSend(personalDestination, message);
+            log.info("empId 기반 개인 알림 전송: {}", personalDestination);
 
-            log.debug("WebSocket 알림 전송 성공 - empNo: {}, title: {}", empNo, notification.getTitle());
+            String personalDestinationByEmpNo = "/user/" + employee.getEmpNo() + "/queue/notifications";
+            messagingTemplate.convertAndSend(personalDestinationByEmpNo, message);
+            log.info("empNo 기반 개인 알림 전송: {}", personalDestinationByEmpNo);
+
+            messagingTemplate.convertAndSend("/topic/notifications", message);
+            log.info("전체 알림 전송 완료");
 
         } catch (Exception e) {
-            log.warn("WebSocket 알림 전송 실패 - empNo: {}, error: {}", empNo, e.getMessage());
+            log.error("WebSocket 알림 전송 실패 - empNo: {}", employee.getEmpNo(), e);
         }
     }
 
-    private void sendBroadcastNotification(String message) {
+    private void sendWebSocketNotificationWithType(Employee employee, Notification notification, String wsType) {
         try {
-            Map<String, Object> broadcastMessage = new HashMap<>();
-            broadcastMessage.put("type", "FACILITY_UPDATE");
-            broadcastMessage.put("message", message);
-            broadcastMessage.put("timestamp", LocalDateTime.now());
+            log.info("WebSocket 알림 전송 시작 - 수신자: {}, 타입: {}", employee.getEmpId(), wsType);
 
-            messagingTemplate.convertAndSend("/topic/facility.updates", broadcastMessage);
+            Map<String, Object> message = new HashMap<>();
+            message.put("notificationNo", notification.getNotificationNo());
+            message.put("type", wsType);
+            message.put("title", notification.getTitle());
+            message.put("content", notification.getContent());
+            message.put("priority", notification.getPriority());
+            message.put("createDate", notification.getCreateDate());
+            message.put("refType", notification.getRefType());
+            message.put("refNo", notification.getRefNo());
+            message.put("recipientEmpNo", notification.getRecipientEmpNo());
+            message.put("isRead", false);
+            message.put("readDate", null);
 
-            log.debug("브로드캐스트 알림 전송: {}", message);
+            String personalDestination = "/user/" + employee.getEmpId() + "/queue/notifications";
+            messagingTemplate.convertAndSend(personalDestination, message);
+            log.info("empId 기반 개인 알림 전송 완료: {}", personalDestination);
+
+            String personalDestinationByEmpNo = "/user/" + employee.getEmpNo() + "/queue/notifications";
+            messagingTemplate.convertAndSend(personalDestinationByEmpNo, message);
+            log.info("empNo 기반 개인 알림 전송 완료: {}", personalDestinationByEmpNo);
+
+            messagingTemplate.convertAndSend("/topic/notifications", message);
+            log.info("전체 알림 전송 완료");
 
         } catch (Exception e) {
-            log.warn("브로드캐스트 알림 전송 실패: {}", e.getMessage());
+            log.error("WebSocket 알림 전송 실패 - empNo: {}", employee.getEmpNo(), e);
         }
     }
 

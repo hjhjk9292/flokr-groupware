@@ -21,16 +21,12 @@ authApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('empName');
-      alert('인증이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
-      window.location.href = '/';
+      console.log('401 Unauthorized - 토큰 확인 필요');
     }
     return Promise.reject(error);
   }
 );
 
-// 기존 API 함수들
 export const login = async (empId, password) => {
   const response = await axios.post('/api/auth/login', { empId, password });
   return response.data;
@@ -51,36 +47,29 @@ export const getEmployees = async () => {
   return response.data;
 };
 
-// 시설 관련 API 함수들 추가
 export const facilityApi = {
-  // 관리자용 API
   admin: {
-    // 모든 시설 목록 조회
     getFacilities: async (keyword = '') => {
       const params = keyword ? `?keyword=${encodeURIComponent(keyword)}` : '';
       const response = await authApi.get(`/facilities/admin${params}`);
       return response.data;
     },
 
-    // 시설 추가
     createFacility: async (facilityData) => {
       const response = await authApi.post('/facilities/admin', facilityData);
       return response.data;
     },
 
-    // 시설 수정
     updateFacility: async (facilityNo, facilityData) => {
       const response = await authApi.put(`/facilities/admin/${facilityNo}`, facilityData);
       return response.data;
     },
 
-    // 시설 삭제
     deleteFacility: async (facilityNo) => {
       const response = await authApi.delete(`/facilities/admin/${facilityNo}`);
       return response.data;
     },
 
-    // 예약 목록 조회
     getReservations: async (params = {}) => {
       const queryParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
@@ -92,16 +81,13 @@ export const facilityApi = {
     }
   },
 
-  // 사용자용 API
   user: {
-    // 사용 가능한 시설 목록 조회
     getAvailableFacilities: async (keyword = '') => {
       const params = keyword ? `?keyword=${encodeURIComponent(keyword)}` : '';
       const response = await authApi.get(`/facilities/available${params}`);
       return response.data;
     },
 
-    // 내 예약 목록 조회
     getMyReservations: async (empNo, params = {}) => {
       const queryParams = new URLSearchParams({ empNo: empNo.toString() });
       Object.entries(params).forEach(([key, value]) => {
@@ -111,34 +97,28 @@ export const facilityApi = {
       return response.data;
     },
 
-    // 예약 생성
     createReservation: async (reservationData) => {
       const response = await authApi.post('/facilities/reservations', reservationData);
       return response.data;
     },
 
-    // 예약 수정
     updateReservation: async (reservationNo, reservationData) => {
       const response = await authApi.put(`/facilities/reservations/${reservationNo}`, reservationData);
       return response.data;
     }
   },
 
-  // 공통 API
   common: {
-    // 시설 상세 정보 조회
     getFacilityDetail: async (facilityNo) => {
       const response = await authApi.get(`/facilities/${facilityNo}`);
       return response.data;
     },
 
-    // 예약 상세 정보 조회
     getReservationDetail: async (reservationNo) => {
       const response = await authApi.get(`/facilities/reservations/${reservationNo}`);
       return response.data;
     },
 
-    // 예약 상태 변경
     updateReservationStatus: async (reservationNo, status, currentUserEmpNo) => {
       const response = await authApi.put(`/facilities/reservations/${reservationNo}/status`, {
         status,
@@ -147,7 +127,6 @@ export const facilityApi = {
       return response.data;
     },
 
-    // 예약 시간 중복 체크
     checkAvailability: async (reservationData) => {
       const response = await authApi.post('/facilities/check-availability', reservationData);
       return response.data;
@@ -155,30 +134,127 @@ export const facilityApi = {
   }
 };
 
-// 알림 관련 API 함수들 추가
 export const notificationApi = {
-  // 읽지 않은 알림 개수 조회
   getUnreadCount: async () => {
-    const response = await authApi.get('/notifications/unread/count');
-    return response.data;
+    try {
+      const response = await authApi.get('/notifications/unread-count');
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      throw error;
+    }
   },
 
-  // 읽지 않은 알림 목록 조회
   getUnreadNotifications: async () => {
-    const response = await authApi.get('/notifications/unread');
-    return response.data;
+    try {
+      const response = await authApi.get('/notifications/unread');
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      throw error;
+    }
   },
 
-  // 알림 읽음 처리
+  getAllNotifications: async (page = 0, size = 20, filters = {}) => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      ...(filters.type && { type: filters.type }),
+      ...(filters.keyword && { keyword: filters.keyword })
+    });
+
+    try {
+      const response = await authApi.get(`/notifications?${params}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      throw error;
+    }
+  },
+
   markAsRead: async (notificationNo) => {
-    const response = await authApi.put(`/notifications/${notificationNo}/read`);
-    return response.data;
+    try {
+      const response = await authApi.put(`/notifications/${notificationNo}/read`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      throw error;
+    }
   },
 
-  // 모든 알림 읽음 처리
   markAllAsRead: async () => {
-    const response = await authApi.put('/notifications/read-all');
-    return response.data;
+    try {
+      const response = await authApi.put('/notifications/read-all');
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      throw error;
+    }
+  },
+
+  createNotification: async (notificationData) => {
+    try {
+      const response = await authApi.post('/admin/notifications', notificationData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      return { success: false, error: error.message };
+    }
+  },
+
+  getAdminNotificationHistory: async (page = 0, size = 15, filters = {}) => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      ...(filters.type && { type: filters.type }),
+      ...(filters.keyword && { keyword: filters.keyword })
+    });
+
+    try {
+      const response = await authApi.get(`/admin/notifications/history?${params}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      return { success: false, error: error.message };
+    }
+  },
+
+  searchEmployees: async (keyword) => {
+    try {
+      const response = await authApi.get(`/admin/notifications/employees/search?keyword=${encodeURIComponent(keyword)}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      return { success: false, error: error.message };
+    }
+  },
+
+  getDepartmentEmployees: async (deptNo) => {
+    try {
+      const response = await authApi.get(`/admin/notifications/departments/${deptNo}/employees`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return { success: false, error: 'UNAUTHORIZED' };
+      }
+      return { success: false, error: error.message };
+    }
   }
 };
 

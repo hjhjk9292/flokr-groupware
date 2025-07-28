@@ -1,8 +1,6 @@
-// ReservationController.java - 알림 연동된 버전
 package com.flokr.groupwarebackend.controller;
 
 import com.flokr.groupwarebackend.service.FacilityService;
-import com.flokr.groupwarebackend.service.NotificationService;
 import com.flokr.groupwarebackend.dto.ApiResponse;
 import com.flokr.groupwarebackend.dto.ReservationRequest;
 import com.flokr.groupwarebackend.dto.ReservationResponse;
@@ -27,15 +25,9 @@ import java.util.List;
 public class ReservationController {
 
     private final FacilityService facilityService;
-    private final NotificationService notificationService;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmployeeRepository employeeRepository;
 
-    // ==================== 사용자 예약 기능 ====================
-
-    /**
-     * 예약 생성
-     */
     @PostMapping("/facilities/{facilityNo}/reservations")
     public ApiResponse<ReservationResponse> createReservation(
             @PathVariable Long facilityNo,
@@ -49,9 +41,6 @@ public class ReservationController {
         return ApiResponse.success("예약이 신청되었습니다.", reservation);
     }
 
-    /**
-     * 내 예약 목록 조회
-     */
     @GetMapping("/my-reservations")
     public ApiResponse<List<ReservationResponse>> getMyReservations(HttpServletRequest request) {
         Long empNo = getCurrentEmployeeNo(request);
@@ -59,9 +48,6 @@ public class ReservationController {
         return ApiResponse.success(reservations);
     }
 
-    /**
-     * 예약 상세 조회
-     */
     @GetMapping("/reservations/{reservationNo}")
     public ApiResponse<ReservationResponse> getReservationDetail(
             @PathVariable Long reservationNo,
@@ -72,9 +58,6 @@ public class ReservationController {
         return ApiResponse.success(reservation);
     }
 
-    /**
-     * 예약 수정
-     */
     @PutMapping("/reservations/{reservationNo}")
     public ApiResponse<ReservationResponse> updateMyReservation(
             @PathVariable Long reservationNo,
@@ -86,9 +69,6 @@ public class ReservationController {
         return ApiResponse.success("예약이 수정되었습니다.", reservation);
     }
 
-    /**
-     * 예약 취소
-     */
     @PutMapping("/reservations/{reservationNo}/cancel")
     public ApiResponse<ReservationResponse> cancelReservation(
             @PathVariable Long reservationNo,
@@ -99,11 +79,6 @@ public class ReservationController {
         return ApiResponse.success("예약이 취소되었습니다.", reservation);
     }
 
-    // ==================== 관리자 예약 관리 기능 ====================
-
-    /**
-     * 모든 예약 목록 조회 (관리자용)
-     */
     @GetMapping("/admin/reservations")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<ReservationResponse>> getAllReservations() {
@@ -111,9 +86,6 @@ public class ReservationController {
         return ApiResponse.success(allReservations);
     }
 
-    /**
-     * 승인 대기 예약 목록 조회
-     */
     @GetMapping("/admin/reservations/pending")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<ReservationResponse>> getPendingReservations() {
@@ -121,48 +93,32 @@ public class ReservationController {
         return ApiResponse.success(pendingReservations);
     }
 
-    /**
-     * 예약 상태 변경 (통합) - 알림 발송 포함
-     */
     @PutMapping("/admin/reservations/{reservationNo}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationNo,
             @RequestBody StatusUpdateRequest request) {
 
+        log.info("예약 상태 변경 요청 - 예약번호: {}, 상태: {}", reservationNo, request.getStatus());
+
         try {
-            // 예약 상태 업데이트
             ReservationResponse result = facilityService.updateReservationStatus(
                     reservationNo, request.getStatus(), request.getComment());
 
-            // 알림 발송
-            if (result != null && result.getEmpNo() != null) {
-                String facilityName = result.getFacilityName();
-
-                if (request.getStatus() == ReservationStatus.APPROVED) {
-                    notificationService.sendFacilityApprovedNotification(result.getEmpNo(), facilityName);
-                    log.info("시설 예약 승인 알림 발송: empNo={}, facilityName={}", result.getEmpNo(), facilityName);
-                } else if (request.getStatus() == ReservationStatus.CANCELED) {
-                    notificationService.sendFacilityRejectedNotification(result.getEmpNo(), facilityName);
-                    log.info("시설 예약 거절 알림 발송: empNo={}, facilityName={}", result.getEmpNo(), facilityName);
-                }
-            }
-
             String message = request.getStatus() == ReservationStatus.APPROVED ?
-                    "예약이 승인되었으며 알림이 발송되었습니다." : "예약이 거절되었으며 알림이 발송되었습니다.";
+                    "예약이 승인되었습니다." : "예약이 거절되었습니다.";
 
+            log.info("예약 상태 변경 완료 - 예약번호: {}", reservationNo);
             return ApiResponse.success(message, result);
+
         } catch (Exception e) {
-            log.error("예약 상태 변경 중 오류 발생", e);
+            log.error("예약 상태 변경 중 오류 발생 - 예약번호: {}", reservationNo, e);
             String message = request.getStatus() == ReservationStatus.APPROVED ?
                     "예약 승인 중 오류가 발생했습니다." : "예약 거절 중 오류가 발생했습니다.";
             return ApiResponse.error(message);
         }
     }
 
-    /**
-     * 예약 승인 - 알림 발송 포함
-     */
     @PutMapping("/admin/reservations/{reservationNo}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<ReservationResponse> approveReservation(
@@ -174,24 +130,13 @@ public class ReservationController {
             ReservationResponse result = facilityService.updateReservationStatus(
                     reservationNo, ReservationStatus.APPROVED, comment);
 
-            // 승인 알림 발송
-            if (result != null && result.getEmpNo() != null) {
-                notificationService.sendFacilityApprovedNotification(
-                        result.getEmpNo(), result.getFacilityName());
-                log.info("시설 예약 승인 알림 발송: empNo={}, facilityName={}",
-                        result.getEmpNo(), result.getFacilityName());
-            }
-
-            return ApiResponse.success("예약이 승인되었으며 알림이 발송되었습니다.", result);
+            return ApiResponse.success("예약이 승인되었습니다.", result);
         } catch (Exception e) {
             log.error("예약 승인 중 오류 발생", e);
             return ApiResponse.error("예약 승인 중 오류가 발생했습니다.");
         }
     }
 
-    /**
-     * 예약 거절 - 알림 발송 포함
-     */
     @PutMapping("/admin/reservations/{reservationNo}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<ReservationResponse> rejectReservation(
@@ -203,26 +148,13 @@ public class ReservationController {
             ReservationResponse result = facilityService.updateReservationStatus(
                     reservationNo, ReservationStatus.CANCELED, comment);
 
-            // 거절 알림 발송
-            if (result != null && result.getEmpNo() != null) {
-                notificationService.sendFacilityRejectedNotification(
-                        result.getEmpNo(), result.getFacilityName());
-                log.info("시설 예약 거절 알림 발송: empNo={}, facilityName={}",
-                        result.getEmpNo(), result.getFacilityName());
-            }
-
-            return ApiResponse.success("예약이 거부되었으며 알림이 발송되었습니다.", result);
+            return ApiResponse.success("예약이 거절되었습니다.", result);
         } catch (Exception e) {
             log.error("예약 거절 중 오류 발생", e);
             return ApiResponse.error("예약 거절 중 오류가 발생했습니다.");
         }
     }
 
-    // ==================== 유틸리티 메서드 ====================
-
-    /**
-     * JWT에서 직원 번호 추출
-     */
     private Long getCurrentEmployeeNo(HttpServletRequest request) {
         String token = extractTokenFromRequest(request);
         if (token != null) {
@@ -247,7 +179,6 @@ public class ReservationController {
     }
 }
 
-// StatusUpdateRequest DTO
 class StatusUpdateRequest {
     private ReservationStatus status;
     private String comment;

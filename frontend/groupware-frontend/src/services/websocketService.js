@@ -1,180 +1,294 @@
 // src/services/websocketService.js
 
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
+
 class WebSocketService {
-    constructor() {
-      this.socket = null;
-      this.reconnectInterval = null;
-      this.isConnected = false;
-      this.reconnectAttempts = 0;
-      this.maxReconnectAttempts = 5;
-      this.reconnectDelay = 1000;
-      this.listeners = new Map();
+  constructor() {
+    this.client = null;
+    this.connected = false;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.reconnectInterval = 5000;
+    this.subscribers = new Map();
+    
+    // 이벤트 핸들러
+    this.onConnectHandler = null;
+    this.onDisconnectHandler = null;
+    this.onNewNotificationHandler = null;
+    this.onErrorHandler = null;
+  }
+
+  // 연결
+  async connect() {
+    if (this.connected) {
+      console.log('이미 WebSocket에 연결되어 있습니다.');
+      return;
     }
-  
-    connect(userData) {
-      if (!userData || !userData.empNo) {
-        console.error('WebSocket 연결을 위한 사용자 정보가 없습니다.');
-        return Promise.reject(new Error('사용자 정보 없음'));
-      }
-  
+
+    try {
+      console.log('WebSocket 연결 시도...');
+      
+      // SockJS 소켓 생성
+      const socket = new SockJS('http://localhost:8080/ws-stomp');
+      this.client = Stomp.over(socket);
+      
+      // 디버그 로그 비활성화 (프로덕션에서)
+      this.client.debug = (str) => {
+        console.log('STOMP:', str);
+      };
+
+      // 연결 설정
+      const connectHeaders = {
+        'heart-beat': '10000,10000'
+      };
+
       return new Promise((resolve, reject) => {
-        try {
-          const wsUrl = `${process.env.REACT_APP_WS_URL || 'ws://localhost:8080'}/ws-stomp`;
-          this.socket = new WebSocket(wsUrl);
-  
-          this.socket.onopen = () => {
-            console.log('WebSocket 연결됨');
-            this.isConnected = true;
+        this.client.connect(
+          connectHeaders,
+          (frame) => {
+            console.log('WebSocket 연결 성공:', frame);
+            this.connected = true;
             this.reconnectAttempts = 0;
-            this.emit('connected');
-            resolve();
-          };
-  
-          this.socket.onmessage = (event) => {
-            try {
-              const data = JSON.parse(event.data);
-              this.handleMessage(data);
-            } catch (error) {
-              console.error('WebSocket 메시지 파싱 오류:', error);
+            
+            // 구독 설정
+            this.setupSubscriptions();
+            
+            if (this.onConnectHandler) {
+              this.onConnectHandler();
             }
-          };
-  
-          this.socket.onclose = () => {
-            console.log('WebSocket 연결 종료됨');
-            this.isConnected = false;
-            this.emit('disconnected');
-            this.attemptReconnect(userData);
-            reject(new Error('WebSocket 연결 종료'));
-          };
-  
-          this.socket.onerror = (error) => {
-            console.error('WebSocket 오류:', error);
-            this.emit('error', error);
+            
+            resolve();
+          },
+          (error) => {
+            console.error('WebSocket 연결 실패:', error);
+            this.connected = false;
+            
+            if (this.onErrorHandler) {
+              this.onErrorHandler(error);
+            }
+            
+            // 재연결 시도
+            this.scheduleReconnect();
+            
             reject(error);
-          };
-  
-        } catch (error) {
-          console.error('WebSocket 연결 실패:', error);
-          reject(error);
-        }
-      });
-    }
-  
-    handleMessage(data) {
-      console.log('WebSocket 메시지 수신:', data);
-      switch (data.type) {
-        case 'NOTIFICATION':
-          this.emit('notification', data);
-          break;
-        case 'FACILITY_RESERVATION':
-          this.emit('facilityReservation', data);
-          break;
-        case 'SYSTEM':
-          this.handleSystemMessage(data);
-          break;
-        default:
-          console.log('알 수 없는 메시지 타입:', data.type);
-      }
-    }
-  
-    handleSystemMessage(data) {
-      console.log('시스템 메시지:', data);
-      this.emit('system', data);
-    }
-    
-    async showBrowserNotification(title, body) {
-      if ('Notification' in window) {
-        let permission = Notification.permission;
-        if (permission === 'default') {
-          permission = await Notification.requestPermission();
-        }
-        if (permission === 'granted') {
-          const notification = new Notification(title, {
-            body: body,
-            icon: '/favicon.ico',
-            badge: '/favicon.ico',
-            tag: 'flokr-notification',
-            requireInteraction: true
-          });
-          notification.onclick = () => {
-            window.focus();
-            notification.close();
-          };
-          setTimeout(() => {
-            notification.close();
-          }, 5000);
-        }
-      }
-    }
-  
-    attemptReconnect(userData) {
-      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.log('최대 재연결 시도 횟수 초과');
-        return;
-      }
-      this.reconnectAttempts++;
-      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-      console.log(`${delay}ms 후 재연결 시도 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-      this.reconnectInterval = setTimeout(() => {
-        this.connect(userData);
-      }, delay);
-    }
-    
-    addMessageHandler(event, callback) {
-      if (!this.listeners.has(event)) {
-        this.listeners.set(event, []);
-      }
-      this.listeners.get(event).push(callback);
-    }
-  
-    removeMessageHandler(event, callback) {
-      if (this.listeners.has(event)) {
-        const callbacks = this.listeners.get(event);
-        const index = callbacks.indexOf(callback);
-        if (index > -1) {
-          callbacks.splice(index, 1);
-        }
-      }
-    }
-  
-    emit(event, data) {
-      if (this.listeners.has(event)) {
-        this.listeners.get(event).forEach(callback => {
-          try {
-            callback(data);
-          } catch (error) {
-            console.error(`이벤트 콜백 오류 (${event}):`, error);
           }
-        });
-      }
-    }
-  
-    send(data) {
-      if (this.isConnected && this.socket) {
-        this.socket.send(JSON.stringify(data));
-      } else {
-        console.warn('WebSocket이 연결되지 않았습니다.');
-      }
-    }
-  
-    disconnect() {
-      if (this.reconnectInterval) {
-        clearTimeout(this.reconnectInterval);
-        this.reconnectInterval = null;
-      }
-      
-      if (this.socket) {
-        this.socket.close();
-        this.socket = null;
-      }
-      
-      this.isConnected = false;
-      this.listeners.clear();
-    }
-  
-    isConnectedToServer() {
-      return this.isConnected;
+        );
+      });
+
+    } catch (error) {
+      console.error('WebSocket 연결 중 오류:', error);
+      this.scheduleReconnect();
+      throw error;
     }
   }
-  
-  export const websocketService = new WebSocketService();
+
+  // 구독 설정
+  setupSubscriptions() {
+    if (!this.client || !this.connected) return;
+
+    const userData = this.getUserData();
+    if (!userData) return;
+
+    try {
+      // 전체 알림 구독
+      this.subscribe('/topic/notifications', (message) => {
+        const notification = JSON.parse(message.body);
+        this.handleNewNotification(notification);
+      });
+
+      // 개인 알림 구독
+      this.subscribe(`/user/${userData.empId}/queue/notifications`, (message) => {
+        const notification = JSON.parse(message.body);
+        this.handleNewNotification(notification);
+      });
+
+      // 부서별 알림 구독
+      if (userData.deptNo) {
+        this.subscribe(`/topic/department/${userData.deptNo}/notifications`, (message) => {
+          const notification = JSON.parse(message.body);
+          this.handleNewNotification(notification);
+        });
+      }
+
+      // 읽음 처리 응답 구독
+      this.subscribe(`/user/${userData.empId}/queue/notification-read`, (message) => {
+        const response = JSON.parse(message.body);
+        console.log('알림 읽음 처리 응답:', response);
+      });
+
+      console.log('모든 구독 설정 완료');
+
+    } catch (error) {
+      console.error('구독 설정 중 오류:', error);
+    }
+  }
+
+  // 구독
+  subscribe(destination, callback) {
+    if (!this.client || !this.connected) {
+      console.warn('WebSocket이 연결되지 않아 구독할 수 없습니다:', destination);
+      return null;
+    }
+
+    try {
+      const subscription = this.client.subscribe(destination, callback);
+      this.subscribers.set(destination, subscription);
+      console.log('구독 완료:', destination);
+      return subscription;
+    } catch (error) {
+      console.error('구독 실패:', destination, error);
+      return null;
+    }
+  }
+
+  // 메시지 발송
+  send(destination, headers = {}, body = '') {
+    if (!this.client || !this.connected) {
+      console.warn('WebSocket이 연결되지 않아 메시지를 보낼 수 없습니다');
+      return false;
+    }
+
+    try {
+      this.client.send(destination, headers, body);
+      return true;
+    } catch (error) {
+      console.error('메시지 발송 실패:', error);
+      return false;
+    }
+  }
+
+  // 알림 읽음 처리
+  markAsRead(notificationNo) {
+    const message = JSON.stringify({ notificationNo });
+    return this.send('/app/notification/read', {}, message);
+  }
+
+  // 모든 알림 읽음 처리
+  markAllAsRead() {
+    return this.send('/app/notification/read-all', {}, '{}');
+  }
+
+  // 새 알림 처리
+  handleNewNotification(notification) {
+    console.log('새 알림 처리:', notification);
+    
+    if (this.onNewNotificationHandler) {
+      this.onNewNotificationHandler(notification);
+    }
+  }
+
+  // 연결 해제
+  disconnect() {
+    if (this.client && this.connected) {
+      try {
+        // 모든 구독 해제
+        this.subscribers.forEach((subscription, destination) => {
+          try {
+            subscription.unsubscribe();
+            console.log('구독 해제:', destination);
+          } catch (error) {
+            console.error('구독 해제 실패:', destination, error);
+          }
+        });
+        this.subscribers.clear();
+
+        // 연결 해제
+        this.client.disconnect(() => {
+          console.log('WebSocket 연결 해제 완료');
+        });
+        
+        this.connected = false;
+        
+        if (this.onDisconnectHandler) {
+          this.onDisconnectHandler();
+        }
+        
+      } catch (error) {
+        console.error('연결 해제 중 오류:', error);
+      }
+    }
+  }
+
+  // 재연결 스케줄링
+  scheduleReconnect() {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error('최대 재연결 시도 횟수 초과');
+      return;
+    }
+
+    this.reconnectAttempts++;
+    const delay = this.reconnectInterval * Math.pow(1.5, this.reconnectAttempts - 1);
+    
+    console.log(`재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts} (${delay}ms 후)`);
+    
+    setTimeout(() => {
+      if (!this.connected) {
+        this.connect().catch(error => {
+          console.error('재연결 실패:', error);
+        });
+      }
+    }, delay);
+  }
+
+  // 사용자 데이터 가져오기
+  getUserData() {
+    try {
+      // localStorage 또는 다른 저장소에서 사용자 정보 가져오기
+      const userStr = localStorage.getItem('userData');
+      if (userStr) {
+        return JSON.parse(userStr);
+      }
+
+      // DOM에서 사용자 정보 가져오기 (fallback)
+      const empId = document.querySelector('#loginUserId')?.value;
+      const deptNo = document.querySelector('#userDeptNo')?.value;
+      const empNo = document.querySelector('#loginUserEmpNo')?.value;
+
+      if (empId) {
+        return { empId, deptNo, empNo };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('사용자 데이터 조회 오류:', error);
+      return null;
+    }
+  }
+
+  // 이벤트 핸들러 설정
+  onConnect(handler) {
+    this.onConnectHandler = handler;
+  }
+
+  onDisconnect(handler) {
+    this.onDisconnectHandler = handler;
+  }
+
+  onNewNotification(handler) {
+    this.onNewNotificationHandler = handler;
+  }
+
+  onError(handler) {
+    this.onErrorHandler = handler;
+  }
+
+  // 연결 상태 확인
+  isConnected() {
+    return this.connected && this.client && this.client.connected;
+  }
+
+  // 강제 재연결
+  forceReconnect() {
+    console.log('강제 재연결 시도...');
+    this.disconnect();
+    setTimeout(() => {
+      this.connect();
+    }, 1000);
+  }
+}
+
+// 싱글톤 인스턴스 생성
+export const websocketService = new WebSocketService();
+
+export default websocketService;

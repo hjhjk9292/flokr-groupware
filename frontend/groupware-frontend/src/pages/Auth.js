@@ -58,7 +58,58 @@ const Auth = ({ onLogin }) => {
       console.log('API 응답 데이터:', data); 
 
       if (data.success && data.data) {
-        onLogin(data.data);
+        // 토큰과 사용자 데이터를 분리해서 전달
+        const responseData = data.data;
+        
+        // 토큰 추출 (여러 가능한 필드명 확인)
+        const token = responseData.token || responseData.accessToken || responseData.authToken;
+        
+        // 실제 응답 데이터 구조 확인
+        console.log('전체 응답 데이터 구조:', responseData);
+        console.log('응답 데이터의 모든 키:', Object.keys(responseData));
+        
+        // 사용자 데이터 추출 (여러 가능한 필드명 확인)
+        const userData = {
+          // empNo 관련 - 여러 가능한 필드명 확인
+          empNo: responseData.empNo || responseData.emp_no || responseData.employeeNo || responseData.userNo || responseData.userId,
+          empId: responseData.empId || responseData.emp_id || responseData.employeeId || responseData.username || responseData.userId,
+          empName: responseData.empName || responseData.emp_name || responseData.employeeName || responseData.userName || responseData.name,
+          
+          // 부서 관련
+          deptNo: responseData.deptNo || responseData.dept_no || responseData.departmentNo,
+          deptName: responseData.deptName || responseData.dept_name || responseData.departmentName || responseData.department,
+          
+          // 직급 관련
+          positionNo: responseData.positionNo || responseData.position_no,
+          positionName: responseData.positionName || responseData.position_name,
+          
+          // 권한 관련
+          role: responseData.role || responseData.authority || responseData.auth,
+          isAdmin: responseData.isAdmin || responseData.is_admin,
+          
+          // 기타 정보
+          email: responseData.email,
+          phone: responseData.phone,
+          hireDate: responseData.hireDate || responseData.hire_date
+        };
+
+        console.log('분리된 토큰:', token ? '존재' : '없음');
+        console.log('분리된 사용자 데이터:', userData);
+        console.log('empNo 값:', userData.empNo, '타입:', typeof userData.empNo);
+
+        // empNo 또는 empId 중 하나라도 있으면 진행
+        if (token && (userData.empNo || userData.empId)) {
+          // 토큰과 사용자 데이터를 분리해서 전달
+          onLogin(token, userData);
+        } else {
+          console.error('토큰 또는 사용자 식별 정보가 없습니다:', { 
+            token: token ? '존재' : '없음', 
+            empNo: userData.empNo, 
+            empId: userData.empId,
+            전체데이터: userData 
+          });
+          setError('로그인 응답에 필요한 정보가 없습니다.');
+        }
       } else {
         setError(data.message || '로그인에 실패했습니다.');
       }

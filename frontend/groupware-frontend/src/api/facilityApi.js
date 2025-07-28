@@ -1,9 +1,7 @@
-// src/api/facilityApi.js
 import { getAuthHeaders, handleAuthError, isAuthenticated, getAuthToken } from '../utils/authUtils';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// 토큰 유효성 사전 검증 함수
 const verifyTokenBeforeRequest = async () => {
   const token = getAuthToken();
   if (!token) {
@@ -27,7 +25,6 @@ const verifyTokenBeforeRequest = async () => {
       }
       return cleanToken;
     } catch (decodeError) {
-      // 토큰 디코딩에 실패해도 요청은 시도 (서버에서 최종 판단)
       return cleanToken;
     }
   } catch (error) {
@@ -43,8 +40,20 @@ const handleResponse = async (response) => {
     
     try {
       const errorData = await response.json();
+      
+      if (errorData.message && errorData.message.includes('이미 예약이 있습니다')) {
+        throw new Error('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.');
+      }
+      
+      if (errorData.message && errorData.message.includes('충돌')) {
+        throw new Error('예약 시간이 중복됩니다. 다른 시간을 선택해주세요.');
+      }
+      
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     } catch (parseError) {
+      if (parseError.message && parseError.message !== `HTTP ${response.status}: ${response.statusText}`) {
+        throw parseError;
+      }
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
   }
@@ -53,7 +62,6 @@ const handleResponse = async (response) => {
   return data;
 };
 
-// 공통 API 요청 함수
 const apiRequest = async (url, options = {}) => {
   try {
     await verifyTokenBeforeRequest();
@@ -84,17 +92,14 @@ const apiRequest = async (url, options = {}) => {
 };
 
 export const facilityApi = {
-  // 시설 목록 조회
   getFacilities: async () => {
     return await apiRequest('/facilities');
   },
   
-  // 시설 상세 조회
   getFacilityDetail: async (facilityNo) => {
     return await apiRequest(`/facilities/${facilityNo}`);
   },
   
-  // 시설 추가
   addFacility: async (facilityData) => {
     return await apiRequest('/facilities', {
       method: 'POST',
@@ -102,7 +107,6 @@ export const facilityApi = {
     });
   },
   
-  // 시설 수정
   updateFacility: async (facilityNo, facilityData) => {
     return await apiRequest(`/facilities/${facilityNo}`, {
       method: 'PUT',
@@ -110,37 +114,49 @@ export const facilityApi = {
     });
   },
   
-  // 시설 삭제
   deleteFacility: async (facilityNo) => {
     return await apiRequest(`/facilities/${facilityNo}`, {
       method: 'DELETE'
     });
   },
   
-  // 모든 예약 목록 조회 (관리자용)
   getAllReservations: async () => {
     return await apiRequest('/admin/reservations');
   },
   
-  // 승인 대기 예약 목록 조회 (관리자용)
   getPendingReservations: async () => {
     return await apiRequest('/admin/reservations/pending');
   },
   
-  // 예약 상태 업데이트 (관리자용)
   updateReservationStatus: async (reservationNo, status) => {
-    return await apiRequest(`/admin/reservations/${reservationNo}/status`, {
-      method: 'PUT',
-      body: JSON.stringify({ status: status })
-    });
+    console.log('=== facilityApi.updateReservationStatus 호출 ===');
+    console.log('예약번호:', reservationNo, '상태:', status);
+    
+    const requestBody = JSON.stringify({ status: status });
+    console.log('요청 본문:', requestBody);
+    
+    const url = `/admin/reservations/${reservationNo}/status`;
+    console.log('요청 URL:', url);
+    
+    try {
+      const result = await apiRequest(url, {
+        method: 'PUT',
+        body: requestBody
+      });
+      
+      console.log('API 응답 성공:', result);
+      return result;
+      
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+      throw error;
+    }
   },
 
-  // 예약 상세 조회
   getReservationDetail: async (reservationNo) => {
     return await apiRequest(`/reservations/${reservationNo}`);
   },
   
-  // 예약 생성 (사용자용)
   createReservation: async (reservationData) => {
     return await apiRequest(`/facilities/${reservationData.facilityNo}/reservations`, {
       method: 'POST',
@@ -148,13 +164,10 @@ export const facilityApi = {
     });
   },
   
-  // 내 예약 목록 조회 (사용자용)
   getMyReservations: async () => {
     return await apiRequest('/my-reservations');
   },
 
-
-  // 예약 수정 (사용자용)
   updateMyReservation: async (reservationNo, reservationData) => {
     return await apiRequest(`/reservations/${reservationNo}`, {
       method: 'PUT',
@@ -162,11 +175,9 @@ export const facilityApi = {
     });
   },
   
-  // 예약 취소 (사용자용)
   cancelReservation: async (reservationNo) => {
     return await apiRequest(`/reservations/${reservationNo}/cancel`, {
       method: 'PUT'
     });
   }
-
 };

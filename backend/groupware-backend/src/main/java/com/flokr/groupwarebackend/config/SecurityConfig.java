@@ -39,16 +39,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        // OPTIONS 요청은 모두 허용 (CORS Preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 인증 없이 접근 가능한 엔드포인트
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()  // WebSocket
-                        .requestMatchers("/h2-console/**").permitAll()  // 개발용
-                        // 관리자 전용 엔드포인트
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws-stomp/**").permitAll()
+                        .requestMatchers("/websocket/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // 나머지는 인증 필요
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

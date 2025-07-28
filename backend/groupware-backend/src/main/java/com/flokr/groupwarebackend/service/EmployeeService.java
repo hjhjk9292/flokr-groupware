@@ -274,4 +274,20 @@ public class EmployeeService {
         LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusDays(1).withHour(23).withMinute(59).withSecond(59);
         return employeeRepository.countByHireDateBetween(startOfMonth, endOfMonth); // Repository에 추가 필요
     }
+
+    /**
+     * 부서별 직원 목록 조회 (알림용)
+     */
+    @Transactional(readOnly = true)
+    public List<Employee> getEmployeesByDepartment(Long deptNo) {
+        return employeeRepository.findByDepartment_DeptNo(deptNo);
+    }
+
+    /**
+     * 직원 검색 (알림용)
+     */
+    @Transactional(readOnly = true)
+    public List<Employee> searchEmployees(String keyword) {
+        return employeeRepository.findByEmpNameContaining(keyword);
+    }
 }

@@ -1,4 +1,4 @@
-// frontend/groupware-frontend/src/App.js
+// src/App.js - 수정된 버전
 
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -11,47 +11,62 @@ import EmployeeRegister from './pages/admin/EmployeeRegister';
 import EmployeeList from './pages/admin/EmployeeList';
 import AdminFacilityManagement from './pages/admin/AdminFacilityManagement';
 import UserFacilityReservation from './pages/user/UserFacilityReservation';
+import UserNotificationsPage from './pages/user/UserNotificationsPage';
+import AdminNotificationManagement from './pages/admin/AdminNotificationManagement';
 
 import Header from './components/common/Header';
 import PrivateRoute from './components/common/PrivateRoute';
 import { NotificationProvider } from './context/NotificationContext';
 
 import {
+  isAuthenticated as checkAuth,
   getUserData,
-  getAuthToken,
   clearAuthData,
   setAuthData,
 } from './utils/authUtils';
 
-function App() {
+// 메인 앱 컴포넌트 (NotificationProvider 내부)
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const storedUserData = localStorage.getItem('userData');
+  const isAdmin = (user) => {
+    return user?.role === 'ADMIN' || user?.isAdmin === 'Y';
+  };
 
-    if (token && storedUserData) {
-      try {
-        setUserData(JSON.parse(storedUserData));
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('사용자 데이터 파싱 오류:', error);
-        clearAuthData();
+  useEffect(() => {
+    const initAuth = async () => {
+      if (checkAuth()) {
+        const user = getUserData();
+        if (user) {
+          setUserData(user);
+          setIsAuthenticated(true);
+        } else {
+          clearAuthData();
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
-  const handleLogin = (data) => {
-    setAuthData(data.accessToken, data);
-    setUserData(data);
+  const handleLogin = (token, userData) => {
+    console.log('App.js handleLogin 호출:', { token: token ? '존재' : '없음', userData });
+    
+    // 토큰과 사용자 데이터를 localStorage에 저장
+    setAuthData(token, userData);
+    
+    // 상태 업데이트
+    setUserData(userData);
     setIsAuthenticated(true);
     
-    // 로그인 성공 후 라우팅을 여기서 직접 처리
-    const userRole = data?.role === 'ADMIN' || data?.isAdmin === 'Y' ? 'ADMIN' : 'USER';
+    // 역할에 따른 라우팅
+    const userRole = userData?.role === 'ADMIN' || userData?.isAdmin === 'Y' ? 'ADMIN' : 'USER';
+    console.log('사용자 역할:', userRole);
+    
     if (userRole === 'ADMIN') {
       navigate('/admin', { replace: true });
     } else {
@@ -66,104 +81,140 @@ function App() {
     navigate('/login', { replace: true });
   };
 
-  const isAdmin = (user) => {
-    return user?.role === 'ADMIN' || user?.isAdmin === 'Y';
-  };
-
   if (loading) {
     return (
-      <div className="app-loading">
-        <div className="loading-spinner"></div>
-        <p>로딩 중...</p>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        로딩 중...
       </div>
     );
   }
 
   return (
     <div className="App">
-      <NotificationProvider userData={userData}>
-        {isAuthenticated && <Header userData={userData} onLogout={handleLogout} isAdmin={isAdmin(userData)} />}
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              isAuthenticated ? (
-                isAdmin(userData) ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Navigate to="/user" replace />
-                )
+      {isAuthenticated && (
+        <Header 
+          userData={userData} 
+          onLogout={handleLogout} 
+          isAdmin={isAdmin(userData)} 
+        />
+      )}
+      
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              isAdmin(userData) ? (
+                <Navigate to="/admin" replace />
               ) : (
-                <Auth onLogin={handleLogin} />
+                <Navigate to="/user" replace />
               )
-            }
-          />
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                isAdmin(userData) ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Navigate to="/user" replace />
-                )
+            ) : (
+              <Auth onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              isAdmin(userData) ? (
+                <Navigate to="/admin" replace />
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/user" replace />
               )
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
-                <AdminDashboard userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/employees/register"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
-                <EmployeeRegister userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/employees/list"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
-                <EmployeeList userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/facilities"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
-                <AdminFacilityManagement userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/user"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="USER">
-                <UserDashboard userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/user/facilities"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="USER">
-                <UserFacilityReservation userData={userData} onLogout={handleLogout} />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<div>404 Not Found</div>} />
-        </Routes>
-      </NotificationProvider>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* 관리자 라우트 */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
+              <AdminDashboard userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/employees/register"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
+              <EmployeeRegister userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/employees/list"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
+              <EmployeeList userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/facilities"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
+              <AdminFacilityManagement userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/notifications"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="ADMIN">
+              <AdminNotificationManagement userData={userData} />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 사용자 라우트 */}
+        <Route
+          path="/user"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="USER">
+              <UserDashboard userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user/facilities"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="USER">
+              <UserFacilityReservation userData={userData} onLogout={handleLogout} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user/notifications"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} userData={userData} requiredRole="USER">
+              <UserNotificationsPage userData={userData} />
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
     </div>
+  );
+}
+
+// 최상위 App 컴포넌트 - NotificationProvider로 감싸기
+function App() {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   );
 }
 

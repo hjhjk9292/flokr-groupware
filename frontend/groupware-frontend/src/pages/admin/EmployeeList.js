@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuthHeaders } from '../../utils/authUtils'; // ✅ getAuthHeaders 임포트
+import { getAuthHeaders } from '../../utils/authUtils'; // getAuthHeaders 임포트
 import './EmployeeList.css';
 
 const EmployeeList = ({ userData, onLogout }) => {
@@ -27,7 +27,7 @@ const EmployeeList = ({ userData, onLogout }) => {
   });
 
   useEffect(() => {
-    // ✅ userData가 있을 때만 데이터 로드를 시작하도록 수정
+    // userData가 있을 때만 데이터 로드를 시작하도록 수정
     if (userData) {
       loadInitialData();
     }
@@ -45,7 +45,7 @@ const EmployeeList = ({ userData, onLogout }) => {
 
   const fetchDepartments = async () => {
     try {
-      // ✅ getAuthHeaders() 사용
+      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const response = await fetch('http://localhost:8080/api/departments', { headers });
       if (response.ok) {
@@ -59,7 +59,7 @@ const EmployeeList = ({ userData, onLogout }) => {
 
   const fetchPositions = async () => {
     try {
-      // ✅ getAuthHeaders() 사용
+      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const response = await fetch('http://localhost:8080/api/positions', { headers });
       if (response.ok) {
@@ -76,7 +76,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     setError(null);
     
     try {
-      // ✅ getAuthHeaders() 사용
+      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const queryParams = new URLSearchParams();
       if (filters.keyword) {
@@ -177,7 +177,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     e.preventDefault();
     
     try {
-      // ✅ getAuthHeaders() 사용
+      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const updateData = {
         empName: editForm.empName,
@@ -226,7 +226,7 @@ const EmployeeList = ({ userData, onLogout }) => {
   const handleDelete = async (empNo, empName) => {
     if (window.confirm(`${empName} 님을 퇴사 처리하시겠습니까?`)) {
       try {
-        // ✅ getAuthHeaders() 사용
+        // getAuthHeaders() 사용
         const headers = getAuthHeaders();
         const response = await fetch(`http://localhost:8080/api/employees/${empNo}`, {
           method: 'DELETE',

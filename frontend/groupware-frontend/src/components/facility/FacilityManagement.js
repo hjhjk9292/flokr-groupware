@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Building2, Users, MapPin, Plus, Edit2, Trash2, Calendar, CheckCircle, XCircle, Eye, AlertCircle } from 'lucide-react';
 import { facilityApi } from '../../api/facilityApi';
 import { isAuthenticated, handleAuthError } from '../../utils/authUtils';
@@ -7,10 +8,14 @@ import './FacilityManagement.css';
 
 const FacilityManagement = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [facilities, setFacilities] = useState([]);
   const [reservations, setReservations] = useState([]);
-  const [activeTab, setActiveTab] = useState('facilities');
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabFromUrl = searchParams.get('tab');
+    return tabFromUrl === 'reservations' ? 'reservations' : 'facilities';
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showReservationModal, setShowReservationModal] = useState(false);
@@ -86,11 +91,32 @@ const FacilityManagement = () => {
     setActiveTab(tabName);
     
     if (tabName === 'reservations') {
+      setSearchParams({ tab: 'reservations' });
+    } else {
+      setSearchParams({});
+    }
+    
+    if (tabName === 'reservations') {
       fetchReservations();
     } else if (tabName === 'facilities') {
       fetchFacilities();
     }
   };
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    const newTab = tabFromUrl === 'reservations' ? 'reservations' : 'facilities';
+    
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+      
+      if (newTab === 'reservations') {
+        fetchReservations();
+      } else {
+        fetchFacilities();
+      }
+    }
+  }, [searchParams]);
 
   const handleAddFacility = async () => {
     if (!newFacility.facilityName || !newFacility.facilityLocation) {
@@ -182,16 +208,60 @@ const FacilityManagement = () => {
     
     try {
       setLoading(true);
-      await facilityApi.updateReservationStatus(reservationNo, action);
+      console.log('예약 처리 시작:', reservationNo, action);
       
-      const message = action === 'APPROVED' ? '승인' : '거절';
-      alert(`예약이 ${message}되었습니다.`);
+      const response = await facilityApi.updateReservationStatus(reservationNo, action);
+      console.log('API 응답:', response);
       
-      updateReservationStatusInUI(reservationNo, action);
-      setShowReservationModal(false);
+      // 서버에서 오는 응답 형태 확인 및 처리
+      let isSuccess = false;
+      let responseData = null;
+      
+      if (response) {
+        // Case 1: { success: true, data: {...}, message: "..." } 형태
+        if (response.success === true) {
+          isSuccess = true;
+          responseData = response.data || response;
+        }
+        // Case 2: { success: false, message: "..." } 형태  
+        else if (response.success === false) {
+          throw new Error(response.message || 'API 처리 실패');
+        }
+        // Case 3: 직접 데이터가 오는 경우 (success 필드 없음)
+        else if (response.reservationNo || response.status) {
+          isSuccess = true;
+          responseData = response;
+        }
+        // Case 4: error 필드가 있는 경우
+        else if (response.error) {
+          throw new Error(response.error);
+        }
+        // Case 5: 빈 응답이나 null인 경우도 성공으로 처리
+        else {
+          isSuccess = true;
+          responseData = response;
+        }
+      } else {
+        // response가 null/undefined인 경우도 성공으로 처리 (204 No Content 등)
+        isSuccess = true;
+      }
+
+      if (isSuccess) {
+        const message = action === 'APPROVED' ? '승인' : '거절';
+        alert(`예약이 ${message}되었습니다.`);
+        
+        updateReservationStatusInUI(reservationNo, action);
+        setShowReservationModal(false);
+        
+        await fetchReservations();
+        
+        console.log('예약 처리 완료:', reservationNo);
+      } else {
+        throw new Error('알 수 없는 응답 형태');
+      }
       
     } catch (error) {
-      console.error(`예약 ${action} 처리 오류:`, error);
+      console.error('예약 처리 오류:', error);
       if (handleAuthError(error)) {
         return;
       }
@@ -223,7 +293,11 @@ const FacilityManagement = () => {
       return;
     }
 
-    fetchFacilities();
+    if (activeTab === 'reservations') {
+      fetchReservations();
+    } else {
+      fetchFacilities();
+    }
   }, []);
 
   const formatDateTime = (dateTime) => {
@@ -842,44 +916,43 @@ const FacilityManagement = () => {
               </button>
             </div>
             <div className="modal-body">
-              <div className="info-section">
-                <div className="info-row">
-                  <span className="label">시설명:</span>
-                  <span className="value">{selectedReservation.facilityName}</span>
+              <div className="reservation-details">
+                <div className="detail-group">
+                  <label>시설명</label>
+                  <p>{selectedReservation.facilityName}</p>
                 </div>
-                <div className="info-row">
-                  <span className="label">부서:</span>
-                  <span className="value">{selectedReservation.deptName}</span>
+                <div className="detail-group">
+                  <label>예약자</label>
+                  <p>{selectedReservation.reserverName} ({selectedReservation.deptName})</p>
                 </div>
-                <div className="info-row">
-                  <span className="label">예약 시간:</span>
-                  <span className="value">
-                    <div className="reservation-time">
-                      <div className="start-time">
-                        {formatDateTime(selectedReservation.startTime)}
-                      </div>
-                      <div className="time-divider">~</div>
-                      <div className="end-time">
-                        {formatDateTime(selectedReservation.endTime)}
-                      </div>
-                    </div>
-                  </span>
+                <div className="detail-group">
+                  <label>예약 시간</label>
+                  <p>
+                    {formatDateTime(selectedReservation.startTime)} ~ {formatDateTime(selectedReservation.endTime)}
+                  </p>
                 </div>
-                <div className="info-row">
-                  <span className="label">사용 목적:</span>
-                  <span className="value">{selectedReservation.purpose}</span>
+                <div className="detail-group">
+                  <label>사용 목적</label>
+                  <p>{selectedReservation.purpose}</p>
                 </div>
-                <div className="info-row">
-                  <span className="label">예약 상태:</span>
-                  <span className="value">{getStatusBadge(selectedReservation)}</span>
+                <div className="detail-group">
+                  <label>예약 상태</label>
+                  <div>{getStatusBadge(selectedReservation)}</div>
                 </div>
-                <div className="info-row">
-                  <span className="label">예약 일시:</span>
-                  <span className="value">{formatDateTime(selectedReservation.createDate)}</span>
+                <div className="detail-group">
+                  <label>신청일</label>
+                  <p>{formatDateTime(selectedReservation.createDate)}</p>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
+              <button
+                onClick={() => setShowReservationModal(false)}
+                className="btn btn-secondary"
+                type="button"
+              >
+                닫기
+              </button>
               {(selectedReservation.status === 'PENDING' || selectedReservation.resStatus === 'PENDING') && (
                 <>
                   <button
@@ -889,7 +962,7 @@ const FacilityManagement = () => {
                     type="button"
                   >
                     <CheckCircle className="btn-icon" />
-                    승인
+                    {loading ? '처리 중...' : '승인'}
                   </button>
                   <button
                     onClick={() => handleReservationAction(selectedReservation.reservationNo, 'CANCELED')}
@@ -898,17 +971,10 @@ const FacilityManagement = () => {
                     type="button"
                   >
                     <XCircle className="btn-icon" />
-                    거절
+                    {loading ? '처리 중...' : '거절'}
                   </button>
                 </>
               )}
-              <button
-                onClick={() => setShowReservationModal(false)}
-                className="btn btn-secondary"
-                type="button"
-              >
-                닫기
-              </button>
             </div>
           </div>
         </div>

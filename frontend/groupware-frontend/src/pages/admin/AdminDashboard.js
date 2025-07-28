@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuthHeaders } from '../../utils/authUtils'; // ✅ getAuthHeaders 임포트
+import { getAuthHeaders } from '../../utils/authUtils'; // getAuthHeaders 임포트
 
 import './AdminDashboard.css';
 
@@ -17,7 +17,7 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  // userData가 유효할 때만 API 호출을 시도하도록 수정
+  // userData가 유효할 때만 API 호출 시도
   useEffect(() => {
     if (userData) {
       fetchDashboardData();
@@ -27,7 +27,7 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // ✅ getAuthHeaders() 함수를 사용하여 인증 헤더를 가져옵니다.
+      // getAuthHeaders() 함수를 사용하여 인증 헤더를 가져옵니다.
       const headers = getAuthHeaders();
       
       const [employeesRes, departmentsRes, noticesRes] = await Promise.all([
@@ -74,7 +74,6 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
           <h1>관리자 대시보드</h1>
           <p>조직 관리와 시스템 설정을 할 수 있습니다.</p>
         </div>
-        {/* 이하 UI 코드 생략 */}
         <div className="stats-grid">
           <div 
             className="stat-card clickable" 
@@ -229,15 +228,9 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
             <div className="feature-actions">
               <button 
                 className="feature-btn primary"
-                onClick={() => navigate('/admin/facilities/status')}
+                onClick={() => navigate('/admin/facilities')}
               >
-                시설 현황
-              </button>
-              <button 
-                className="feature-btn secondary"
-                onClick={() => navigate('/admin/facilities/reservations')}
-              >
-                예약 관리
+                시설 관리
               </button>
             </div>
           </div>

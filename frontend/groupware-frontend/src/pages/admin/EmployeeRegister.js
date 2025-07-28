@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/common/Header';
 import './EmployeeRegister.css';
 
 const EmployeeRegister = ({ userData, onLogout }) => {
@@ -207,10 +206,10 @@ const EmployeeRegister = ({ userData, onLogout }) => {
           });
           setEmpPreview({ empId: '', email: '', password: '' });
           
-          // 2초 후 목록 페이지로 이동
+          // 1초 후 목록 페이지로 이동
           setTimeout(() => {
             navigate('/admin/employees/list');
-          }, 2000);
+          }, 1000);
         } else {
           setError(data.message || '사원 등록에 실패했습니다.');
         }
@@ -231,8 +230,7 @@ const EmployeeRegister = ({ userData, onLogout }) => {
 
   return (
     <div className="employee-register-container">
-      <Header userData={userData} onLogout={onLogout} isAdmin={true} />
-      
+
       <div className="register-container">
         <h2 className="register-title">사원 등록</h2>
         
@@ -391,7 +389,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
             </p>
           </div>
           
-          {/* 관리자 여부 필드 제거, 기본값 N으로 설정 */}
           <input type="hidden" name="isAdmin" value="N" />
           
           <div className="register-btn-container">

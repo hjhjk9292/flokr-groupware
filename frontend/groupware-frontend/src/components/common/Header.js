@@ -1,15 +1,49 @@
-// frontend/groupware-frontend/src/components/common/Header.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import './Header.css';
 
 const Header = ({ userData, onLogout, isAdmin = false }) => {
   const navigate = useNavigate();
-  const { notifications, notificationList, loading, fetchUnreadNotifications, markAsRead, markAllAsRead } = useNotification();
+  const { 
+    notifications, 
+    notificationList, 
+    loading, 
+    fetchUnreadNotifications, 
+    markAsRead, 
+    markAllAsRead 
+  } = useNotification();
+  
   const [chatMessages, setChatMessages] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = (message, type = 'info') => {
+    const id = Date.now();
+    const toast = { id, message, type };
+    setToasts(prev => [...prev, toast]);
+
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  useEffect(() => {
+    window.showToast = showToast;
+    return () => {
+      delete window.showToast;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (userData) {
+      fetchUnreadNotifications();
+    }
+  }, [userData, fetchUnreadNotifications]);
 
   const handleNotificationButtonClick = async () => {
     if (!showNotifications) {
@@ -27,18 +61,18 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
     setShowNotifications(false);
 
     if (notification.refType === 'FACILITY_RESERVATION') {
-      const path = isAdmin ? '/admin/facilities' : '/user/facilities';
+      const path = isAdmin ? '/admin/facilities?tab=reservations' : '/user/facilities?tab=reservations';
       navigate(path);
-    } else {
-      // 다른 알림 타입에 따른 이동 로직 추가
     }
   };
 
   const handleMarkAllRead = async () => {
     try {
       await markAllAsRead();
+      showToast('모든 알림을 읽음 처리했습니다.', 'success');
     } catch (error) {
       console.error('모든 알림 읽음 처리 오류:', error);
+      showToast('알림 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
@@ -54,13 +88,7 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
     }
   };
 
-  const handleFacilityNavigation = () => {
-    if (isAdmin) {
-      navigate('/admin/facilities');
-    } else {
-      navigate('/user/facilities');
-    }
-  };
+  const safeNotificationList = Array.isArray(notificationList) ? notificationList : [];
 
   return (
     <>
@@ -114,22 +142,23 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
                       <div className="loading-spinner"></div>
                       <p>로딩 중...</p>
                     </div>
-                  ) : notificationList.length === 0 ? (
+                  ) : safeNotificationList.length === 0 ? (
                     <div className="no-notifications">
                       <i className="fas fa-bell" style={{fontSize: '48px', color: '#ddd'}}></i>
                       <p>새로운 알림이 없습니다</p>
                     </div>
                   ) : (
                     <div className="notification-list">
-                      {notificationList.map((notification) => (
+                      {safeNotificationList.map((notification) => (
                         <div
                           key={notification.notificationNo}
-                          className="notification-item"
+                          className={`notification-item ${!(notification.isRead || notification.readDate) ? 'unread' : 'read'}`}
                           onClick={() => handleNotificationClick(notification)}
                         >
                           <div className="notification-icon">
                             <i className={`fas ${
-                              notification.type === 'FACILITY' ? 'fa-building' : 'fa-info-circle'
+                              notification.type === 'FACILITY_APPROVED' || notification.type === 'FACILITY_REJECTED' 
+                                ? 'fa-building' : 'fa-info-circle'
                             }`}></i>
                           </div>
                           <div className="notification-body">
@@ -179,8 +208,8 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
           {isAdmin ? (
             <>
               <a href="/admin" className="header-nav-item header-active">
-                <i className="fas fa-tachometer-alt header-nav-icon"></i>
-                대시보드
+                <i className="fas fa-home header-nav-icon"></i>
+                Home
               </a>
               <a href="/admin/organization" className="header-nav-item">
                 <i className="fas fa-sitemap header-nav-icon"></i>
@@ -198,13 +227,10 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
                 <i className="fas fa-user-shield header-nav-icon"></i>
                 사용자 관리
               </a>
-              <button
-                onClick={handleFacilityNavigation}
-                className="header-nav-item header-nav-button"
-              >
+              <a href="/admin/facilities" className="header-nav-item">
                 <i className="fas fa-building header-nav-icon"></i>
                 시설 관리
-              </button>
+              </a>
               <a href="/admin/notifications" className="header-nav-item">
                 <i className="fas fa-bell header-nav-icon"></i>
                 알림 관리
@@ -214,7 +240,7 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
             <>
               <a href="/user" className="header-nav-item header-active">
                 <i className="fas fa-home header-nav-icon"></i>
-                홈
+                Home
               </a>
               <a href="/user/attendance" className="header-nav-item">
                 <i className="fas fa-clock header-nav-icon"></i>
@@ -228,21 +254,18 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
                 <i className="fas fa-bullhorn header-nav-icon"></i>
                 공지사항
               </a>
-              <a href="/user/chat" className="header-nav-item">
-                <i className="fas fa-comments header-nav-icon"></i>
-                메신저
-              </a>
               <a href="/user/schedule" className="header-nav-item">
                 <i className="fas fa-calendar header-nav-icon"></i>
                 일정 관리
               </a>
-              <button
-                onClick={handleFacilityNavigation}
-                className="header-nav-item header-nav-button"
-              >
+              <a href="/user/facilities" className="header-nav-item">
                 <i className="fas fa-building header-nav-icon"></i>
                 시설 예약
-              </button>
+              </a>
+              <a href="/user/notifications" className="header-nav-item">
+                <i className="fas fa-bell header-nav-icon"></i>
+                모든 알림
+              </a>
             </>
           )}
         </div>
@@ -254,6 +277,31 @@ const Header = ({ userData, onLogout, isAdmin = false }) => {
           onClick={() => setShowNotifications(false)}
         />
       )}
+
+      <div className="toast-container">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`toast toast-${toast.type}`}
+            onClick={() => removeToast(toast.id)}
+          >
+            <div className="toast-icon">
+              <i className={`fas ${
+                toast.type === 'success' ? 'fa-check-circle' :
+                toast.type === 'error' ? 'fa-exclamation-circle' :
+                toast.type === 'warning' ? 'fa-exclamation-triangle' :
+                'fa-info-circle'
+              }`}></i>
+            </div>
+            <div className="toast-content">
+              <span className="toast-message">{toast.message}</span>
+            </div>
+            <div className="toast-close">
+              <i className="fas fa-times"></i>
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   );
 };
