@@ -516,20 +516,20 @@ public class FacilityService {
 
     private void validateReservationRequest(ReservationRequest request) {
         if (request.getEndTime().isBefore(request.getStartTime())) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
+            throw new ReservationConflictException("종료 시간은 시작 시간보다 늦어야 합니다.");
         }
 
         if (request.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("시작 시간은 현재 시간 이후여야 합니다.");
+            throw new ReservationConflictException("시작 시간은 현재 시간 이후여야 합니다.");
         }
 
         long minutes = java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
         if (minutes < 30) {
-            throw new IllegalArgumentException("최소 30분 이상 예약해야 합니다.");
+            throw new ReservationConflictException("최소 30분 이상 예약해야 합니다.");
         }
 
         if (minutes > 480) {
-            throw new IllegalArgumentException("최대 8시간까지 예약 가능합니다.");
+            throw new ReservationConflictException("최대 8시간까지 예약 가능합니다.");
         }
     }
 

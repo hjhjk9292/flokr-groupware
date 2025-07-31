@@ -12,10 +12,6 @@ const getApiBaseUrl = () => {
 
 const API_BASE_URL = getApiBaseUrl();
 
-// 디버깅용 로그
-console.log('facilityApi - Environment:', process.env.NODE_ENV);
-console.log('facilityApi - API_BASE_URL:', API_BASE_URL);
-
 const verifyTokenBeforeRequest = async () => {
   const token = getAuthToken();
   if (!token) {
@@ -93,7 +89,6 @@ const apiRequest = async (url, options = {}) => {
   };
 
   try {
-    console.log('API 요청:', `${API_BASE_URL}${url}`);
     const response = await fetch(`${API_BASE_URL}${url}`, {
       ...options,
       headers
@@ -102,7 +97,6 @@ const apiRequest = async (url, options = {}) => {
     const result = await handleResponse(response);
     return result;
   } catch (error) {
-    console.error('API 요청 오류:', error);
     throw error;
   }
 };
@@ -145,28 +139,13 @@ export const facilityApi = {
   },
   
   updateReservationStatus: async (reservationNo, status) => {
-    console.log('=== facilityApi.updateReservationStatus 호출 ===');
-    console.log('예약번호:', reservationNo, '상태:', status);
-    
     const requestBody = JSON.stringify({ status: status });
-    console.log('요청 본문:', requestBody);
-    
     const url = `/admin/reservations/${reservationNo}/status`;
-    console.log('요청 URL:', url);
     
-    try {
-      const result = await apiRequest(url, {
-        method: 'PUT',
-        body: requestBody
-      });
-      
-      console.log('API 응답 성공:', result);
-      return result;
-      
-    } catch (error) {
-      console.error('API 요청 실패:', error);
-      throw error;
-    }
+    return await apiRequest(url, {
+      method: 'PUT',
+      body: requestBody
+    });
   },
 
   getReservationDetail: async (reservationNo) => {

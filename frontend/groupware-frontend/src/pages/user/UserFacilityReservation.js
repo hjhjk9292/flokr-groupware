@@ -5,7 +5,6 @@ import FacilityReservation from '../../components/facility/FacilityReservation';
 const UserFacilityReservation = ({ userData, onLogout }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [currentPage] = useState('/user/facilities');
 
   const handleNavigation = (path, params = {}) => {
     if (params.tab) {
@@ -16,7 +15,7 @@ const UserFacilityReservation = ({ userData, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <main>
         <FacilityReservation 
           userData={userData}
