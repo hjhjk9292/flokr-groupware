@@ -68,8 +68,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3001",
-                "https://flokr-groupware-9ggky304g-hjs-projects-1eb38cf4.vercel.app",  // 배포 URL
-                "https://*.vercel.app"                 // Vercel 서브도메인
+                "https://flokr-groupware-9ggky304g-hjs-projects-1eb38cf4.vercel.app",  // vercel 배포 URL
+                "https://*.vercel.app",                                                // Vercel 서브도메인
+                "https://classy-macaron-862915.netlify.app",                           // Netlify 배포 URL
+                "https://*.netlify.app"                                                // Netlify 서브도메인
                 ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
