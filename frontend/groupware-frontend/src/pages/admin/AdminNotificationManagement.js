@@ -14,6 +14,8 @@ const AdminNotificationManagement = ({ userData }) => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
   
   const [formData, setFormData] = useState({
     targetType: 'ALL',
@@ -64,7 +66,6 @@ const AdminNotificationManagement = ({ userData }) => {
         setDepartments(Array.isArray(result.data) ? result.data : (result.data || []));
       }
     } catch (error) {
-      console.error('부서 목록 조회 오류:', error);
       setDepartments([]);
     }
   };
@@ -72,7 +73,6 @@ const AdminNotificationManagement = ({ userData }) => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      console.log('발송 내역 조회 시작:', { currentPage, filters });
       
       const result = await notificationApi.getAdminNotificationHistory(
         currentPage - 1, 
@@ -80,62 +80,45 @@ const AdminNotificationManagement = ({ userData }) => {
         filters
       );
       
-      console.log('발송 내역 API 응답:', result);
-      
       if (result.success) {
         let responseData = result.data;
         
-        // 중첩된 data 구조 처리 - 콘솔에서 확인된 구조에 따라 수정
         if (responseData && responseData.data && typeof responseData.data === 'object') {
           responseData = responseData.data;
-          console.log('중첩 data 구조 처리됨:', responseData);
         }
         
-        console.log('처리된 응답 데이터:', responseData);
-        
         if (responseData && typeof responseData === 'object') {
-          // Spring Page 객체 처리
           if (responseData.content && Array.isArray(responseData.content)) {
-            console.log('Page 객체 감지:', responseData.content.length, '개');
             setNotifications(responseData.content);
             setTotalPages(responseData.totalPages || 0);
             setTotalElements(responseData.totalElements || 0);
           } 
-          // 직접 배열인 경우
           else if (Array.isArray(responseData)) {
-            console.log('직접 배열 감지:', responseData.length, '개');
             setNotifications(responseData);
             setTotalPages(Math.ceil(responseData.length / 10));
             setTotalElements(responseData.length);
           } 
-          // success, message, data 구조에서 data가 Page 객체인 경우
           else if (responseData.success && responseData.data && responseData.data.content) {
-            console.log('중첩된 success 구조의 Page 객체:', responseData.data.content.length, '개');
             setNotifications(responseData.data.content);
             setTotalPages(responseData.data.totalPages || 0);
             setTotalElements(responseData.data.totalElements || 0);
           }
-          // 빈 객체이거나 다른 형태
           else {
-            console.log('빈 데이터 또는 알 수 없는 형태:', responseData);
             setNotifications([]);
             setTotalPages(0);
             setTotalElements(0);
           }
         } else {
-          console.log('응답 데이터가 객체가 아님:', typeof responseData);
           setNotifications([]);
           setTotalPages(0);
           setTotalElements(0);
         }
       } else {
-        console.log('API 호출 실패:', result);
         setNotifications([]);
         setTotalPages(0);
         setTotalElements(0);
       }
     } catch (error) {
-      console.error('알림 목록 조회 오류:', error);
       setNotifications([]);
       setTotalPages(0);
       setTotalElements(0);
@@ -159,7 +142,6 @@ const AdminNotificationManagement = ({ userData }) => {
         setSearchResults(filtered);
       }
     } catch (error) {
-      console.error('직원 검색 오류:', error);
       setSearchResults([]);
     }
   };
@@ -211,7 +193,6 @@ const AdminNotificationManagement = ({ userData }) => {
         alert('알림 발송에 실패했습니다: ' + result.message);
       }
     } catch (error) {
-      console.error('알림 발송 오류:', error);
       alert('알림 발송 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -236,13 +217,8 @@ const AdminNotificationManagement = ({ userData }) => {
   };
 
   const viewNotification = (notification) => {
-    const modal = `
-제목: ${notification.title}
-유형: ${notification.type}
-내용: ${notification.content || '내용 없음'}
-발송일: ${formatDate(notification.createDate)}
-    `.trim();
-    alert(modal);
+    setSelectedNotification(notification);
+    setShowDetailModal(true);
   };
 
   const formatDate = (dateString) => {
@@ -293,6 +269,15 @@ const AdminNotificationManagement = ({ userData }) => {
       'FACILITY_REJECTED': '시설 거절'
     };
     return typeMap[type] || type;
+  };
+
+  const getPriorityDisplayName = (priority) => {
+    const priorityMap = {
+      'NORMAL': '일반',
+      'HIGH': '높음',
+      'URGENT': '긴급'
+    };
+    return priorityMap[priority] || priority;
   };
 
   return (
@@ -703,6 +688,95 @@ const AdminNotificationManagement = ({ userData }) => {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedNotification && (
+        <div className="modal-overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowDetailModal(false);
+          }
+        }}>
+          <div className="modal-content notification-detail-modal">
+            <div className="modal-header">
+              <h2>알림 상세 정보</h2>
+              <button 
+                onClick={() => setShowDetailModal(false)} 
+                className="modal-close"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="notification-detail">
+                <div className="detail-section">
+                  <div className="detail-row">
+                    <label>알림 유형</label>
+                    <span className={`notification-type-badge ${selectedNotification.type?.toLowerCase()}`}>
+                      <i className="fas fa-bell"></i>
+                      {getTypeDisplayName(selectedNotification.type)}
+                    </span>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <label>제목</label>
+                    <span className="detail-title">{selectedNotification.title}</span>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <label>내용</label>
+                    <div className="detail-content">
+                      {selectedNotification.content || '내용이 없습니다.'}
+                    </div>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <label>수신자</label>
+                    <span>{selectedNotification.empName || '전체 직원'}</span>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <label>발송일시</label>
+                    <span>{formatDate(selectedNotification.createDate)}</span>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <label>읽음 상태</label>
+                    {selectedNotification.readDate ? (
+                      <span className="status-read">
+                        <i className="fas fa-check-circle"></i>
+                        읽음 ({formatDate(selectedNotification.readDate)})
+                      </span>
+                    ) : (
+                      <span className="status-unread">
+                        <i className="fas fa-circle"></i>
+                        읽지 않음
+                      </span>
+                    )}
+                  </div>
+                  
+                  {selectedNotification.priority && (
+                    <div className="detail-row">
+                      <label>우선순위</label>
+                      <span className={`priority-badge priority-${selectedNotification.priority?.toLowerCase()}`}>
+                        {getPriorityDisplayName(selectedNotification.priority)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="btn btn-secondary"
+                type="button"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
