@@ -1,7 +1,31 @@
+# application.yml - 기존 설정 기반 프로필 분리
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: ${PORT:8080}  # Railway PORT 환경변수 대응
+
+# JWT 설정 (공통)
+jwt:
+  secret: flokr-groupware-jwt-secret-key-for-authentication-system-very-long-secret-key-must-be-at-least-256-bits
+  token-validity-in-seconds: 86400
+
+logging:
+  level:
+    com.flokr.groupware: DEBUG
+    org.hibernate.SQL: DEBUG
+
+---
+# 로컬 개발 환경 (기존 설정 유지)
+spring:
+  config:
+    activate:
+      on-profile: local
+
   jpa:
     hibernate:
-      ddl-auto: validate  # validate → update로 변경 (테이블 자동 생성/수정)
+      ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
@@ -11,18 +35,35 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
+
   datasource:
     url: jdbc:mysql://localhost:3306/flokr_groupware?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: "root123!"
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-# JWT 설정
-jwt:
-  secret: flokr-groupware-jwt-secret-key-for-authentication-system-very-long-secret-key-must-be-at-least-256-bits
-  token-validity-in-seconds: 86400
+---
+# Railway 배포 환경
+spring:
+  config:
+    activate:
+      on-profile: prod
 
-logging:
-  level:
-    com.flokr.groupware: DEBUG
-    org.hibernate.SQL: DEBUG
+  jpa:
+    hibernate:
+      ddl-auto: update  # 배포 시 테이블 자동 생성
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    properties:
+      hibernate:
+        show_sql: false  # 운영환경에서는 SQL 로그 최소화
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}

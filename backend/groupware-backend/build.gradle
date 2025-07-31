@@ -40,7 +40,8 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // Database
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j'   // 로컬 MySQL
+    runtimeOnly 'org.postgresql:postgresql'     // Railway PostgreSQL
 
     // JWT 의존성
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
