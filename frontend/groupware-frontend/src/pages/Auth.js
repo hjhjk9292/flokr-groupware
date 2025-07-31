@@ -47,7 +47,8 @@ const Auth = ({ onLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
