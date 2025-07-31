@@ -27,13 +27,16 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // getAuthHeaders() 함수를 사용하여 인증 헤더를 가져옵니다.
+      // getAuthHeaders() 함수를 사용하여 인증 헤더를 가져온다.
       const headers = getAuthHeaders();
-      
+      const API_BASE_URL = process.env.NODE_ENV === 'development' 
+      ? 'http://localhost:8080'
+      : (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080');
+    
       const [employeesRes, departmentsRes, noticesRes] = await Promise.all([
-        fetch('http://localhost:8080/api/employees/stats/total', { headers }),
-        fetch('http://localhost:8080/api/departments', { headers }),
-        fetch('http://localhost:8080/api/notices', { headers })
+        fetch(`${API_BASE_URL}/api/employees/stats/total`, { headers }),
+        fetch(`${API_BASE_URL}/api/departments`, { headers }),
+        fetch(`${API_BASE_URL}/api/notices`, { headers })
       ]);
 
       const [employeesData, departmentsData, noticesData] = await Promise.all([
@@ -42,7 +45,7 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
         noticesRes.json()
       ]);
 
-      const activeEmployeesRes = await fetch('http://localhost:8080/api/employees/stats/active', { headers });
+      const activeEmployeesRes = await fetch(`${API_BASE_URL}/api/employees/stats/active`, { headers });
       const activeEmployeesData = await activeEmployeesRes.json();
 
       setStats({

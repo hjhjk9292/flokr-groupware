@@ -47,7 +47,7 @@ const Auth = ({ onLogin }) => {
     setError('');
 
     try {
-      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+      const apiBaseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080');
       const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -47,7 +47,9 @@ const EmployeeList = ({ userData, onLogout }) => {
     try {
       // getAuthHeaders() 사용
       const headers = getAuthHeaders();
-      const response = await fetch('http://localhost:8080/api/departments', { headers });
+      const response = await fetch(process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8080/api/departments' 
+  : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setDepartments(data.data || []);
@@ -61,7 +63,9 @@ const EmployeeList = ({ userData, onLogout }) => {
     try {
       // getAuthHeaders() 사용
       const headers = getAuthHeaders();
-      const response = await fetch('http://localhost:8080/api/positions', { headers });
+      const response = await fetch(process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8080/api/positions' 
+  : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setPositions(data.data || []);
@@ -89,8 +93,8 @@ const EmployeeList = ({ userData, onLogout }) => {
         queryParams.append('status', filters.statusFilter === 'active' ? 'Y' : 'N');
       }
       
-      const url = `http://localhost:8080/api/employees${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-      console.log('Fetching employees from:', url);
+      const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080');
+      const url = `${baseUrl}/api/employees${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
       const response = await fetch(url, { headers });
       
@@ -191,15 +195,15 @@ const EmployeeList = ({ userData, onLogout }) => {
         status: selectedEmployee.status || 'Y'
       };
 
-      console.log('수정 데이터:', updateData);
-
-      const response = await fetch(`http://localhost:8080/api/employees/${selectedEmployee.empNo}`, {
+      const apiUrl = process.env.NODE_ENV === 'development' 
+      ? `http://localhost:8080/api/employees/${selectedEmployee.empNo}`
+      : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${selectedEmployee.empNo}`;
+      
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers,
         body: JSON.stringify(updateData)
       });
-
-      console.log('응답 상태:', response.status);
 
       if (response.ok) {
         const data = await response.json();
@@ -214,11 +218,9 @@ const EmployeeList = ({ userData, onLogout }) => {
         alert('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('수정 실패:', errorData);
         alert(errorData.message || `수정에 실패했습니다. (${response.status})`);
       }
     } catch (err) {
-      console.error('사원 수정 오류:', err);
       alert('수정 중 오류가 발생했습니다.');
     }
   };
@@ -228,7 +230,11 @@ const EmployeeList = ({ userData, onLogout }) => {
       try {
         // getAuthHeaders() 사용
         const headers = getAuthHeaders();
-        const response = await fetch(`http://localhost:8080/api/employees/${empNo}`, {
+        const apiUrl = process.env.NODE_ENV === 'development' 
+        ? `http://localhost:8080/api/employees/${empNo}`
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${empNo}`;
+        
+        const response = await fetch(apiUrl, {
           method: 'DELETE',
           headers
         });

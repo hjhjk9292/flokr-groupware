@@ -85,7 +85,7 @@ export const useNotifications = (userData) => {
       console.log('WebSocket 연결 시도...');
       
       // SockJS 소켓 생성 (인증 없이)
-      const socket = new SockJS('http://localhost:8080/ws-stomp');
+      const socket = new SockJS(process.env.NODE_ENV === 'development' ? 'http://localhost:8080/ws-stomp' : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/ws-stomp`);
       const client = Stomp.over(socket);
       
       // 디버그 로그 최소화

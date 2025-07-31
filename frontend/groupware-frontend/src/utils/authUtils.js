@@ -90,16 +90,13 @@ localStorage.removeItem('userData');
 };
 
 export const handleAuthError = (error) => {
-console.error('인증 오류:', error);
 
 if (error.message && error.message.includes('토큰이 만료되었거나')) {
-  console.log('토큰 만료 감지 - 사용자에게 알림');
   
   const token = getAuthToken();
   const userData = getUserData();
   
   if (!token || !userData) {
-    console.log('토큰 또는 사용자 데이터 없음 - 로그아웃 처리');
     clearAuthData();
     
     if (window.location.pathname !== '/login') {
@@ -108,7 +105,6 @@ if (error.message && error.message.includes('토큰이 만료되었거나')) {
     }
     return true;
   } else {
-    console.log('토큰과 사용자 데이터 존재 - 로그아웃 하지 않음');
     return false;
   }
 }
@@ -120,26 +116,30 @@ export const validateToken = async () => {
 const token = getAuthToken();
 
 if (!token) {
-  console.log('토큰이 없어 유효성 검사 불가');
   return false;
 }
 
 try {
-  const response = await fetch('http://localhost:8080/api/auth/validate', {
-    method: 'GET',
-    headers: getAuthHeaders()
-  });
-  
-  const isValid = response.ok;
-  console.log('토큰 유효성 검사 결과:', isValid ? '유효' : '무효');
-  
-  if (!isValid) {
-    clearAuthData();
+
+  const apiUrl = process.env.NODE_ENV === 'development' 
+      ? 'http://localhost:8080/api/auth/validate'
+      : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/auth/validate`;
+      
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+    
+    const isValid = response.ok;
+    console.log('토큰 유효성 검사 결과:', isValid ? '유효' : '무효');
+    
+    if (!isValid) {
+      clearAuthData();
+    }
+    
+    return isValid;
+  } catch (error) {
+    console.error('토큰 유효성 검사 오류:', error);
+    return false;
   }
-  
-  return isValid;
-} catch (error) {
-  console.error('토큰 유효성 검사 오류:', error);
-  return false;
-}
 };

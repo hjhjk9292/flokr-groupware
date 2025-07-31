@@ -1,6 +1,7 @@
 // src/api/notificationApi.js
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = `${apiBaseUrl}/api`;
 
 // API 요청 헬퍼 함수
 const apiRequest = async (url, options = {}) => {

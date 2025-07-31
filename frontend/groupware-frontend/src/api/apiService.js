@@ -1,7 +1,15 @@
 import axios from 'axios';
 
+// 환경에 따른 API URL 설정
+const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8080/api' 
+  : `${process.env.REACT_APP_API_BASE_URL}/api`;
+
+console.log('apiService - Environment:', process.env.NODE_ENV);
+console.log('apiService - API_BASE_URL:', API_BASE_URL);
+
 const authApi = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,  // 절대 URL 사용
 });
 
 authApi.interceptors.request.use(
@@ -27,8 +35,9 @@ authApi.interceptors.response.use(
   }
 );
 
+// 로그인은 절대 URL 사용
 export const login = async (empId, password) => {
-  const response = await axios.post('/api/auth/login', { empId, password });
+  const response = await axios.post(`${API_BASE_URL.replace('/api', '')}/api/auth/login`, { empId, password });
   return response.data;
 };
 

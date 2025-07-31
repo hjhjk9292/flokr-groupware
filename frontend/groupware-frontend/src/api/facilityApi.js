@@ -1,6 +1,20 @@
 import { getAuthHeaders, handleAuthError, isAuthenticated, getAuthToken } from '../utils/authUtils';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// 환경별 API URL 설정
+const getApiBaseUrl = () => {
+  // 개발 환경에서는 로컬 백엔드 사용
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:8080/api';
+  }
+  // 배포 환경에서는 환경변수 사용
+  return `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// 디버깅용 로그
+console.log('facilityApi - Environment:', process.env.NODE_ENV);
+console.log('facilityApi - API_BASE_URL:', API_BASE_URL);
 
 const verifyTokenBeforeRequest = async () => {
   const token = getAuthToken();
@@ -79,6 +93,7 @@ const apiRequest = async (url, options = {}) => {
   };
 
   try {
+    console.log('API 요청:', `${API_BASE_URL}${url}`);
     const response = await fetch(`${API_BASE_URL}${url}`, {
       ...options,
       headers
@@ -87,6 +102,7 @@ const apiRequest = async (url, options = {}) => {
     const result = await handleResponse(response);
     return result;
   } catch (error) {
+    console.error('API 요청 오류:', error);
     throw error;
   }
 };

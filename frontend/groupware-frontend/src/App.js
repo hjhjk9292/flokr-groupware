@@ -1,4 +1,4 @@
-// src/App.js - 수정된 버전
+// src/App.js
 
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';

@@ -240,7 +240,7 @@ export const NotificationProvider = ({ children }) => {
       isConnectingRef.current = true;
       currentUserRef.current = userData;
       
-      const socket = new SockJS('http://localhost:8080/ws-stomp');
+      const socket = new SockJS(process.env.NODE_ENV === 'development' ? 'http://localhost:8080/ws-stomp' : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/ws-stomp`);
       const client = Stomp.over(socket);
       
       client.debug = () => {};

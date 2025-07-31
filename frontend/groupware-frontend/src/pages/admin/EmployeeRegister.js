@@ -1,3 +1,5 @@
+// src/pages/admin/EmployeeRegister.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EmployeeRegister.css';
@@ -58,8 +60,12 @@ const EmployeeRegister = ({ userData, onLogout }) => {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const [deptResponse, posResponse] = await Promise.all([
-        fetch('http://localhost:8080/api/departments', { headers }),
-        fetch('http://localhost:8080/api/positions', { headers })
+        fetch(process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:8080/api/departments' 
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers }),
+      fetch(process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:8080/api/positions' 
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers })
       ]);
 
       // 부서 데이터 처리
@@ -179,7 +185,9 @@ const EmployeeRegister = ({ userData, onLogout }) => {
 
       console.log('사원 등록 데이터:', employeeData);
 
-      const registerResponse = await fetch('http://localhost:8080/api/employees', {
+      const registerResponse = await fetch(process.env.NODE_ENV === 'development' 
+      ? 'http://localhost:8080/api/employees' 
+      : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees`, {
         method: 'POST',
         headers,
         body: JSON.stringify(employeeData)

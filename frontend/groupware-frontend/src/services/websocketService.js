@@ -30,7 +30,7 @@ class WebSocketService {
       console.log('WebSocket 연결 시도...');
       
       // SockJS 소켓 생성
-      const socket = new SockJS('http://localhost:8080/ws-stomp');
+      const socket = new SockJS(process.env.NODE_ENV === 'development' ? 'http://localhost:8080/ws-stomp' : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/ws-stomp`);
       this.client = Stomp.over(socket);
       
       // 디버그 로그 비활성화 (프로덕션에서)
