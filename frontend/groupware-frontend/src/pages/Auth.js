@@ -1,5 +1,3 @@
-// frontend/groupware-frontend/src/pages/Auth.js
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
@@ -41,13 +39,21 @@ const Auth = ({ onLogin }) => {
     }
   };
 
+  const getApiBaseUrl = () => {
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:8080';
+    }
+    // 배포 환경에서는 Railway URL 사용 (환경변수가 없으면 기본값)
+    return process.env.REACT_APP_API_BASE_URL || 'https://flokr-groupware-production.up.railway.app';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const apiBaseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080');
+      const apiBaseUrl = getApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,23 +61,15 @@ const Auth = ({ onLogin }) => {
       });
 
       const data = await response.json();
-      
-      console.log('API 응답 데이터:', data); 
 
       if (data.success && data.data) {
-        // 토큰과 사용자 데이터를 분리해서 전달
         const responseData = data.data;
         
-        // 토큰 추출 (여러 가능한 필드명 확인)
+        // 토큰 추출
         const token = responseData.token || responseData.accessToken || responseData.authToken;
         
-        // 실제 응답 데이터 구조 확인
-        console.log('전체 응답 데이터 구조:', responseData);
-        console.log('응답 데이터의 모든 키:', Object.keys(responseData));
-        
-        // 사용자 데이터 추출 (여러 가능한 필드명 확인)
+        // 사용자 데이터 추출
         const userData = {
-          // empNo 관련 - 여러 가능한 필드명 확인
           empNo: responseData.empNo || responseData.emp_no || responseData.employeeNo || responseData.userNo || responseData.userId,
           empId: responseData.empId || responseData.emp_id || responseData.employeeId || responseData.username || responseData.userId,
           empName: responseData.empName || responseData.emp_name || responseData.employeeName || responseData.userName || responseData.name,
@@ -94,21 +92,9 @@ const Auth = ({ onLogin }) => {
           hireDate: responseData.hireDate || responseData.hire_date
         };
 
-        console.log('분리된 토큰:', token ? '존재' : '없음');
-        console.log('분리된 사용자 데이터:', userData);
-        console.log('empNo 값:', userData.empNo, '타입:', typeof userData.empNo);
-
-        // empNo 또는 empId 중 하나라도 있으면 진행
         if (token && (userData.empNo || userData.empId)) {
-          // 토큰과 사용자 데이터를 분리해서 전달
           onLogin(token, userData);
         } else {
-          console.error('토큰 또는 사용자 식별 정보가 없습니다:', { 
-            token: token ? '존재' : '없음', 
-            empNo: userData.empNo, 
-            empId: userData.empId,
-            전체데이터: userData 
-          });
           setError('로그인 응답에 필요한 정보가 없습니다.');
         }
       } else {
