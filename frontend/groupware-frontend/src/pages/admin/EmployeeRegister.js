@@ -93,7 +93,6 @@ const EmployeeRegister = ({ userData, onLogout }) => {
       }
 
     } catch (err) {
-      console.error('공통 데이터 로딩 오류:', err);
       setError('서버 연결에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -175,15 +174,12 @@ const EmployeeRegister = ({ userData, onLogout }) => {
       // 백엔드 EmployeeRequest DTO에 맞는 데이터 구성
       const employeeData = {
         empName: employee.empName.trim(),
-        password: 'temp123', // 임시 비밀번호 (백엔드에서 자동 생성된 것으로 덮어씀)
         hireDate: employee.hireDate + 'T00:00:00', // LocalDateTime 형식
         phone: phone,
         deptNo: parseInt(employee.deptNo),
         positionNo: parseInt(employee.positionNo),
         isAdmin: 'N'
       };
-
-      console.log('사원 등록 데이터:', employeeData);
 
       const registerResponse = await fetch(process.env.NODE_ENV === 'development' 
       ? 'http://localhost:8080/api/employees' 
@@ -193,11 +189,8 @@ const EmployeeRegister = ({ userData, onLogout }) => {
         body: JSON.stringify(employeeData)
       });
 
-      console.log('등록 응답 상태:', registerResponse.status);
-      
       if (registerResponse.ok) {
         const data = await registerResponse.json();
-        console.log('등록 응답 데이터:', data);
         
         if (data.success) {
           setSuccess('사원이 성공적으로 등록되었습니다.');
@@ -225,11 +218,9 @@ const EmployeeRegister = ({ userData, onLogout }) => {
         setError('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await registerResponse.json().catch(() => ({}));
-        console.error('등록 오류 응답:', errorData);
         setError(errorData.message || `서버 오류 (${registerResponse.status}): 사원 등록에 실패했습니다.`);
       }
     } catch (err) {
-      console.error('사원 등록 오류:', err);
       setError('네트워크 연결에 실패했습니다. 서버 상태를 확인해주세요.');
     } finally {
       setLoading(false);

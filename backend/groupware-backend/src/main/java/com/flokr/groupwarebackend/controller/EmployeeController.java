@@ -254,4 +254,22 @@ public class EmployeeController {
             return ResponseEntity.internalServerError().body(ApiResponse.error("월별 신규 입사자 수 조회 실패", "INTERNAL_SERVER_ERROR"));
         }
     }
+
+    @PostMapping("/{empNo}/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@PathVariable Long empNo) {
+        try {
+            log.info("Request to reset password for employee empNo: {}", empNo);
+            boolean success = employeeService.resetPassword(empNo);
+            if (success) {
+                return ResponseEntity.ok(ApiResponse.success("비밀번호가 초기화되었습니다.", "RESET_SUCCESS"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("직원을 찾을 수 없음", "EMPLOYEE_NOT_FOUND"));
+            }
+        } catch (Exception e) {
+            log.error("Error resetting password for employee empNo {}: {}", empNo, e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("비밀번호 초기화 실패", "INTERNAL_SERVER_ERROR"));
+        }
+    }
 }

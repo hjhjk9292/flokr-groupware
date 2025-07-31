@@ -470,7 +470,7 @@ const AdminNotificationManagement = ({ userData }) => {
 
                 <div className="form-grid">
                   <div className="form-group">
-                    <label className="form-label">연결 페이지 (선택)</label>
+                    <label className="form-label">연결 페이지(선택)</label>
                     <select
                       className="form-select"
                       value={formData.refType}

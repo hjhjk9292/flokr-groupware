@@ -250,9 +250,9 @@ const AdminDashboardPage = ({ userData, onLogout }) => {
             <div className="feature-actions">
               <button 
                 className="feature-btn primary"
-                onClick={() => navigate('/admin/notifications/settings')}
+                onClick={() => navigate('/admin/notifications')}
               >
-                알림 설정
+                알림 관리
               </button>
             </div>
           </div>

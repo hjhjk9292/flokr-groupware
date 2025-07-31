@@ -1,8 +1,6 @@
-// src/pages/admin/EmployeeList.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuthHeaders } from '../../utils/authUtils'; // getAuthHeaders 임포트
+import { getAuthHeaders } from '../../utils/authUtils';
 import './EmployeeList.css';
 
 const EmployeeList = ({ userData, onLogout }) => {
@@ -27,7 +25,6 @@ const EmployeeList = ({ userData, onLogout }) => {
   });
 
   useEffect(() => {
-    // userData가 있을 때만 데이터 로드를 시작하도록 수정
     if (userData) {
       loadInitialData();
     }
@@ -45,33 +42,31 @@ const EmployeeList = ({ userData, onLogout }) => {
 
   const fetchDepartments = async () => {
     try {
-      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const response = await fetch(process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8080/api/departments' 
-  : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers });
+        ? 'http://localhost:8080/api/departments' 
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setDepartments(data.data || []);
       }
     } catch (err) {
-      console.error('부서 목록 로딩 오류:', err);
+      setError('부서 목록을 불러오는데 실패했습니다.');
     }
   };
 
   const fetchPositions = async () => {
     try {
-      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const response = await fetch(process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8080/api/positions' 
-  : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers });
+        ? 'http://localhost:8080/api/positions' 
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setPositions(data.data || []);
       }
     } catch (err) {
-      console.error('직급 목록 로딩 오류:', err);
+      setError('직급 목록을 불러오는데 실패했습니다.');
     }
   };
 
@@ -80,7 +75,6 @@ const EmployeeList = ({ userData, onLogout }) => {
     setError(null);
     
     try {
-      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const queryParams = new URLSearchParams();
       if (filters.keyword) {
@@ -100,9 +94,7 @@ const EmployeeList = ({ userData, onLogout }) => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Employee data received:', data);
         if (data.success) {
-          console.log('첫 번째 사원 데이터 구조:', data.data[0]);
           setEmployees(data.data || []);
         } else {
           setError(data.message || '사원 목록을 불러오는데 실패했습니다.');
@@ -111,11 +103,9 @@ const EmployeeList = ({ userData, onLogout }) => {
         setError('인증이 만료되었습니다. 다시 로그인해주세요.');
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('서버 응답 오류:', errorData);
         setError(errorData.message || '서버에서 데이터를 가져오는데 실패했습니다.');
       }
     } catch (err) {
-      console.error('사원 목록 로딩 오류:', err);
       setError('서버 연결에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -181,11 +171,9 @@ const EmployeeList = ({ userData, onLogout }) => {
     e.preventDefault();
     
     try {
-      // getAuthHeaders() 사용
       const headers = getAuthHeaders();
       const updateData = {
         empName: editForm.empName,
-        password: selectedEmployee.empId + 'init',
         email: editForm.email,
         phone: editForm.phone,
         hireDate: selectedEmployee.hireDate,
@@ -196,8 +184,8 @@ const EmployeeList = ({ userData, onLogout }) => {
       };
 
       const apiUrl = process.env.NODE_ENV === 'development' 
-      ? `http://localhost:8080/api/employees/${selectedEmployee.empNo}`
-      : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${selectedEmployee.empNo}`;
+        ? `http://localhost:8080/api/employees/${selectedEmployee.empNo}`
+        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${selectedEmployee.empNo}`;
       
       const response = await fetch(apiUrl, {
         method: 'PUT',
@@ -228,11 +216,10 @@ const EmployeeList = ({ userData, onLogout }) => {
   const handleDelete = async (empNo, empName) => {
     if (window.confirm(`${empName} 님을 퇴사 처리하시겠습니까?`)) {
       try {
-        // getAuthHeaders() 사용
         const headers = getAuthHeaders();
         const apiUrl = process.env.NODE_ENV === 'development' 
-        ? `http://localhost:8080/api/employees/${empNo}`
-        : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${empNo}`;
+          ? `http://localhost:8080/api/employees/${empNo}`
+          : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${empNo}`;
         
         const response = await fetch(apiUrl, {
           method: 'DELETE',
@@ -249,13 +236,41 @@ const EmployeeList = ({ userData, onLogout }) => {
           }
         }
       } catch (err) {
-        console.error('퇴사 처리 오류:', err);
         alert('퇴사 처리 중 오류가 발생했습니다.');
       }
     }
   };
 
-  // ... (이하 UI 코드 생략)
+  const handlePasswordReset = async (empNo, empName) => {
+    if (window.confirm(`${empName} 님의 비밀번호를 초기화하시겠습니까? (사번 + "init")`)) {
+      try {
+        const headers = getAuthHeaders();
+        const apiUrl = process.env.NODE_ENV === 'development' 
+          ? `http://localhost:8080/api/employees/${empNo}/reset-password`
+          : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${empNo}/reset-password`;
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            alert('비밀번호가 초기화되었습니다. (사번 + "init")');
+          } else {
+            alert(data.message || '비밀번호 초기화에 실패했습니다.');
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(errorData.message || '비밀번호 초기화에 실패했습니다.');
+        }
+      } catch (err) {
+        alert('비밀번호 초기화 중 오류가 발생했습니다.');
+      }
+    }
+  };
+
   const getProfileDisplay = (emp) => {
     if (emp.profileImageUrl || emp.profileImgPath) {
       return (
@@ -437,6 +452,13 @@ const EmployeeList = ({ userData, onLogout }) => {
                         title="수정"
                       >
                         <i className="fas fa-edit"></i>
+                      </button>
+                      <button 
+                        className="action-btn reset" 
+                        onClick={() => handlePasswordReset(emp.empNo, emp.empName)}
+                        title="비밀번호 초기화"
+                      >
+                        <i className="fas fa-key"></i>
                       </button>
                       {emp.status === 'Y' && (
                         <button 
@@ -632,4 +654,5 @@ const EmployeeList = ({ userData, onLogout }) => {
     </div>
   );
 };
+
 export default EmployeeList;
