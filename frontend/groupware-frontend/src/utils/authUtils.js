@@ -125,7 +125,7 @@ if (!token) {
 }
 
 try {
-  const response = await fetch('http://localhost:8080/api/auth/validate', {
+  const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/auth/validate`, {
     method: 'GET',
     headers: getAuthHeaders()
   });

@@ -47,7 +47,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     try {
       // getAuthHeaders() 사용
       const headers = getAuthHeaders();
-      const response = await fetch('http://localhost:8080/api/departments', { headers });
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setDepartments(data.data || []);
@@ -61,7 +61,7 @@ const EmployeeList = ({ userData, onLogout }) => {
     try {
       // getAuthHeaders() 사용
       const headers = getAuthHeaders();
-      const response = await fetch('http://localhost:8080/api/positions', { headers });
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.success) setPositions(data.data || []);
@@ -89,7 +89,7 @@ const EmployeeList = ({ userData, onLogout }) => {
         queryParams.append('status', filters.statusFilter === 'active' ? 'Y' : 'N');
       }
       
-      const url = `http://localhost:8080/api/employees${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      const url = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       console.log('Fetching employees from:', url);
       
       const response = await fetch(url, { headers });
@@ -193,7 +193,7 @@ const EmployeeList = ({ userData, onLogout }) => {
 
       console.log('수정 데이터:', updateData);
 
-      const response = await fetch(`http://localhost:8080/api/employees/${selectedEmployee.empNo}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${selectedEmployee.empNo}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(updateData)
@@ -228,7 +228,7 @@ const EmployeeList = ({ userData, onLogout }) => {
       try {
         // getAuthHeaders() 사용
         const headers = getAuthHeaders();
-        const response = await fetch(`http://localhost:8080/api/employees/${empNo}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees/${empNo}`, {
           method: 'DELETE',
           headers
         });

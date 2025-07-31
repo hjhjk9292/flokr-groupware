@@ -58,8 +58,8 @@ const EmployeeRegister = ({ userData, onLogout }) => {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const [deptResponse, posResponse] = await Promise.all([
-        fetch('http://localhost:8080/api/departments', { headers }),
-        fetch('http://localhost:8080/api/positions', { headers })
+        fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/departments`, { headers }),
+        fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/positions`, { headers })
       ]);
 
       // 부서 데이터 처리
@@ -179,7 +179,7 @@ const EmployeeRegister = ({ userData, onLogout }) => {
 
       console.log('사원 등록 데이터:', employeeData);
 
-      const registerResponse = await fetch('http://localhost:8080/api/employees', {
+      const registerResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'}/api/employees`, {
         method: 'POST',
         headers,
         body: JSON.stringify(employeeData)
